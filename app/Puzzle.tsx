@@ -34,6 +34,7 @@ interface ProgressState {
   version?: string;
   placedShapes: Array<{ id: string; gridRow: number; gridCol: number; cells: ShapeMatrix }>;
   shapeRotations: Record<string, ShapeMatrix>;
+  elapsedTime?: number;
 }
 
 function loadProgress(): ProgressState | null {
@@ -134,6 +135,13 @@ function markTargets(grid: GridCell[][], date: Date = new Date()): GridCell[][] 
 const CELL_SIZE = 48;
 const PALETTE_CELL_SIZE = 18;
 
+// Format seconds as MM:SS
+function formatTime(seconds: number): string {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}:${secs.toString().padStart(2, "0")}`;
+}
+
 export default function Puzzle() {
   const [currentDate, setCurrentDate] = useState(() => new Date());
   const [viewingDate, setViewingDate] = useState<string | null>(null); // null = playing today
@@ -160,6 +168,22 @@ export default function Puzzle() {
   const gridRef = useRef<HTMLDivElement>(null);
   const DRAG_THRESHOLD = 5;
 
+  // Timer state
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const [finalTime, setFinalTime] = useState<number | null>(null);
+
+  // Timer effect
+  useEffect(() => {
+    if (!isPlaying || isSolved || viewingDate) return;
+    
+    const interval = setInterval(() => {
+      setElapsedTime((t) => t + 1);
+    }, 1000);
+    
+    return () => clearInterval(interval);
+  }, [isPlaying, isSolved, viewingDate]);
+
   // Load saved progress on mount
   useEffect(() => {
     const progress = loadProgress();
@@ -173,6 +197,9 @@ export default function Puzzle() {
       });
       setPlacedShapes(restored);
       setShapeRotations(progress.shapeRotations);
+      if (progress.elapsedTime !== undefined) {
+        setElapsedTime(progress.elapsedTime);
+      }
     } else if (progress && progress.dateKey !== todayKey) {
       // Old progress from different day, clear it
       clearProgress();
@@ -184,6 +211,7 @@ export default function Puzzle() {
   useEffect(() => {
     if (!hasLoadedProgress) return; // Don't save until we've loaded
     if (viewingDate) return; // Don't save when viewing history
+    if (isSolved) return; // Don't save after solved (progress is cleared)
     
     const todayKey = getDateKey(currentDate);
     const state: ProgressState = {
@@ -195,9 +223,10 @@ export default function Puzzle() {
         cells: shapeRotations[p.id],
       })),
       shapeRotations: { ...shapeRotations },
+      elapsedTime,
     };
     saveProgress(state);
-  }, [placedShapes, shapeRotations, currentDate, hasLoadedProgress, viewingDate]);
+  }, [placedShapes, shapeRotations, currentDate, hasLoadedProgress, viewingDate, elapsedTime, isSolved]);
 
   // Check if puzzle is solved (all placeable cells are covered)
   const checkSolved = useCallback(() => {
@@ -254,6 +283,7 @@ export default function Puzzle() {
     const solved = checkSolved();
     if (solved && !isSolved) {
       setIsSolved(true);
+      setFinalTime(elapsedTime);
       // Save to history and clear progress (no longer in-progress)
       const dateKey = getDateKey(currentDate);
       const state: SavedPuzzleState = {
@@ -271,7 +301,7 @@ export default function Puzzle() {
       saveHistory(newHistory);
       clearProgress();
     }
-  }, [placedShapes, shapeRotations, checkSolved, isSolved, currentDate, history, viewingDate]);
+  }, [placedShapes, shapeRotations, checkSolved, isSolved, currentDate, history, viewingDate, elapsedTime]);
 
   // View a previous solve
   const viewSolve = (dateKey: string) => {
@@ -312,6 +342,17 @@ export default function Puzzle() {
     } else {
       setIsSolved(false);
     }
+  };
+
+  // Reset today's puzzle
+  const resetToday = () => {
+    setPlacedShapes([]);
+    setShapeRotations(Object.fromEntries(SHAPES.map((s) => [s.id, s.cells])));
+    setIsSolved(false);
+    setIsPlaying(false);
+    setElapsedTime(0);
+    setFinalTime(null);
+    clearProgress();
   };
 
   // Get sorted list of solved dates
@@ -392,10 +433,22 @@ export default function Puzzle() {
         const isInvalid = isOutOfBounds || !cell || cell.isBlocked || cell.isTarget;
         
         if (isInvalid) {
-          // Show shake animation, don't rotate
           setInvalidShake(shapeId);
           setTimeout(() => setInvalidShake(null), 300);
           return;
+        }
+        
+        // Check for overlap with other placed shapes
+        for (const other of placedShapes) {
+          if (other.id === shapeId) continue;
+          const otherCells = shapeRotations[other.id];
+          for (const [or, oc] of otherCells) {
+            if (other.gridRow + or === row && other.gridCol + oc === col) {
+              setInvalidShake(shapeId);
+              setTimeout(() => setInvalidShake(null), 300);
+              return;
+            }
+          }
         }
       }
     }
@@ -566,6 +619,17 @@ export default function Puzzle() {
           {month} {dayNum} · {dayWord}
         </h1>
         
+        {/* Timer display */}
+        {!isViewingHistory && (
+          <motion.div 
+            className="font-mono text-lg text-zinc-500"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            {formatTime(isSolved && finalTime !== null ? finalTime : elapsedTime)}
+          </motion.div>
+        )}
+        
         <AnimatePresence mode="wait">
           {isViewingHistory && (
             <motion.button
@@ -585,12 +649,17 @@ export default function Puzzle() {
           {isSolved && !isViewingHistory && (
             <motion.div 
               key="solved"
-              className="text-sm text-green-600 font-medium"
+              className="flex flex-col items-center gap-1"
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
             >
-              ✓ Solved!
+              <span className="text-lg font-medium text-green-600">
+                🎉 Congratulations!
+              </span>
+              <span className="text-sm text-zinc-500">
+                Completed in {formatTime(finalTime ?? elapsedTime)}
+              </span>
             </motion.div>
           )}
         </AnimatePresence>
@@ -634,13 +703,16 @@ export default function Puzzle() {
 
       {/* Grid */}
       <motion.div
-        ref={gridRef}
-        className="relative rounded-lg border border-zinc-200 bg-zinc-50"
-        style={{ width: 7 * CELL_SIZE, height: 8 * CELL_SIZE }}
+        className="border-4 border-zinc-200 rounded-lg"
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.4, delay: 0.2 }}
       >
+        <div
+          ref={gridRef}
+          className="relative bg-zinc-50 rounded"
+          style={{ width: 7 * CELL_SIZE, height: 8 * CELL_SIZE }}
+        >
         {grid.map((row, rowIdx) =>
           row.map((cell, colIdx) => {
             const cellInfo = getCellInfo(rowIdx, colIdx);
@@ -708,7 +780,7 @@ export default function Puzzle() {
         </AnimatePresence>
 
         {/* Placed shapes (invisible, for drag handling) */}
-        {!isViewingHistory && placedShapes.map((placed) => {
+        {!isViewingHistory && isPlaying && !isSolved && placedShapes.map((placed) => {
           const cells = shapeRotations[placed.id];
           const maxRow = Math.max(...cells.map(([r]) => r)) + 1;
           const maxCol = Math.max(...cells.map(([, c]) => c)) + 1;
@@ -727,14 +799,61 @@ export default function Puzzle() {
             />
           );
         })}
+
+        {/* Blur overlay when paused or not started */}
+        <AnimatePresence>
+          {!isViewingHistory && (!isPlaying || isSolved) && (
+            <motion.div
+              className="absolute inset-0 flex items-center justify-center z-10"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              style={{ backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" }}
+            >
+              <div className="absolute inset-0 bg-white/60 rounded-lg" />
+              {!isSolved && (
+                <motion.button
+                  onClick={() => setIsPlaying(true)}
+                  className="relative z-10 px-6 py-3 rounded-full bg-zinc-800 text-white font-medium shadow-lg"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  initial={{ scale: 0.9 }}
+                  animate={{ scale: 1 }}
+                >
+                  {elapsedTime > 0 ? "Resume" : "Start"}
+                </motion.button>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+        </div>
       </motion.div>
 
-      {/* Shape palette - hidden when viewing history */}
-      {!isViewingHistory && (
+      {/* Pause button - shown when playing */}
+      <AnimatePresence>
+        {!isViewingHistory && isPlaying && !isSolved && (
+          <motion.button
+            onClick={() => setIsPlaying(false)}
+            className="text-xs px-3 py-1 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-500"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            Pause
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* Shape palette - hidden when viewing history or not playing */}
+      {!isViewingHistory && isPlaying && !isSolved && (
         <motion.div 
           className="flex flex-wrap justify-center items-center gap-2 max-w-sm"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 10 }}
           transition={{ duration: 0.4, delay: 0.3 }}
         >
           <AnimatePresence mode="popLayout">
@@ -793,16 +912,33 @@ export default function Puzzle() {
         )}
       </AnimatePresence>
 
-      <motion.p 
-        className="text-sm text-zinc-400"
+      <motion.div
+        className="flex items-center gap-4"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
       >
-        {isViewingHistory 
-          ? "Viewing previous solve" 
-          : "Tap shapes to rotate · Drag onto grid to place"}
-      </motion.p>
+        <p className="text-sm text-zinc-400">
+          {isViewingHistory 
+            ? "Viewing previous solve" 
+            : isSolved
+            ? "Play again tomorrow!"
+            : isPlaying
+            ? "Tap shapes to rotate · Drag onto grid to place"
+            : "Press Start to begin"}
+        </p>
+        
+        {!isViewingHistory && (placedShapes.length > 0 || isSolved || elapsedTime > 0) && (
+          <motion.button
+            onClick={resetToday}
+            className="text-xs px-2 py-1 rounded bg-zinc-100 hover:bg-zinc-200 text-zinc-500"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            Reset
+          </motion.button>
+        )}
+      </motion.div>
     </motion.div>
   );
 }
