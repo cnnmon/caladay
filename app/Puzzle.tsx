@@ -315,6 +315,7 @@ export default function Puzzle() {
         })),
         shapeRotations: { ...shapeRotations },
         solvedAt: new Date().toISOString(),
+        solveTime: elapsedTime,
       };
       const newHistory = { ...history, [dateKey]: state };
       setHistory(newHistory);
@@ -331,6 +332,7 @@ export default function Puzzle() {
     const date = new Date(dateKey + "T12:00:00");
     setViewingDate(dateKey);
     setGrid(markTargets(buildGrid(), date));
+    setFinalTime(state.solveTime ?? null);
     
     // Restore placed shapes
     const restored = state.placedShapes.map((s) => {
