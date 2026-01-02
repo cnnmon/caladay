@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { GridCell, ShapeMatrix, PlacedShape, SavedPuzzleState, SolveHistory } from "./types";
 import { SHAPES, rotateShape, normalizeShape } from "./shapes";
 
@@ -548,112 +549,163 @@ export default function Puzzle() {
   const isViewingHistory = viewingDate !== null;
 
   return (
-    <div className="flex flex-col items-center gap-6 p-4 select-none">
+    <motion.div 
+      className="flex flex-col items-center gap-6 p-4 select-none"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
+    >
       {/* Header */}
-      <div className="flex flex-col items-center gap-2">
+      <motion.div 
+        className="flex flex-col items-center gap-2"
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+      >
         <h1 className="text-2xl font-light tracking-wide text-zinc-700">
           {month} {dayNum} · {dayWord}
         </h1>
         
-        {isViewingHistory && (
-          <button
-            onClick={backToToday}
-            className="text-sm px-3 py-1 rounded-full bg-zinc-200 hover:bg-zinc-300 text-zinc-600 transition-colors"
-          >
-            ← Back to today
-          </button>
-        )}
+        <AnimatePresence mode="wait">
+          {isViewingHistory && (
+            <motion.button
+              key="back"
+              onClick={backToToday}
+              className="text-sm px-3 py-1 rounded-full bg-zinc-200 hover:bg-zinc-300 text-zinc-600"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              ← Back to today
+            </motion.button>
+          )}
         
-        {isSolved && !isViewingHistory && (
-          <div className="text-sm text-green-600 font-medium">
-            ✓ Solved!
-          </div>
-        )}
-      </div>
+          {isSolved && !isViewingHistory && (
+            <motion.div 
+              key="solved"
+              className="text-sm text-green-600 font-medium"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            >
+              ✓ Solved!
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
 
       {/* History picker */}
-      {solvedDates.length > 0 && (
-        <div className="flex flex-wrap justify-center gap-2 max-w-md">
-          <span className="text-xs text-zinc-400 w-full text-center mb-1">Previous solves:</span>
-          {solvedDates.slice(0, 7).map((dateKey) => {
-            const isActive = viewingDate === dateKey;
-            const isToday = dateKey === getDateKey(currentDate);
-            return (
-              <button
-                key={dateKey}
-                onClick={() => isToday ? backToToday() : viewSolve(dateKey)}
-                className={`text-xs px-2 py-1 rounded transition-colors ${
-                  isActive 
-                    ? "bg-zinc-700 text-white" 
-                    : "bg-zinc-100 hover:bg-zinc-200 text-zinc-600"
-                }`}
-              >
-                {isToday ? "Today" : dateKey.slice(5)}
-              </button>
-            );
-          })}
-        </div>
-      )}
+      <AnimatePresence>
+        {solvedDates.length > 0 && (
+          <motion.div 
+            className="flex flex-wrap justify-center gap-2 max-w-md"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+          >
+            <span className="text-xs text-zinc-400 w-full text-center mb-1">Previous solves:</span>
+            {solvedDates.slice(0, 7).map((dateKey, i) => {
+              const isActive = viewingDate === dateKey;
+              const isToday = dateKey === getDateKey(currentDate);
+              return (
+                <motion.button
+                  key={dateKey}
+                  onClick={() => isToday ? backToToday() : viewSolve(dateKey)}
+                  className={`text-xs px-2 py-1 rounded ${
+                    isActive 
+                      ? "bg-zinc-700 text-white" 
+                      : "bg-zinc-100 hover:bg-zinc-200 text-zinc-600"
+                  }`}
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.03 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  {isToday ? "Today" : dateKey.slice(5)}
+                </motion.button>
+              );
+            })}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Grid */}
-      <div
+      <motion.div
         ref={gridRef}
         className="relative rounded-lg border border-zinc-200 bg-zinc-50"
         style={{ width: 7 * CELL_SIZE, height: 8 * CELL_SIZE }}
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4, delay: 0.2 }}
       >
         {grid.map((row, rowIdx) =>
           row.map((cell, colIdx) => {
             const cellInfo = getCellInfo(rowIdx, colIdx);
             const isShaking = cellInfo && invalidShake === cellInfo.shapeId;
             return (
-              <div
+              <motion.div
                 key={`${rowIdx}-${colIdx}`}
-                className={`absolute flex items-center justify-center text-xs font-medium transition-colors
+                className={`absolute flex items-center justify-center text-xs font-medium
                   ${cell.isBlocked ? "bg-zinc-200" : cell.isTarget ? "bg-white border-2 border-zinc-400" : "bg-zinc-100 border border-zinc-200"}
                   ${cell.isTarget ? "text-zinc-800" : "text-zinc-500"}
-                  ${isShaking ? "animate-shake" : ""}
                 `}
                 style={{
                   width: CELL_SIZE,
                   height: CELL_SIZE,
                   top: rowIdx * CELL_SIZE,
                   left: colIdx * CELL_SIZE,
-                  backgroundColor: isShaking ? "#ef4444" : cellInfo?.color || undefined,
-                  color: cellInfo ? "white" : undefined,
-                  textShadow: cellInfo ? "0 1px 2px rgba(0,0,0,0.3)" : undefined,
+                }}
+                animate={{
+                  backgroundColor: isShaking ? "#ef4444" : cellInfo?.color || (cell.isBlocked ? "#e4e4e7" : cell.isTarget ? "#ffffff" : "#f4f4f5"),
+                  color: cellInfo ? "#ffffff" : (cell.isTarget ? "#27272a" : "#71717a"),
+                  x: isShaking ? [0, -4, 4, -4, 4, 0] : 0,
+                }}
+                transition={{ 
+                  backgroundColor: { duration: 0.2 },
+                  x: { duration: 0.3 }
                 }}
               >
-                {cell.label}
-              </div>
+                <span style={{ textShadow: cellInfo ? "0 1px 2px rgba(0,0,0,0.3)" : undefined }}>
+                  {cell.label}
+                </span>
+              </motion.div>
             );
           })
         )}
 
         {/* Hover preview when dragging */}
-        {hoverPreview && hoverPreview.cells.map(([r, c], i) => {
-          const row = hoverPreview.gridRow + r;
-          const col = hoverPreview.gridCol + c;
-          if (row < 0 || row >= 8 || col < 0 || col >= 7) return null;
-          return (
-            <div
-              key={`preview-${i}`}
-              className="absolute pointer-events-none rounded-sm"
-              style={{
-                width: CELL_SIZE - 2,
-                height: CELL_SIZE - 2,
-                top: row * CELL_SIZE + 1,
-                left: col * CELL_SIZE + 1,
-                backgroundColor: hoverPreview.isValid 
-                  ? hoverPreview.color 
-                  : "rgba(239, 68, 68, 0.5)",
-                opacity: 0.5,
-                border: hoverPreview.isValid 
-                  ? "2px solid rgba(255,255,255,0.8)" 
-                  : "2px solid rgba(239, 68, 68, 0.8)",
-              }}
-            />
-          );
-        })}
+        <AnimatePresence>
+          {hoverPreview && hoverPreview.cells.map(([r, c], i) => {
+            const row = hoverPreview.gridRow + r;
+            const col = hoverPreview.gridCol + c;
+            if (row < 0 || row >= 8 || col < 0 || col >= 7) return null;
+            return (
+              <motion.div
+                key={`preview-${i}`}
+                className="absolute pointer-events-none rounded-sm"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.5 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.1 }}
+                style={{
+                  width: CELL_SIZE - 2,
+                  height: CELL_SIZE - 2,
+                  top: row * CELL_SIZE + 1,
+                  left: col * CELL_SIZE + 1,
+                  backgroundColor: hoverPreview.isValid 
+                    ? hoverPreview.color 
+                    : "rgba(239, 68, 68, 0.5)",
+                  border: hoverPreview.isValid 
+                    ? "2px solid rgba(255,255,255,0.8)" 
+                    : "2px solid rgba(239, 68, 68, 0.8)",
+                }}
+              />
+            );
+          })}
+        </AnimatePresence>
 
         {/* Placed shapes (invisible, for drag handling) */}
         {!isViewingHistory && placedShapes.map((placed) => {
@@ -675,57 +727,83 @@ export default function Puzzle() {
             />
           );
         })}
-      </div>
+      </motion.div>
 
       {/* Shape palette - hidden when viewing history */}
       {!isViewingHistory && (
-        <div className="flex flex-wrap justify-center items-center gap-2 max-w-sm">
-          {availableShapes.map((shape) => {
-            const cells = shapeRotations[shape.id];
-            const isDragging = dragging?.shapeId === shape.id;
-            return (
-              <div key={shape.id} className={isDragging ? "opacity-30" : ""}>
-                {renderShape(
-                  shape.id,
-                  cells,
-                  shape.color,
-                  (e) => handleDragStart(shape.id, e, false),
-                  (e) => handleDragStart(shape.id, e, false),
-                  () => handleRotate(shape.id),
-                  undefined,
-                  PALETTE_CELL_SIZE
-                )}
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Dragging preview */}
-      {dragging && dragPos && (
-        <div
-          className="fixed pointer-events-none z-50 opacity-80"
-          style={{
-            left: dragPos.x - dragging.offsetX,
-            top: dragPos.y - dragging.offsetY,
-          }}
+        <motion.div 
+          className="flex flex-wrap justify-center items-center gap-2 max-w-sm"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.3 }}
         >
-          {renderShape(
-            dragging.shapeId,
-            shapeRotations[dragging.shapeId],
-            hoverPreview && !hoverPreview.isValid ? "#ef4444" : SHAPES.find((s) => s.id === dragging.shapeId)!.color,
-            () => {},
-            () => {}
-          )}
-        </div>
+          <AnimatePresence mode="popLayout">
+            {availableShapes.map((shape) => {
+              const cells = shapeRotations[shape.id];
+              const isDragging = dragging?.shapeId === shape.id;
+              return (
+                <motion.div 
+                  key={shape.id} 
+                  layout
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: isDragging ? 0.3 : 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                  whileHover={{ scale: 1.1 }}
+                >
+                  {renderShape(
+                    shape.id,
+                    cells,
+                    shape.color,
+                    (e) => handleDragStart(shape.id, e, false),
+                    (e) => handleDragStart(shape.id, e, false),
+                    () => handleRotate(shape.id),
+                    undefined,
+                    PALETTE_CELL_SIZE
+                  )}
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
+        </motion.div>
       )}
 
-      <p className="text-sm text-zinc-400">
+      {/* Dragging preview - only show at full size after movement threshold */}
+      <AnimatePresence>
+        {dragging && dragPos && dragging.hasMoved && (
+          <motion.div
+            className="fixed pointer-events-none z-50"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 0.8, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.15 }}
+            style={{
+              left: dragPos.x - dragging.offsetX,
+              top: dragPos.y - dragging.offsetY,
+            }}
+          >
+            {renderShape(
+              dragging.shapeId,
+              shapeRotations[dragging.shapeId],
+              hoverPreview && !hoverPreview.isValid ? "#ef4444" : SHAPES.find((s) => s.id === dragging.shapeId)!.color,
+              () => {},
+              () => {}
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <motion.p 
+        className="text-sm text-zinc-400"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5 }}
+      >
         {isViewingHistory 
           ? "Viewing previous solve" 
           : "Tap shapes to rotate · Drag onto grid to place"}
-      </p>
-    </div>
+      </motion.p>
+    </motion.div>
   );
 }
 
