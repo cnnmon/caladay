@@ -145,8 +145,9 @@ function formatTime(seconds: number): string {
 export default function Puzzle() {
   const [currentDate, setCurrentDate] = useState(() => new Date());
   const [viewingDate, setViewingDate] = useState<string | null>(null); // null = playing today
-  const [history, setHistory] = useState<SolveHistory>(() => loadHistory());
+  const [history, setHistory] = useState<SolveHistory>({});
   const [isSolved, setIsSolved] = useState(false);
+  const [hasMounted, setHasMounted] = useState(false);
   
   const [grid, setGrid] = useState(() => markTargets(buildGrid(), currentDate));
   const [placedShapes, setPlacedShapes] = useState<PlacedShape[]>([]);
@@ -172,6 +173,12 @@ export default function Puzzle() {
   const [isMobile, setIsMobile] = useState(false);
   const [isPanelOpen, setIsPanelOpen] = useState(true);
   const cellSize = MAX_CELL_SIZE;
+
+  // Load history after mount to avoid hydration mismatch
+  useEffect(() => {
+    setHistory(loadHistory());
+    setHasMounted(true);
+  }, []);
 
   // Detect mobile
   useEffect(() => {
@@ -599,6 +606,40 @@ export default function Puzzle() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
     >
+        {hasMounted && solvedDates.length > 0 && (
+          <motion.div 
+            className="absolute top-0 left-0 p-2 flex gap-2 items-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <span className="text-xs text-zinc-400 w-full text-center mb-1">Previous solves:</span>
+            {solvedDates.slice(0, 7).map((dateKey, i) => {
+              const isActive = viewingDate === dateKey;
+              const isToday = dateKey === getDateKey(currentDate);
+              return (
+                <motion.button
+                  key={dateKey}
+                  onClick={() => isToday ? backToToday() : viewSolve(dateKey)}
+                  className={`text-xs px-2 py-1 rounded ${
+                    isActive 
+                      ? "bg-zinc-700 text-white" 
+                      : "bg-zinc-100 hover:bg-zinc-200 text-zinc-600"
+                  }`}
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.03 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  {isToday ? "Today" : dateKey.slice(5)}
+                </motion.button>
+              );
+            })}
+          </motion.div>
+        )}
+
+
       {/* Header */}
       <motion.div 
         className="flex flex-col items-center gap-2"
@@ -655,42 +696,6 @@ export default function Puzzle() {
           )}
         </AnimatePresence>
       </motion.div>
-
-      {/* History picker */}
-      <AnimatePresence>
-        {solvedDates.length > 0 && (
-          <motion.div 
-            className="flex flex-wrap justify-center gap-2 max-w-md"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-          >
-            <span className="text-xs text-zinc-400 w-full text-center mb-1">Previous solves:</span>
-            {solvedDates.slice(0, 7).map((dateKey, i) => {
-              const isActive = viewingDate === dateKey;
-              const isToday = dateKey === getDateKey(currentDate);
-              return (
-                <motion.button
-                  key={dateKey}
-                  onClick={() => isToday ? backToToday() : viewSolve(dateKey)}
-                  className={`text-xs px-2 py-1 rounded ${
-                    isActive 
-                      ? "bg-zinc-700 text-white" 
-                      : "bg-zinc-100 hover:bg-zinc-200 text-zinc-600"
-                  }`}
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.03 }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  {isToday ? "Today" : dateKey.slice(5)}
-                </motion.button>
-              );
-            })}
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Grid */}
       <motion.div
@@ -793,7 +798,7 @@ export default function Puzzle() {
 
         {/* Blur overlay when paused or not started */}
         <AnimatePresence>
-          {!isViewingHistory && (!isPlaying || isSolved) && (
+          {!isSolved && !isViewingHistory && !isPlaying && (
             <motion.div
               className="absolute inset-0 flex items-center justify-center z-10"
               initial={{ opacity: 0 }}
