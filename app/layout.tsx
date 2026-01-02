@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Caesar Calendar Puzzle",
+  title: "calendar a day puzzle",
   description: "A daily puzzle where you place shapes to reveal today's date",
 };
 
