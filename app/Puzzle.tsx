@@ -361,7 +361,6 @@ export default function Puzzle() {
   const resetToday = () => {
     setPlacedShapes([]);
     setShapeRotations(Object.fromEntries(SHAPES.map((s) => [s.id, s.cells])));
-    setShapeFlipState(Object.fromEntries(SHAPES.map((s) => [s.id, false])));
     setIsSolved(false);
     setIsPlaying(false);
     setElapsedTime(0);
@@ -431,32 +430,25 @@ export default function Puzzle() {
     return { gridRow, gridCol, cells, color: shape.color, isValid };
   })();
 
-  // Track flip state for each shape (to know when to rotate)
-  const [shapeFlipState, setShapeFlipState] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries(SHAPES.map((s) => [s.id, false]))
-  );
-
-  // Tap to cycle: flip → rotate+unflip → flip → rotate+unflip ...
-  const handleTapShape = useCallback((shapeId: string) => {
+  // Rotate a shape in the palette
+  const handleRotate = useCallback((shapeId: string) => {
     const isPlaced = placedShapes.some((p) => p.id === shapeId);
     if (isPlaced) return;
     
-    const isFlipped = shapeFlipState[shapeId];
     const currentCells = shapeRotations[shapeId];
+    const newCells = normalizeShape(rotateShape(currentCells));
+    setShapeRotations((prev) => ({ ...prev, [shapeId]: newCells }));
+  }, [placedShapes, shapeRotations]);
+
+  // Flip a shape in the palette
+  const handleFlip = useCallback((shapeId: string) => {
+    const isPlaced = placedShapes.some((p) => p.id === shapeId);
+    if (isPlaced) return;
     
-    if (!isFlipped) {
-      // Not flipped → flip it
-      const newCells = normalizeShape(flipShape(currentCells));
-      setShapeRotations((prev) => ({ ...prev, [shapeId]: newCells }));
-      setShapeFlipState((prev) => ({ ...prev, [shapeId]: true }));
-    } else {
-      // Flipped → unflip and rotate 90°
-      const unflipped = normalizeShape(flipShape(currentCells));
-      const rotated = normalizeShape(rotateShape(unflipped));
-      setShapeRotations((prev) => ({ ...prev, [shapeId]: rotated }));
-      setShapeFlipState((prev) => ({ ...prev, [shapeId]: false }));
-    }
-  }, [placedShapes, shapeRotations, shapeFlipState]);
+    const currentCells = shapeRotations[shapeId];
+    const newCells = normalizeShape(flipShape(currentCells));
+    setShapeRotations((prev) => ({ ...prev, [shapeId]: newCells }));
+  }, [placedShapes, shapeRotations]);
 
   // Mouse/touch handlers
   const handleDragStart = (
@@ -849,7 +841,7 @@ export default function Puzzle() {
       {/* Shape palette - desktop inline version */}
       {!isViewingHistory && isPlaying && !isSolved && !isMobile && (
         <motion.div 
-          className="flex flex-wrap justify-center items-center gap-2 max-w-sm"
+          className="flex flex-wrap justify-center items-center gap-3 max-w-md"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 10 }}
@@ -863,11 +855,11 @@ export default function Puzzle() {
                 <motion.div 
                   key={shape.id} 
                   layout
+                  className="flex flex-col items-center gap-1"
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: isDragging ? 0.3 : 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
                   transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                  whileHover={{ scale: 1.1 }}
                 >
                   {renderShape(
                     shape.id,
@@ -875,10 +867,26 @@ export default function Puzzle() {
                     shape.color,
                     (e) => handleDragStart(shape.id, e, false),
                     (e) => handleDragStart(shape.id, e, false),
-                    () => handleTapShape(shape.id),
+                    undefined,
                     undefined,
                     PALETTE_CELL_SIZE
                   )}
+                  <div className="flex gap-1">
+                    <button
+                      onClick={() => handleRotate(shape.id)}
+                      className="w-5 h-5 flex items-center justify-center rounded bg-zinc-100 hover:bg-zinc-200 text-zinc-500 text-xs"
+                      title="Rotate"
+                    >
+                      ↻
+                    </button>
+                    <button
+                      onClick={() => handleFlip(shape.id)}
+                      className="w-5 h-5 flex items-center justify-center rounded bg-zinc-100 hover:bg-zinc-200 text-zinc-500 text-xs"
+                      title="Flip"
+                    >
+                      ⇆
+                    </button>
+                  </div>
                 </motion.div>
               );
             })}
@@ -912,7 +920,7 @@ export default function Puzzle() {
           <AnimatePresence>
             {isPanelOpen && (
               <motion.div
-                className="flex flex-wrap justify-center items-center gap-2 px-4 pb-4 pt-1"
+                className="flex flex-wrap justify-center items-center gap-3 px-4 pb-4 pt-1"
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
@@ -924,6 +932,7 @@ export default function Puzzle() {
                   return (
                     <motion.div 
                       key={shape.id}
+                      className="flex flex-col items-center gap-1"
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: isDragging ? 0.3 : 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.8 }}
@@ -935,10 +944,24 @@ export default function Puzzle() {
                         shape.color,
                         (e) => handleDragStart(shape.id, e, false),
                         (e) => handleDragStart(shape.id, e, false),
-                        () => handleTapShape(shape.id),
+                        undefined,
                         undefined,
                         PALETTE_CELL_SIZE
                       )}
+                      <div className="flex gap-1">
+                        <button
+                          onClick={() => handleRotate(shape.id)}
+                          className="w-6 h-6 flex items-center justify-center rounded bg-zinc-100 active:bg-zinc-200 text-zinc-500 text-sm"
+                        >
+                          ↻
+                        </button>
+                        <button
+                          onClick={() => handleFlip(shape.id)}
+                          className="w-6 h-6 flex items-center justify-center rounded bg-zinc-100 active:bg-zinc-200 text-zinc-500 text-sm"
+                        >
+                          ⇆
+                        </button>
+                      </div>
                     </motion.div>
                   );
                 })}
@@ -985,7 +1008,7 @@ export default function Puzzle() {
             : isSolved
             ? "Play again tomorrow!"
             : isPlaying
-            ? (isMobile ? "Tap to flip/rotate · Drag to place" : "Tap to flip/rotate · Drag onto grid")
+            ? "Drag shapes onto grid to place"
             : elapsedTime > 0
             ? "Press Resume to continue"
             : "Press Start to begin"}
