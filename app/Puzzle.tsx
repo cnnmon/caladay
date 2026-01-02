@@ -654,15 +654,15 @@ export default function Puzzle() {
         </h1>
         
         {/* Timer display */}
-        {!isViewingHistory && (
-          <motion.div 
-            className="font-mono text-lg text-zinc-500"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
-            {formatTime(isSolved && finalTime !== null ? finalTime : elapsedTime)}
-          </motion.div>
-        )}
+        <motion.div 
+          className="font-mono text-lg text-zinc-500"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          {isViewingHistory 
+            ? formatTime(history[viewingDate!]?.solveTime ?? 0)
+            : formatTime(isSolved && finalTime !== null ? finalTime : elapsedTime)}
+        </motion.div>
         
         <AnimatePresence mode="wait">
           {isViewingHistory && (
@@ -680,7 +680,7 @@ export default function Puzzle() {
             </motion.button>
           )}
         
-          {isSolved && !isViewingHistory && (
+          {(isSolved || isViewingHistory) && (
             <motion.div 
               key="solved"
               className="flex flex-col items-center gap-1"
@@ -689,10 +689,12 @@ export default function Puzzle() {
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
             >
               <span className="text-lg font-medium text-green-600">
-                🎉 Congratulations!
+                {isViewingHistory ? "✓ Solved" : "🎉 Congratulations!"}
               </span>
               <span className="text-sm text-zinc-500">
-                Completed in {formatTime(finalTime ?? elapsedTime)}
+                Completed in {isViewingHistory 
+                  ? formatTime(history[viewingDate!]?.solveTime ?? 0)
+                  : formatTime(finalTime ?? 0)}
               </span>
             </motion.div>
           )}
