@@ -132,7 +132,7 @@ function markTargets(grid: GridCell[][], date: Date = new Date()): GridCell[][] 
   );
 }
 
-const CELL_SIZE = 48;
+const MAX_CELL_SIZE = 48;
 const PALETTE_CELL_SIZE = 18;
 
 // Format seconds as MM:SS
@@ -167,6 +167,19 @@ export default function Puzzle() {
   const [hasLoadedProgress, setHasLoadedProgress] = useState(false);
   const gridRef = useRef<HTMLDivElement>(null);
   const DRAG_THRESHOLD = 5;
+
+  // Mobile panel state
+  const [isMobile, setIsMobile] = useState(false);
+  const [isPanelOpen, setIsPanelOpen] = useState(true);
+  const cellSize = MAX_CELL_SIZE;
+
+  // Detect mobile
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 640);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   // Timer state
   const [isPlaying, setIsPlaying] = useState(false);
@@ -405,10 +418,10 @@ export default function Puzzle() {
     if (!dragging || !dragging.hasMoved || !dragPos || !gridRef.current) return null;
     
     const gridRect = gridRef.current.getBoundingClientRect();
-    const x = dragPos.x - gridRect.left - dragging.offsetX + CELL_SIZE / 2;
-    const y = dragPos.y - gridRect.top - dragging.offsetY + CELL_SIZE / 2;
-    const gridCol = Math.floor(x / CELL_SIZE);
-    const gridRow = Math.floor(y / CELL_SIZE);
+    const x = dragPos.x - gridRect.left - dragging.offsetX + cellSize / 2;
+    const y = dragPos.y - gridRect.top - dragging.offsetY + cellSize / 2;
+    const gridCol = Math.floor(x / cellSize);
+    const gridRow = Math.floor(y / cellSize);
     
     const cells = shapeRotations[dragging.shapeId];
     const shape = SHAPES.find((s) => s.id === dragging.shapeId)!;
@@ -523,10 +536,10 @@ export default function Puzzle() {
       const gridRect = gridRef.current.getBoundingClientRect();
 
       // Calculate grid position
-      const x = clientX - gridRect.left - dragging.offsetX + CELL_SIZE / 2;
-      const y = clientY - gridRect.top - dragging.offsetY + CELL_SIZE / 2;
-      const gridCol = Math.floor(x / CELL_SIZE);
-      const gridRow = Math.floor(y / CELL_SIZE);
+      const x = clientX - gridRect.left - dragging.offsetX + cellSize / 2;
+      const y = clientY - gridRect.top - dragging.offsetY + cellSize / 2;
+      const gridCol = Math.floor(x / cellSize);
+      const gridRow = Math.floor(y / cellSize);
 
       const shape = SHAPES.find((s) => s.id === dragging.shapeId)!;
       if (isValidPlacement(dragging.shapeId, gridRow, gridCol)) {
@@ -562,7 +575,7 @@ export default function Puzzle() {
     onTouchStart: (e: React.TouchEvent) => void,
     onClick?: () => void,
     style?: React.CSSProperties,
-    cellSize: number = CELL_SIZE
+    size: number = cellSize
   ) => {
     const maxRow = Math.max(...cells.map(([r]) => r)) + 1;
     const maxCol = Math.max(...cells.map(([, c]) => c)) + 1;
@@ -572,8 +585,8 @@ export default function Puzzle() {
         key={shapeId}
         className="relative cursor-grab active:cursor-grabbing"
         style={{
-          width: maxCol * cellSize,
-          height: maxRow * cellSize,
+          width: maxCol * size,
+          height: maxRow * size,
           ...style,
         }}
         onMouseDown={onMouseDown}
@@ -585,10 +598,10 @@ export default function Puzzle() {
             key={i}
             className="absolute rounded-sm border border-white/30"
             style={{
-              width: cellSize - 2,
-              height: cellSize - 2,
-              top: r * cellSize + 1,
-              left: c * cellSize + 1,
+              width: size - 2,
+              height: size - 2,
+              top: r * size + 1,
+              left: c * size + 1,
               backgroundColor: color,
             }}
           />
@@ -603,7 +616,7 @@ export default function Puzzle() {
 
   return (
     <motion.div 
-      className="flex flex-col items-center gap-6 p-4 select-none"
+      className="flex flex-col items-center gap-4 p-4 select-none max-h-dvh overflow-hidden touch-none"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
@@ -711,7 +724,7 @@ export default function Puzzle() {
         <div
           ref={gridRef}
           className="relative bg-zinc-50 rounded"
-          style={{ width: 7 * CELL_SIZE, height: 8 * CELL_SIZE }}
+          style={{ width: 7 * cellSize, height: 8 * cellSize }}
         >
         {grid.map((row, rowIdx) =>
           row.map((cell, colIdx) => {
@@ -725,10 +738,10 @@ export default function Puzzle() {
                   ${cell.isTarget ? "text-zinc-800" : "text-zinc-500"}
                 `}
                 style={{
-                  width: CELL_SIZE,
-                  height: CELL_SIZE,
-                  top: rowIdx * CELL_SIZE,
-                  left: colIdx * CELL_SIZE,
+                  width: cellSize,
+                  height: cellSize,
+                  top: rowIdx * cellSize,
+                  left: colIdx * cellSize,
                 }}
                 animate={{
                   backgroundColor: isShaking ? "#ef4444" : cellInfo?.color || (cell.isBlocked ? "#e4e4e7" : cell.isTarget ? "#ffffff" : "#f4f4f5"),
@@ -763,10 +776,10 @@ export default function Puzzle() {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.1 }}
                 style={{
-                  width: CELL_SIZE - 2,
-                  height: CELL_SIZE - 2,
-                  top: row * CELL_SIZE + 1,
-                  left: col * CELL_SIZE + 1,
+                  width: cellSize - 2,
+                  height: cellSize - 2,
+                  top: row * cellSize + 1,
+                  left: col * cellSize + 1,
                   backgroundColor: hoverPreview.isValid 
                     ? hoverPreview.color 
                     : "rgba(239, 68, 68, 0.5)",
@@ -789,10 +802,10 @@ export default function Puzzle() {
               key={placed.id}
               className="absolute cursor-grab"
               style={{
-                width: maxCol * CELL_SIZE,
-                height: maxRow * CELL_SIZE,
-                top: placed.gridRow * CELL_SIZE,
-                left: placed.gridCol * CELL_SIZE,
+                width: maxCol * cellSize,
+                height: maxRow * cellSize,
+                top: placed.gridRow * cellSize,
+                left: placed.gridCol * cellSize,
               }}
               onMouseDown={(e) => handleDragStart(placed.id, e, true)}
               onTouchStart={(e) => handleDragStart(placed.id, e, true)}
@@ -847,8 +860,8 @@ export default function Puzzle() {
         )}
       </AnimatePresence>
 
-      {/* Shape palette - hidden when viewing history or not playing */}
-      {!isViewingHistory && isPlaying && !isSolved && (
+      {/* Shape palette - desktop inline version */}
+      {!isViewingHistory && isPlaying && !isSolved && !isMobile && (
         <motion.div 
           className="flex flex-wrap justify-center items-center gap-2 max-w-sm"
           initial={{ opacity: 0, y: 10 }}
@@ -887,6 +900,68 @@ export default function Puzzle() {
         </motion.div>
       )}
 
+      {/* Mobile bottom panel for shapes */}
+      {!isViewingHistory && isPlaying && !isSolved && isMobile && (
+        <motion.div
+          className="fixed bottom-0 left-0 right-0 bg-white border-t border-zinc-200 shadow-lg z-40"
+          initial={{ y: 100 }}
+          animate={{ y: 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        >
+          {/* Panel toggle */}
+          <button
+            onClick={() => setIsPanelOpen(!isPanelOpen)}
+            className="w-full py-2 flex items-center justify-center gap-2 text-zinc-500 text-sm"
+          >
+            <motion.span
+              animate={{ rotate: isPanelOpen ? 180 : 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              ▲
+            </motion.span>
+            {isPanelOpen ? "Hide shapes" : `Show shapes (${availableShapes.length})`}
+          </button>
+          
+          {/* Shapes container */}
+          <AnimatePresence>
+            {isPanelOpen && (
+              <motion.div
+                className="flex flex-wrap justify-center items-center gap-2 px-4 pb-4 pt-1"
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                {availableShapes.map((shape) => {
+                  const cells = shapeRotations[shape.id];
+                  const isDragging = dragging?.shapeId === shape.id;
+                  return (
+                    <motion.div 
+                      key={shape.id}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: isDragging ? 0.3 : 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                    >
+                      {renderShape(
+                        shape.id,
+                        cells,
+                        shape.color,
+                        (e) => handleDragStart(shape.id, e, false),
+                        (e) => handleDragStart(shape.id, e, false),
+                        () => handleRotate(shape.id),
+                        undefined,
+                        PALETTE_CELL_SIZE
+                      )}
+                    </motion.div>
+                  );
+                })}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+      )}
+
       {/* Dragging preview - only show at full size after movement threshold */}
       <AnimatePresence>
         {dragging && dragPos && dragging.hasMoved && (
@@ -913,18 +988,18 @@ export default function Puzzle() {
       </AnimatePresence>
 
       <motion.div
-        className="flex items-center gap-4"
+        className={`flex items-center gap-4 ${isMobile && isPlaying && !isSolved ? "mb-24" : ""}`}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
       >
-        <p className="text-sm text-zinc-400">
+        <p className="text-sm text-zinc-400 text-center">
           {isViewingHistory 
             ? "Viewing previous solve" 
             : isSolved
             ? "Play again tomorrow!"
             : isPlaying
-            ? "Tap shapes to rotate · Drag onto grid to place"
+            ? (isMobile ? "Drag shapes from below" : "Tap shapes to rotate · Drag onto grid")
             : elapsedTime > 0
             ? "Press Resume to continue"
             : "Press Start to begin"}
