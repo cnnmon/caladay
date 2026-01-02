@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { GridCell, ShapeMatrix, PlacedShape, SavedPuzzleState, SolveHistory } from "./types";
-import { SHAPES, rotateShape, normalizeShape } from "./shapes";
+import { SHAPES, rotateShape, flipShape, normalizeShape } from "./shapes";
 
 const STORAGE_KEY = "caesar-puzzle-history";
 const PROGRESS_KEY = "caesar-puzzle-progress";
@@ -361,6 +361,7 @@ export default function Puzzle() {
   const resetToday = () => {
     setPlacedShapes([]);
     setShapeRotations(Object.fromEntries(SHAPES.map((s) => [s.id, s.cells])));
+    setShapeFlipState(Object.fromEntries(SHAPES.map((s) => [s.id, false])));
     setIsSolved(false);
     setIsPlaying(false);
     setElapsedTime(0);
@@ -430,44 +431,32 @@ export default function Puzzle() {
     return { gridRow, gridCol, cells, color: shape.color, isValid };
   })();
 
-  // Rotate a shape (checks validity for placed shapes)
-  const handleRotate = useCallback((shapeId: string) => {
-    const placed = placedShapes.find((p) => p.id === shapeId);
+  // Track flip state for each shape (to know when to rotate)
+  const [shapeFlipState, setShapeFlipState] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(SHAPES.map((s) => [s.id, false]))
+  );
+
+  // Tap to cycle: flip → rotate+unflip → flip → rotate+unflip ...
+  const handleTapShape = useCallback((shapeId: string) => {
+    const isPlaced = placedShapes.some((p) => p.id === shapeId);
+    if (isPlaced) return;
+    
+    const isFlipped = shapeFlipState[shapeId];
     const currentCells = shapeRotations[shapeId];
-    const newCells = normalizeShape(rotateShape(currentCells));
     
-    // If shape is placed, validate the new rotation fits
-    if (placed) {
-      for (const [r, c] of newCells) {
-        const row = placed.gridRow + r;
-        const col = placed.gridCol + c;
-        const isOutOfBounds = row < 0 || row >= 8 || col < 0 || col >= 7;
-        const cell = grid[row]?.[col];
-        const isInvalid = isOutOfBounds || !cell || cell.isBlocked || cell.isTarget;
-        
-        if (isInvalid) {
-          setInvalidShake(shapeId);
-          setTimeout(() => setInvalidShake(null), 300);
-          return;
-        }
-        
-        // Check for overlap with other placed shapes
-        for (const other of placedShapes) {
-          if (other.id === shapeId) continue;
-          const otherCells = shapeRotations[other.id];
-          for (const [or, oc] of otherCells) {
-            if (other.gridRow + or === row && other.gridCol + oc === col) {
-              setInvalidShake(shapeId);
-              setTimeout(() => setInvalidShake(null), 300);
-              return;
-            }
-          }
-        }
-      }
+    if (!isFlipped) {
+      // Not flipped → flip it
+      const newCells = normalizeShape(flipShape(currentCells));
+      setShapeRotations((prev) => ({ ...prev, [shapeId]: newCells }));
+      setShapeFlipState((prev) => ({ ...prev, [shapeId]: true }));
+    } else {
+      // Flipped → unflip and rotate 90°
+      const unflipped = normalizeShape(flipShape(currentCells));
+      const rotated = normalizeShape(rotateShape(unflipped));
+      setShapeRotations((prev) => ({ ...prev, [shapeId]: rotated }));
+      setShapeFlipState((prev) => ({ ...prev, [shapeId]: false }));
     }
-    
-    setShapeRotations((prev) => ({ ...prev, [shapeId]: newCells }));
-  }, [placedShapes, grid, shapeRotations]);
+  }, [placedShapes, shapeRotations, shapeFlipState]);
 
   // Mouse/touch handlers
   const handleDragStart = (
@@ -521,11 +510,8 @@ export default function Puzzle() {
         return;
       }
 
-      // If no movement, treat as tap to rotate
+      // If no movement, just cancel the drag
       if (!dragging.hasMoved) {
-        if (dragging.isFromGrid) {
-          handleRotate(dragging.shapeId);
-        }
         setDragging(null);
         setDragPos(null);
         return;
@@ -564,7 +550,7 @@ export default function Puzzle() {
       window.removeEventListener("touchmove", handleMove);
       window.removeEventListener("touchend", handleEnd);
     };
-  }, [dragging, isValidPlacement, shapeRotations, handleRotate]);
+  }, [dragging, isValidPlacement, shapeRotations]);
 
   // Render shape as positioned div
   const renderShape = (
@@ -889,7 +875,7 @@ export default function Puzzle() {
                     shape.color,
                     (e) => handleDragStart(shape.id, e, false),
                     (e) => handleDragStart(shape.id, e, false),
-                    () => handleRotate(shape.id),
+                    () => handleTapShape(shape.id),
                     undefined,
                     PALETTE_CELL_SIZE
                   )}
@@ -949,7 +935,7 @@ export default function Puzzle() {
                         shape.color,
                         (e) => handleDragStart(shape.id, e, false),
                         (e) => handleDragStart(shape.id, e, false),
-                        () => handleRotate(shape.id),
+                        () => handleTapShape(shape.id),
                         undefined,
                         PALETTE_CELL_SIZE
                       )}
@@ -999,7 +985,7 @@ export default function Puzzle() {
             : isSolved
             ? "Play again tomorrow!"
             : isPlaying
-            ? (isMobile ? "Drag shapes from below" : "Tap shapes to rotate · Drag onto grid")
+            ? (isMobile ? "Tap to flip/rotate · Drag to place" : "Tap to flip/rotate · Drag onto grid")
             : elapsedTime > 0
             ? "Press Resume to continue"
             : "Press Start to begin"}

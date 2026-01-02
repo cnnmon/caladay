@@ -5,6 +5,11 @@ export function rotateShape(cells: ShapeMatrix): ShapeMatrix {
   return cells.map(([r, c]) => [-c, r] as [number, number]);
 }
 
+// Flip shape horizontally (mirror along vertical axis)
+export function flipShape(cells: ShapeMatrix): ShapeMatrix {
+  return cells.map(([r, c]) => [r, -c] as [number, number]);
+}
+
 // Normalize shape so minimum row/col is 0
 export function normalizeShape(cells: ShapeMatrix): ShapeMatrix {
   const minRow = Math.min(...cells.map(([r]) => r));
