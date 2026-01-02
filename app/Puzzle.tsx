@@ -925,6 +925,8 @@ export default function Puzzle() {
             ? "Play again tomorrow!"
             : isPlaying
             ? "Tap shapes to rotate · Drag onto grid to place"
+            : elapsedTime > 0
+            ? "Press Resume to continue"
             : "Press Start to begin"}
         </p>
         
