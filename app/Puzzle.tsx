@@ -1013,7 +1013,7 @@ export default function Puzzle() {
             : isSolved
             ? "Play again tomorrow!"
             : isPlaying
-            ? "Drag shapes onto grid to place"
+            ? "Drag all the shapes onto grid without touching the current day"
             : elapsedTime > 0
             ? "Press Resume to continue"
             : "Press Start to begin"}
