@@ -131,6 +131,7 @@ function markTargets(grid: GridCell[][], date: Date = new Date()): GridCell[][] 
 }
 
 const CELL_SIZE = 48;
+const PALETTE_CELL_SIZE = 18;
 
 export default function Puzzle() {
   const [currentDate, setCurrentDate] = useState(() => new Date());
@@ -506,7 +507,8 @@ export default function Puzzle() {
     onMouseDown: (e: React.MouseEvent) => void,
     onTouchStart: (e: React.TouchEvent) => void,
     onClick?: () => void,
-    style?: React.CSSProperties
+    style?: React.CSSProperties,
+    cellSize: number = CELL_SIZE
   ) => {
     const maxRow = Math.max(...cells.map(([r]) => r)) + 1;
     const maxCol = Math.max(...cells.map(([, c]) => c)) + 1;
@@ -516,8 +518,8 @@ export default function Puzzle() {
         key={shapeId}
         className="relative cursor-grab active:cursor-grabbing"
         style={{
-          width: maxCol * CELL_SIZE,
-          height: maxRow * CELL_SIZE,
+          width: maxCol * cellSize,
+          height: maxRow * cellSize,
           ...style,
         }}
         onMouseDown={onMouseDown}
@@ -529,10 +531,10 @@ export default function Puzzle() {
             key={i}
             className="absolute rounded-sm border border-white/30"
             style={{
-              width: CELL_SIZE - 2,
-              height: CELL_SIZE - 2,
-              top: r * CELL_SIZE + 1,
-              left: c * CELL_SIZE + 1,
+              width: cellSize - 2,
+              height: cellSize - 2,
+              top: r * cellSize + 1,
+              left: c * cellSize + 1,
               backgroundColor: color,
             }}
           />
@@ -677,7 +679,7 @@ export default function Puzzle() {
 
       {/* Shape palette - hidden when viewing history */}
       {!isViewingHistory && (
-        <div className="flex flex-wrap justify-center gap-4 max-w-2xl">
+        <div className="flex flex-wrap justify-center items-center gap-2 max-w-sm">
           {availableShapes.map((shape) => {
             const cells = shapeRotations[shape.id];
             const isDragging = dragging?.shapeId === shape.id;
@@ -689,7 +691,9 @@ export default function Puzzle() {
                   shape.color,
                   (e) => handleDragStart(shape.id, e, false),
                   (e) => handleDragStart(shape.id, e, false),
-                  () => handleRotate(shape.id)
+                  () => handleRotate(shape.id),
+                  undefined,
+                  PALETTE_CELL_SIZE
                 )}
               </div>
             );
