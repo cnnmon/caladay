@@ -169,24 +169,29 @@ export default function Puzzle() {
   const gridRef = useRef<HTMLDivElement>(null);
   const DRAG_THRESHOLD = 5;
 
-  // Mobile panel state
-  const [isMobile, setIsMobile] = useState(false);
-  const [isPanelOpen, setIsPanelOpen] = useState(true);
   const cellSize = MAX_CELL_SIZE;
 
   // Load history after mount to avoid hydration mismatch
   useEffect(() => {
-    setHistory(loadHistory());
+    const loadedHistory = loadHistory();
+    setHistory(loadedHistory);
+    
+    // Check if today was already solved and restore that state
+    const todayKey = getDateKey(currentDate);
+    const todayState = loadedHistory[todayKey];
+    if (todayState) {
+      const restored = todayState.placedShapes.map((s) => {
+        const shape = SHAPES.find((sh) => sh.id === s.id)!;
+        return { ...shape, gridRow: s.gridRow, gridCol: s.gridCol, cells: s.cells };
+      });
+      setPlacedShapes(restored);
+      setShapeRotations(todayState.shapeRotations);
+      setIsSolved(true);
+      setFinalTime(todayState.solveTime ?? null);
+    }
+    
     setHasMounted(true);
-  }, []);
-
-  // Detect mobile
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 640);
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
+  }, [currentDate]);
 
   // Timer state
   const [isPlaying, setIsPlaying] = useState(false);
@@ -204,8 +209,14 @@ export default function Puzzle() {
     return () => clearInterval(interval);
   }, [isPlaying, isSolved, viewingDate]);
 
-  // Load saved progress on mount
+  // Load saved progress on mount (only if not already solved)
   useEffect(() => {
+    // Skip if today was already solved (already restored from history)
+    if (isSolved) {
+      setHasLoadedProgress(true);
+      return;
+    }
+    
     const progress = loadProgress();
     const todayKey = getDateKey();
     
@@ -225,7 +236,7 @@ export default function Puzzle() {
       clearProgress();
     }
     setHasLoadedProgress(true);
-  }, []);
+  }, [isSolved]);
 
   // Save progress whenever state changes (debounced to avoid excessive writes)
   useEffect(() => {
@@ -542,7 +553,7 @@ export default function Puzzle() {
 
     window.addEventListener("mousemove", handleMove);
     window.addEventListener("mouseup", handleEnd);
-    window.addEventListener("touchmove", handleMove);
+    window.addEventListener("touchmove", handleMove, { passive: false });
     window.addEventListener("touchend", handleEnd);
 
     return () => {
@@ -574,6 +585,7 @@ export default function Puzzle() {
         style={{
           width: maxCol * size,
           height: maxRow * size,
+          touchAction: "none",
           ...style,
         }}
         onMouseDown={onMouseDown}
@@ -608,38 +620,38 @@ export default function Puzzle() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
     >
-        {hasMounted && solvedDates.length > 0 && (
-          <motion.div 
-            className="absolute top-0 left-0 p-2 flex gap-2 items-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <span className="text-xs text-zinc-400 w-full text-center mb-1">Previous solves:</span>
-            {solvedDates.slice(0, 7).map((dateKey, i) => {
-              const isActive = viewingDate === dateKey;
-              const isToday = dateKey === getDateKey(currentDate);
-              return (
-                <motion.button
-                  key={dateKey}
-                  onClick={() => isToday ? backToToday() : viewSolve(dateKey)}
-                  className={`text-xs px-2 py-1 rounded ${
-                    isActive 
-                      ? "bg-zinc-700 text-white" 
-                      : "bg-zinc-100 hover:bg-zinc-200 text-zinc-600"
-                  }`}
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.03 }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  {isToday ? "Today" : dateKey.slice(5)}
-                </motion.button>
-              );
-            })}
-          </motion.div>
-        )}
+      {hasMounted && solvedDates.length > 0 && (
+        <motion.div 
+          className="absolute top-0 left-0 p-2 flex flex-wrap gap-2 items-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <span className="text-xs text-zinc-400">Previous solves:</span>
+          {solvedDates.slice(0, 7).map((dateKey, i) => {
+            const isActive = viewingDate === dateKey;
+            const isToday = dateKey === getDateKey(currentDate);
+            return (
+              <motion.button
+                key={dateKey}
+                onClick={() => isToday ? backToToday() : viewSolve(dateKey)}
+                className={`text-xs px-2 py-1 rounded shrink-0 ${
+                  isActive 
+                    ? "bg-zinc-700 text-white" 
+                    : "bg-zinc-100 hover:bg-zinc-200 text-zinc-600"
+                }`}
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.03 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                {isToday ? "Today" : dateKey.slice(5)}
+              </motion.button>
+            );
+          })}
+        </motion.div>
+      )}
 
 
       {/* Header */}
@@ -655,16 +667,29 @@ export default function Puzzle() {
         
         {/* Timer display */}
         <motion.div 
-          className="font-mono text-lg text-zinc-500"
+          className="font-mono text-lg text-zinc-500 flex gap-2"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
           {isViewingHistory 
             ? formatTime(history[viewingDate!]?.solveTime ?? 0)
             : formatTime(isSolved && finalTime !== null ? finalTime : elapsedTime)}
+
+          {(isSolved || isViewingHistory) && (
+            <motion.div 
+              key="solved"
+              className="flex flex-col items-center gap-1"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <span className="text-lg font-medium text-green-600">
+                {isViewingHistory ? "✓ Solved" : "🎉 Congratulations!"}
+              </span>
+            </motion.div>
+          )}
         </motion.div>
         
-        <AnimatePresence mode="wait">
+        <AnimatePresence>
           {isViewingHistory && (
             <motion.button
               key="back"
@@ -672,31 +697,11 @@ export default function Puzzle() {
               className="text-sm px-3 py-1 rounded-full bg-zinc-200 hover:bg-zinc-300 text-zinc-600"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
               ← Back to today
             </motion.button>
-          )}
-        
-          {(isSolved || isViewingHistory) && (
-            <motion.div 
-              key="solved"
-              className="flex flex-col items-center gap-1"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            >
-              <span className="text-lg font-medium text-green-600">
-                {isViewingHistory ? "✓ Solved" : "🎉 Congratulations!"}
-              </span>
-              <span className="text-sm text-zinc-500">
-                Completed in {isViewingHistory 
-                  ? formatTime(history[viewingDate!]?.solveTime ?? 0)
-                  : formatTime(finalTime ?? 0)}
-              </span>
-            </motion.div>
           )}
         </AnimatePresence>
       </motion.div>
@@ -847,136 +852,62 @@ export default function Puzzle() {
         )}
       </AnimatePresence>
 
-      {/* Shape palette - desktop inline version */}
-      {!isViewingHistory && isPlaying && !isSolved && !isMobile && (
+      {/* Shape palette - horizontal scrollable drawer */}
+      {!isViewingHistory && isPlaying && !isSolved && (
         <motion.div 
-          className="flex flex-wrap justify-center items-center gap-3 max-w-md"
+          className="w-full max-w-lg overflow-x-auto pb-2"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 10 }}
           transition={{ duration: 0.4, delay: 0.3 }}
+          style={{ touchAction: "pan-x" }}
         >
-          <AnimatePresence mode="popLayout">
-            {availableShapes.map((shape) => {
-              const cells = shapeRotations[shape.id];
-              const isDragging = dragging?.shapeId === shape.id;
-              return (
-                <motion.div 
-                  key={shape.id} 
-                  layout
-                  className="flex flex-col items-center gap-1"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: isDragging ? 0.3 : 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                >
-                  {renderShape(
-                    shape.id,
-                    cells,
-                    shape.color,
-                    (e) => handleDragStart(shape.id, e, false),
-                    (e) => handleDragStart(shape.id, e, false),
-                    undefined,
-                    undefined,
-                    PALETTE_CELL_SIZE
-                  )}
-                  <div className="flex gap-1">
-                    <button
-                      onClick={() => handleRotate(shape.id)}
-                      className="w-5 h-5 flex items-center justify-center rounded bg-zinc-100 hover:bg-zinc-200 text-zinc-500 text-xs"
-                      title="Rotate"
-                    >
-                      ↻
-                    </button>
-                    <button
-                      onClick={() => handleFlip(shape.id)}
-                      className="w-5 h-5 flex items-center justify-center rounded bg-zinc-100 hover:bg-zinc-200 text-zinc-500 text-xs"
-                      title="Flip"
-                    >
-                      ⇆
-                    </button>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </AnimatePresence>
-        </motion.div>
-      )}
-
-      {/* Mobile bottom panel for shapes */}
-      {!isViewingHistory && isPlaying && !isSolved && isMobile && (
-        <motion.div
-          className="fixed bottom-0 left-0 right-0 bg-white border-t border-zinc-200 shadow-lg z-40"
-          initial={{ y: 100 }}
-          animate={{ y: 0 }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        >
-          {/* Panel toggle */}
-          <button
-            onClick={() => setIsPanelOpen(!isPanelOpen)}
-            className="w-full py-2 flex items-center justify-center gap-2 text-zinc-500 text-sm"
-          >
-            <motion.span
-              animate={{ rotate: isPanelOpen ? 180 : 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              ▲
-            </motion.span>
-            {isPanelOpen ? "Hide shapes" : `Show shapes (${availableShapes.length})`}
-          </button>
-          
-          {/* Shapes container */}
-          <AnimatePresence>
-            {isPanelOpen && (
-              <motion.div
-                className="flex flex-wrap justify-center items-center gap-3 px-4 pb-4 pt-1"
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                {availableShapes.map((shape) => {
-                  const cells = shapeRotations[shape.id];
-                  const isDragging = dragging?.shapeId === shape.id;
-                  return (
-                    <motion.div 
-                      key={shape.id}
-                      className="flex flex-col items-center gap-1"
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: isDragging ? 0.3 : 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.8 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                    >
-                      {renderShape(
-                        shape.id,
-                        cells,
-                        shape.color,
-                        (e) => handleDragStart(shape.id, e, false),
-                        (e) => handleDragStart(shape.id, e, false),
-                        undefined,
-                        undefined,
-                        PALETTE_CELL_SIZE
-                      )}
-                      <div className="flex gap-1">
-                        <button
-                          onClick={() => handleRotate(shape.id)}
-                          className="w-6 h-6 flex items-center justify-center rounded bg-zinc-100 active:bg-zinc-200 text-zinc-500 text-sm"
-                        >
-                          ↻
-                        </button>
-                        <button
-                          onClick={() => handleFlip(shape.id)}
-                          className="w-6 h-6 flex items-center justify-center rounded bg-zinc-100 active:bg-zinc-200 text-zinc-500 text-sm"
-                        >
-                          ⇆
-                        </button>
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <div className="flex gap-3 px-4 min-w-max">
+            <AnimatePresence mode="popLayout">
+              {availableShapes.map((shape) => {
+                const cells = shapeRotations[shape.id];
+                const isDraggingThis = dragging?.shapeId === shape.id;
+                return (
+                  <motion.div 
+                    key={shape.id} 
+                    layout
+                    className="flex flex-col items-center gap-1 shrink-0"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: isDraggingThis ? 0.3 : 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                  >
+                    {renderShape(
+                      shape.id,
+                      cells,
+                      shape.color,
+                      (e) => handleDragStart(shape.id, e, false),
+                      (e) => handleDragStart(shape.id, e, false),
+                      undefined,
+                      undefined,
+                      PALETTE_CELL_SIZE
+                    )}
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => handleRotate(shape.id)}
+                        className="w-5 h-5 flex items-center justify-center rounded bg-zinc-100 hover:bg-zinc-200 active:bg-zinc-300 text-zinc-500 text-xs"
+                        title="Rotate"
+                      >
+                        ↻
+                      </button>
+                      <button
+                        onClick={() => handleFlip(shape.id)}
+                        className="w-5 h-5 flex items-center justify-center rounded bg-zinc-100 hover:bg-zinc-200 active:bg-zinc-300 text-zinc-500 text-xs"
+                        title="Flip"
+                      >
+                        ⇆
+                      </button>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
+          </div>
         </motion.div>
       )}
 
@@ -1006,7 +937,7 @@ export default function Puzzle() {
       </AnimatePresence>
 
       <motion.div
-        className={`flex items-center gap-4 ${isMobile && isPlaying && !isSolved ? "mb-24" : ""}`}
+        className="flex items-center gap-4"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
