@@ -2,7 +2,7 @@ import { Shape, ShapeMatrix } from "./types";
 
 // Rotate shape 90 degrees clockwise (in screen coords where row increases down)
 export function rotateShape(cells: ShapeMatrix): ShapeMatrix {
-  return cells.map(([r, c]) => [-c, r] as [number, number]);
+  return cells.map(([r, c]) => [c, -r] as [number, number]);
 }
 
 // Flip shape horizontally (mirror along vertical axis)
