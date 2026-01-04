@@ -1,9 +1,15 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { GridCell, ShapeMatrix, PlacedShape, SavedPuzzleState, SolveHistory } from "./types";
-import { SHAPES, rotateShape, flipShape, normalizeShape } from "./shapes";
+import { AnimatePresence, motion } from "framer-motion";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { SHAPES, flipShape, normalizeShape, rotateShape } from "./shapes";
+import {
+  GridCell,
+  PlacedShape,
+  SavedPuzzleState,
+  ShapeMatrix,
+  SolveHistory,
+} from "./types";
 
 const STORAGE_KEY = "caesar-puzzle-history";
 const PROGRESS_KEY = "caesar-puzzle-progress";
@@ -32,7 +38,12 @@ function saveHistory(history: SolveHistory): void {
 interface ProgressState {
   dateKey: string;
   version?: string;
-  placedShapes: Array<{ id: string; gridRow: number; gridCol: number; cells: ShapeMatrix }>;
+  placedShapes: Array<{
+    id: string;
+    gridRow: number;
+    gridCol: number;
+    cells: ShapeMatrix;
+  }>;
   shapeRotations: Record<string, ShapeMatrix>;
   elapsedTime?: number;
 }
@@ -56,7 +67,10 @@ function loadProgress(): ProgressState | null {
 
 function saveProgress(state: ProgressState): void {
   if (typeof window === "undefined") return;
-  localStorage.setItem(PROGRESS_KEY, JSON.stringify({ ...state, version: SHAPES_VERSION }));
+  localStorage.setItem(
+    PROGRESS_KEY,
+    JSON.stringify({ ...state, version: SHAPES_VERSION })
+  );
 }
 
 function clearProgress(): void {
@@ -65,7 +79,20 @@ function clearProgress(): void {
 }
 
 // Build the grid structure
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 function buildGrid(): GridCell[][] {
@@ -73,13 +100,25 @@ function buildGrid(): GridCell[][] {
 
   // Row 0: Jan-Jun + blocked
   grid.push([
-    ...MONTHS.slice(0, 6).map((m, i) => ({ row: 0, col: i, label: m, isBlocked: false, isTarget: false })),
+    ...MONTHS.slice(0, 6).map((m, i) => ({
+      row: 0,
+      col: i,
+      label: m,
+      isBlocked: false,
+      isTarget: false,
+    })),
     { row: 0, col: 6, label: "", isBlocked: true, isTarget: false },
   ]);
 
   // Row 1: Jul-Dec + blocked
   grid.push([
-    ...MONTHS.slice(6, 12).map((m, i) => ({ row: 1, col: i, label: m, isBlocked: false, isTarget: false })),
+    ...MONTHS.slice(6, 12).map((m, i) => ({
+      row: 1,
+      col: i,
+      label: m,
+      isBlocked: false,
+      isTarget: false,
+    })),
     { row: 1, col: 6, label: "", isBlocked: true, isTarget: false },
   ]);
 
@@ -91,11 +130,29 @@ function buildGrid(): GridCell[][] {
       if (rowIdx === 6 && col >= 3) {
         // Row 6, cols 3-6: Sun, Mon, Tue, Wed
         const dayWord = DAYS[col - 3];
-        row.push({ row: rowIdx, col, label: dayWord, isBlocked: false, isTarget: false });
+        row.push({
+          row: rowIdx,
+          col,
+          label: dayWord,
+          isBlocked: false,
+          isTarget: false,
+        });
       } else if (dayNum <= 31) {
-        row.push({ row: rowIdx, col, label: String(dayNum), isBlocked: false, isTarget: false });
+        row.push({
+          row: rowIdx,
+          col,
+          label: String(dayNum),
+          isBlocked: false,
+          isTarget: false,
+        });
       } else {
-        row.push({ row: rowIdx, col, label: "", isBlocked: true, isTarget: false });
+        row.push({
+          row: rowIdx,
+          col,
+          label: "",
+          isBlocked: true,
+          isTarget: false,
+        });
       }
     }
     grid.push(row);
@@ -115,19 +172,27 @@ function buildGrid(): GridCell[][] {
   return grid;
 }
 
-function getTargetsForDate(date: Date = new Date()): { month: string; dayNum: string; dayWord: string } {
+function getTargetsForDate(date: Date = new Date()): {
+  month: string;
+  dayNum: string;
+  dayWord: string;
+} {
   const month = MONTHS[date.getMonth()];
   const dayNum = String(date.getDate());
   const dayWord = DAYS[date.getDay()];
   return { month, dayNum, dayWord };
 }
 
-function markTargets(grid: GridCell[][], date: Date = new Date()): GridCell[][] {
+function markTargets(
+  grid: GridCell[][],
+  date: Date = new Date()
+): GridCell[][] {
   const { month, dayNum, dayWord } = getTargetsForDate(date);
   return grid.map((row) =>
     row.map((cell) => ({
       ...cell,
-      isTarget: cell.label === month || cell.label === dayNum || cell.label === dayWord,
+      isTarget:
+        cell.label === month || cell.label === dayNum || cell.label === dayWord,
     }))
   );
 }
@@ -148,26 +213,29 @@ export default function Puzzle() {
   const [history, setHistory] = useState<SolveHistory>({});
   const [isSolved, setIsSolved] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
-  
+
   const [grid, setGrid] = useState(() => markTargets(buildGrid(), currentDate));
   const [placedShapes, setPlacedShapes] = useState<PlacedShape[]>([]);
-  const [shapeRotations, setShapeRotations] = useState<Record<string, ShapeMatrix>>(() =>
-    Object.fromEntries(SHAPES.map((s) => [s.id, s.cells]))
-  );
-  const [dragging, setDragging] = useState<{
+  const [shapeRotations, setShapeRotations] = useState<
+    Record<string, ShapeMatrix>
+  >(() => Object.fromEntries(SHAPES.map((s) => [s.id, s.cells])));
+  const [dragState, setDragState] = useState<{
     shapeId: string;
     offsetX: number;
     offsetY: number;
-    isFromGrid: boolean;
+    currentX: number;
+    currentY: number;
     startX: number;
     startY: number;
+    isFromGrid: boolean;
     hasMoved: boolean;
   } | null>(null);
-  const [dragPos, setDragPos] = useState<{ x: number; y: number } | null>(null);
+  const DRAG_THRESHOLD = 5;
+  const [selectedShapeId, setSelectedShapeId] = useState<string | null>(null);
   const [invalidShake, setInvalidShake] = useState<string | null>(null);
   const [hasLoadedProgress, setHasLoadedProgress] = useState(false);
   const gridRef = useRef<HTMLDivElement>(null);
-  const DRAG_THRESHOLD = 5;
+  const shapeRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const cellSize = MAX_CELL_SIZE;
 
@@ -175,21 +243,26 @@ export default function Puzzle() {
   useEffect(() => {
     const loadedHistory = loadHistory();
     setHistory(loadedHistory);
-    
+
     // Check if today was already solved and restore that state
     const todayKey = getDateKey(currentDate);
     const todayState = loadedHistory[todayKey];
     if (todayState) {
       const restored = todayState.placedShapes.map((s) => {
         const shape = SHAPES.find((sh) => sh.id === s.id)!;
-        return { ...shape, gridRow: s.gridRow, gridCol: s.gridCol, cells: s.cells };
+        return {
+          ...shape,
+          gridRow: s.gridRow,
+          gridCol: s.gridCol,
+          cells: s.cells,
+        };
       });
       setPlacedShapes(restored);
       setShapeRotations(todayState.shapeRotations);
       setIsSolved(true);
       setFinalTime(todayState.solveTime ?? null);
     }
-    
+
     setHasMounted(true);
   }, [currentDate]);
 
@@ -201,11 +274,11 @@ export default function Puzzle() {
   // Timer effect
   useEffect(() => {
     if (!isPlaying || isSolved || viewingDate) return;
-    
+
     const interval = setInterval(() => {
       setElapsedTime((t) => t + 1);
     }, 1000);
-    
+
     return () => clearInterval(interval);
   }, [isPlaying, isSolved, viewingDate]);
 
@@ -216,15 +289,20 @@ export default function Puzzle() {
       setHasLoadedProgress(true);
       return;
     }
-    
+
     const progress = loadProgress();
     const todayKey = getDateKey();
-    
+
     if (progress && progress.dateKey === todayKey) {
       // Restore today's progress
       const restored = progress.placedShapes.map((s) => {
         const shape = SHAPES.find((sh) => sh.id === s.id)!;
-        return { ...shape, gridRow: s.gridRow, gridCol: s.gridCol, cells: s.cells };
+        return {
+          ...shape,
+          gridRow: s.gridRow,
+          gridCol: s.gridCol,
+          cells: s.cells,
+        };
       });
       setPlacedShapes(restored);
       setShapeRotations(progress.shapeRotations);
@@ -243,7 +321,7 @@ export default function Puzzle() {
     if (!hasLoadedProgress) return; // Don't save until we've loaded
     if (viewingDate) return; // Don't save when viewing history
     if (isSolved) return; // Don't save after solved (progress is cleared)
-    
+
     const todayKey = getDateKey(currentDate);
     const state: ProgressState = {
       dateKey: todayKey,
@@ -257,7 +335,15 @@ export default function Puzzle() {
       elapsedTime,
     };
     saveProgress(state);
-  }, [placedShapes, shapeRotations, currentDate, hasLoadedProgress, viewingDate, elapsedTime, isSolved]);
+  }, [
+    placedShapes,
+    shapeRotations,
+    currentDate,
+    hasLoadedProgress,
+    viewingDate,
+    elapsedTime,
+    isSolved,
+  ]);
 
   // Check if puzzle is solved (all placeable cells are covered)
   const checkSolved = useCallback(() => {
@@ -269,7 +355,10 @@ export default function Puzzle() {
         for (const placed of placedShapes) {
           const cells = shapeRotations[placed.id];
           for (const [r, c] of cells) {
-            if (placed.gridRow + r === cell.row && placed.gridCol + c === cell.col) {
+            if (
+              placed.gridRow + r === cell.row &&
+              placed.gridCol + c === cell.col
+            ) {
               covered = true;
               break;
             }
@@ -288,19 +377,21 @@ export default function Puzzle() {
       const now = new Date();
       const todayKey = getDateKey(now);
       const currentKey = getDateKey(currentDate);
-      
+
       if (todayKey !== currentKey) {
         // Day changed - reset for new day
         setCurrentDate(now);
         setGrid(markTargets(buildGrid(), now));
         setPlacedShapes([]);
-        setShapeRotations(Object.fromEntries(SHAPES.map((s) => [s.id, s.cells])));
+        setShapeRotations(
+          Object.fromEntries(SHAPES.map((s) => [s.id, s.cells]))
+        );
         setIsSolved(false);
         setViewingDate(null);
         clearProgress();
       }
     };
-    
+
     // Check immediately and every minute
     checkDate();
     const interval = setInterval(checkDate, 60000);
@@ -310,7 +401,7 @@ export default function Puzzle() {
   // Check for win after each move
   useEffect(() => {
     if (viewingDate) return; // Don't check when viewing history
-    
+
     const solved = checkSolved();
     if (solved && !isSolved) {
       setIsSolved(true);
@@ -333,22 +424,36 @@ export default function Puzzle() {
       saveHistory(newHistory);
       clearProgress();
     }
-  }, [placedShapes, shapeRotations, checkSolved, isSolved, currentDate, history, viewingDate, elapsedTime]);
+  }, [
+    placedShapes,
+    shapeRotations,
+    checkSolved,
+    isSolved,
+    currentDate,
+    history,
+    viewingDate,
+    elapsedTime,
+  ]);
 
   // View a previous solve
   const viewSolve = (dateKey: string) => {
     const state = history[dateKey];
     if (!state) return;
-    
+
     const date = new Date(dateKey + "T12:00:00");
     setViewingDate(dateKey);
     setGrid(markTargets(buildGrid(), date));
     setFinalTime(state.solveTime ?? null);
-    
+
     // Restore placed shapes
     const restored = state.placedShapes.map((s) => {
       const shape = SHAPES.find((sh) => sh.id === s.id)!;
-      return { ...shape, gridRow: s.gridRow, gridCol: s.gridCol, cells: s.cells };
+      return {
+        ...shape,
+        gridRow: s.gridRow,
+        gridCol: s.gridCol,
+        cells: s.cells,
+      };
     });
     setPlacedShapes(restored);
     setShapeRotations(state.shapeRotations);
@@ -360,14 +465,19 @@ export default function Puzzle() {
     setGrid(markTargets(buildGrid(), currentDate));
     setPlacedShapes([]);
     setShapeRotations(Object.fromEntries(SHAPES.map((s) => [s.id, s.cells])));
-    
+
     // Restore today's progress if solved
     const todayKey = getDateKey(currentDate);
     const todayState = history[todayKey];
     if (todayState) {
       const restored = todayState.placedShapes.map((s) => {
         const shape = SHAPES.find((sh) => sh.id === s.id)!;
-        return { ...shape, gridRow: s.gridRow, gridCol: s.gridCol, cells: s.cells };
+        return {
+          ...shape,
+          gridRow: s.gridRow,
+          gridCol: s.gridCol,
+          cells: s.cells,
+        };
       });
       setPlacedShapes(restored);
       setShapeRotations(todayState.shapeRotations);
@@ -385,14 +495,29 @@ export default function Puzzle() {
     setIsPlaying(false);
     setElapsedTime(0);
     setFinalTime(null);
+    setSelectedShapeId(null);
     clearProgress();
   };
 
   // Get sorted list of solved dates
   const solvedDates = Object.keys(history).sort().reverse();
 
-  // Get shapes that are not placed
-  const availableShapes = SHAPES.filter((s) => !placedShapes.some((p) => p.id === s.id));
+  // Check if a shape is placed on the grid
+  const isShapePlaced = useCallback(
+    (shapeId: string) => placedShapes.some((p) => p.id === shapeId),
+    [placedShapes]
+  );
+
+  // Scroll to selected shape in drawer
+  useEffect(() => {
+    if (selectedShapeId && shapeRefs.current[selectedShapeId]) {
+      shapeRefs.current[selectedShapeId]?.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "center",
+      });
+    }
+  }, [selectedShapeId]);
 
   // Get cell info based on placed shapes
   const getCellInfo = useCallback(
@@ -433,145 +558,224 @@ export default function Puzzle() {
     [grid, shapeRotations, placedShapes, getCellInfo]
   );
 
-  // Calculate hover preview when dragging
+  // Calculate hover preview when dragging (only after movement threshold)
   const hoverPreview = (() => {
-    if (!dragging || !dragging.hasMoved || !dragPos || !gridRef.current) return null;
-    
+    if (!dragState || !dragState.hasMoved || !gridRef.current) return null;
+
     const gridRect = gridRef.current.getBoundingClientRect();
-    const x = dragPos.x - gridRect.left - dragging.offsetX + cellSize / 2;
-    const y = dragPos.y - gridRect.top - dragging.offsetY + cellSize / 2;
+    const x =
+      dragState.currentX - gridRect.left - dragState.offsetX + cellSize / 2;
+    const y =
+      dragState.currentY - gridRect.top - dragState.offsetY + cellSize / 2;
     const gridCol = Math.floor(x / cellSize);
     const gridRow = Math.floor(y / cellSize);
-    
-    const cells = shapeRotations[dragging.shapeId];
-    const shape = SHAPES.find((s) => s.id === dragging.shapeId)!;
-    const isValid = isValidPlacement(dragging.shapeId, gridRow, gridCol);
-    
+
+    const cells = shapeRotations[dragState.shapeId];
+    const shape = SHAPES.find((s) => s.id === dragState.shapeId)!;
+    const isValid = isValidPlacement(dragState.shapeId, gridRow, gridCol);
+
     return { gridRow, gridCol, cells, color: shape.color, isValid };
   })();
 
-  // Rotate a shape in the palette
-  const handleRotate = useCallback((shapeId: string) => {
-    const isPlaced = placedShapes.some((p) => p.id === shapeId);
-    if (isPlaced) return;
-    
-    const currentCells = shapeRotations[shapeId];
-    const newCells = normalizeShape(rotateShape(currentCells));
-    setShapeRotations((prev) => ({ ...prev, [shapeId]: newCells }));
-  }, [placedShapes, shapeRotations]);
-
-  // Flip a shape in the palette
-  const handleFlip = useCallback((shapeId: string) => {
-    const isPlaced = placedShapes.some((p) => p.id === shapeId);
-    if (isPlaced) return;
-    
-    const currentCells = shapeRotations[shapeId];
-    const newCells = normalizeShape(flipShape(currentCells));
-    setShapeRotations((prev) => ({ ...prev, [shapeId]: newCells }));
-  }, [placedShapes, shapeRotations]);
-
-  // Mouse/touch handlers
-  const handleDragStart = (
-    shapeId: string,
-    e: React.MouseEvent | React.TouchEvent,
-    isFromGrid: boolean
-  ) => {
-    e.preventDefault();
-    const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
-    const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
-    const target = e.currentTarget as HTMLElement;
-    const rect = target.getBoundingClientRect();
-    setDragging({
-      shapeId,
-      offsetX: clientX - rect.left,
-      offsetY: clientY - rect.top,
-      isFromGrid,
-      startX: clientX,
-      startY: clientY,
-      hasMoved: false,
-    });
-    setDragPos({ x: clientX, y: clientY });
+  // Compare if two shape matrices are identical
+  const shapesEqual = (a: ShapeMatrix, b: ShapeMatrix): boolean => {
+    if (a.length !== b.length) return false;
+    const sortedA = [...a].sort((x, y) => x[0] - y[0] || x[1] - y[1]);
+    const sortedB = [...b].sort((x, y) => x[0] - y[0] || x[1] - y[1]);
+    return sortedA.every(
+      (cell, i) => cell[0] === sortedB[i][0] && cell[1] === sortedB[i][1]
+    );
   };
 
-  useEffect(() => {
-    if (!dragging) return;
+  // Check if a placed shape can be transformed (rotated/flipped) in its current position
+  const canTransformPlacedShape = useCallback(
+    (shapeId: string, newCells: ShapeMatrix): boolean => {
+      const placed = placedShapes.find((p) => p.id === shapeId);
+      if (!placed) return true; // Not placed, always allowed
 
-    const handleMove = (e: MouseEvent | TouchEvent) => {
-      const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
-      const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
-      setDragPos({ x: clientX, y: clientY });
-
-      // Check if we've moved past the threshold
-      if (!dragging.hasMoved) {
-        const dx = Math.abs(clientX - dragging.startX);
-        const dy = Math.abs(clientY - dragging.startY);
-        if (dx > DRAG_THRESHOLD || dy > DRAG_THRESHOLD) {
-          setDragging((prev) => prev ? { ...prev, hasMoved: true } : null);
-          // Remove from grid when drag actually starts
-          if (dragging.isFromGrid) {
-            setPlacedShapes((prev) => prev.filter((p) => p.id !== dragging.shapeId));
+      for (const [r, c] of newCells) {
+        const row = placed.gridRow + r;
+        const col = placed.gridCol + c;
+        if (row < 0 || row >= 8 || col < 0 || col >= 7) return false;
+        const cell = grid[row]?.[col];
+        if (!cell || cell.isBlocked || cell.isTarget) return false;
+        // Check overlap with other shapes (not self)
+        for (const other of placedShapes) {
+          if (other.id === shapeId) continue;
+          const otherCells = shapeRotations[other.id];
+          for (const [or, oc] of otherCells) {
+            if (other.gridRow + or === row && other.gridCol + oc === col) {
+              return false;
+            }
           }
         }
       }
-    };
+      return true;
+    },
+    [placedShapes, shapeRotations, grid]
+  );
 
-    const handleEnd = (e: MouseEvent | TouchEvent) => {
-      if (!dragging || !gridRef.current) {
-        setDragging(null);
-        setDragPos(null);
+  // Rotate a shape (works for both palette and placed shapes)
+  const handleRotate = useCallback(
+    (shapeId: string) => {
+      const currentCells = shapeRotations[shapeId];
+      const newCells = normalizeShape(rotateShape(currentCells));
+
+      // Check if transformation is valid for placed shapes
+      if (!canTransformPlacedShape(shapeId, newCells)) return;
+
+      setShapeRotations((prev) => ({ ...prev, [shapeId]: newCells }));
+    },
+    [shapeRotations, canTransformPlacedShape]
+  );
+
+  // Flip a shape (works for both palette and placed shapes)
+  const handleFlip = useCallback(
+    (shapeId: string) => {
+      const currentCells = shapeRotations[shapeId];
+      const newCells = normalizeShape(flipShape(currentCells));
+
+      // Check if transformation is valid for placed shapes
+      if (!canTransformPlacedShape(shapeId, newCells)) return;
+
+      setShapeRotations((prev) => ({ ...prev, [shapeId]: newCells }));
+    },
+    [shapeRotations, canTransformPlacedShape]
+  );
+
+  // Check if rotate/flip would do anything for the selected shape
+  const canRotateSelected = selectedShapeId
+    ? (() => {
+        const currentCells = shapeRotations[selectedShapeId];
+        const rotatedCells = normalizeShape(rotateShape(currentCells));
+        // Check if rotation changes the shape AND is valid for placed shapes
+        if (shapesEqual(currentCells, rotatedCells)) return false;
+        return canTransformPlacedShape(selectedShapeId, rotatedCells);
+      })()
+    : false;
+
+  const canFlipSelected = selectedShapeId
+    ? (() => {
+        const currentCells = shapeRotations[selectedShapeId];
+        const flippedCells = normalizeShape(flipShape(currentCells));
+        // Check if flip changes the shape AND is valid for placed shapes
+        if (shapesEqual(currentCells, flippedCells)) return false;
+        return canTransformPlacedShape(selectedShapeId, flippedCells);
+      })()
+    : false;
+
+  // Pointer event handlers (unified mouse + touch)
+  const handlePointerDown = useCallback(
+    (
+      shapeId: string,
+      e: React.PointerEvent,
+      isFromGrid: boolean,
+      cellOffset?: { row: number; col: number }
+    ) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      // Capture pointer for reliable tracking
+      (e.target as HTMLElement).setPointerCapture(e.pointerId);
+
+      const target = e.currentTarget as HTMLElement;
+      const rect = target.getBoundingClientRect();
+
+      // Calculate offset relative to clicked element
+      let offsetX = e.clientX - rect.left;
+      let offsetY = e.clientY - rect.top;
+
+      // For placed shapes with cell-based hitboxes, add the cell's position within the shape
+      if (cellOffset) {
+        offsetX += cellOffset.col * cellSize;
+        offsetY += cellOffset.row * cellSize;
+      }
+
+      // Don't remove from grid yet - wait until actual movement
+      setDragState({
+        shapeId,
+        offsetX,
+        offsetY,
+        currentX: e.clientX,
+        currentY: e.clientY,
+        startX: e.clientX,
+        startY: e.clientY,
+        isFromGrid,
+        hasMoved: false,
+      });
+    },
+    [cellSize]
+  );
+
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent) => {
+      if (!dragState) return;
+      e.preventDefault();
+
+      const dx = Math.abs(e.clientX - dragState.startX);
+      const dy = Math.abs(e.clientY - dragState.startY);
+      const shouldStartDrag = dx > DRAG_THRESHOLD || dy > DRAG_THRESHOLD;
+
+      // If this is the first real movement and shape is from grid, remove it now
+      if (shouldStartDrag && !dragState.hasMoved && dragState.isFromGrid) {
+        setPlacedShapes((prev) =>
+          prev.filter((p) => p.id !== dragState.shapeId)
+        );
+      }
+
+      setDragState((prev) =>
+        prev
+          ? {
+              ...prev,
+              currentX: e.clientX,
+              currentY: e.clientY,
+              hasMoved: prev.hasMoved || shouldStartDrag,
+            }
+          : null
+      );
+    },
+    [dragState]
+  );
+
+  const handlePointerUp = useCallback(
+    (e: React.PointerEvent) => {
+      if (!dragState || !gridRef.current) {
+        setDragState(null);
         return;
       }
 
-      // If no movement, just cancel the drag
-      if (!dragging.hasMoved) {
-        setDragging(null);
-        setDragPos(null);
+      // If no movement occurred, this was just a click to select
+      if (!dragState.hasMoved) {
+        setSelectedShapeId(dragState.shapeId);
+        setDragState(null);
         return;
       }
 
-      const clientX = "changedTouches" in e ? e.changedTouches[0].clientX : e.clientX;
-      const clientY = "changedTouches" in e ? e.changedTouches[0].clientY : e.clientY;
       const gridRect = gridRef.current.getBoundingClientRect();
-
-      // Calculate grid position
-      const x = clientX - gridRect.left - dragging.offsetX + cellSize / 2;
-      const y = clientY - gridRect.top - dragging.offsetY + cellSize / 2;
+      const x = e.clientX - gridRect.left - dragState.offsetX + cellSize / 2;
+      const y = e.clientY - gridRect.top - dragState.offsetY + cellSize / 2;
       const gridCol = Math.floor(x / cellSize);
       const gridRow = Math.floor(y / cellSize);
 
-      const shape = SHAPES.find((s) => s.id === dragging.shapeId)!;
-      if (isValidPlacement(dragging.shapeId, gridRow, gridCol)) {
+      const shape = SHAPES.find((s) => s.id === dragState.shapeId)!;
+      if (isValidPlacement(dragState.shapeId, gridRow, gridCol)) {
         setPlacedShapes((prev) => [
           ...prev,
           { ...shape, cells: shapeRotations[shape.id], gridRow, gridCol },
         ]);
       }
 
-      setDragging(null);
-      setDragPos(null);
-    };
-
-    window.addEventListener("mousemove", handleMove);
-    window.addEventListener("mouseup", handleEnd);
-    window.addEventListener("touchmove", handleMove, { passive: false });
-    window.addEventListener("touchend", handleEnd);
-
-    return () => {
-      window.removeEventListener("mousemove", handleMove);
-      window.removeEventListener("mouseup", handleEnd);
-      window.removeEventListener("touchmove", handleMove);
-      window.removeEventListener("touchend", handleEnd);
-    };
-  }, [dragging, isValidPlacement, shapeRotations]);
+      setDragState(null);
+    },
+    [dragState, cellSize, isValidPlacement, shapeRotations]
+  );
 
   // Render shape as positioned div
   const renderShape = (
     shapeId: string,
     cells: ShapeMatrix,
     color: string,
-    onMouseDown: (e: React.MouseEvent) => void,
-    onTouchStart: (e: React.TouchEvent) => void,
-    onClick?: () => void,
+    onPointerDown: (e: React.PointerEvent) => void,
     style?: React.CSSProperties,
     size: number = cellSize
   ) => {
@@ -588,14 +792,12 @@ export default function Puzzle() {
           touchAction: "none",
           ...style,
         }}
-        onMouseDown={onMouseDown}
-        onTouchStart={onTouchStart}
-        onClick={onClick}
+        onPointerDown={onPointerDown}
       >
         {cells.map(([r, c], i) => (
           <div
             key={i}
-            className="absolute rounded-sm border border-white/30"
+            className="absolute rounded-sm border border-white/30 pointer-events-none"
             style={{
               width: size - 2,
               height: size - 2,
@@ -609,74 +811,109 @@ export default function Puzzle() {
     );
   };
 
-  const displayDate = viewingDate ? new Date(viewingDate + "T12:00:00") : currentDate;
+  const displayDate = viewingDate
+    ? new Date(viewingDate + "T12:00:00")
+    : currentDate;
   const { month, dayNum, dayWord } = getTargetsForDate(displayDate);
   const isViewingHistory = viewingDate !== null;
 
   return (
-    <motion.div 
-      className="flex flex-col items-center gap-4 p-4 select-none max-h-dvh overflow-hidden touch-none"
+    <motion.div
+      className="flex flex-col items-center gap-4 p-4 select-none max-h-dvh overflow-hidden"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
+      style={{
+        WebkitTouchCallout: "none",
+        WebkitUserSelect: "none",
+        touchAction: "none",
+      }}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={() => setDragState(null)}
     >
       {hasMounted && solvedDates.length > 0 && (
-        <motion.div 
-          className="absolute top-0 left-0 p-2 flex flex-wrap gap-2 items-center"
+        <motion.div
+          className="absolute top-0 left-0 p-2 flex flex-wrap gap-2 items-center bg-white w-full justify-between"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          <span className="text-xs text-zinc-400">Previous solves:</span>
-          {solvedDates.slice(0, 7).map((dateKey, i) => {
-            const isActive = viewingDate === dateKey;
-            const isToday = dateKey === getDateKey(currentDate);
-            return (
-              <motion.button
-                key={dateKey}
-                onClick={() => isToday ? backToToday() : viewSolve(dateKey)}
-                className={`text-xs px-2 py-1 rounded shrink-0 ${
-                  isActive 
-                    ? "bg-zinc-700 text-white" 
-                    : "bg-zinc-100 hover:bg-zinc-200 text-zinc-600"
-                }`}
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.03 }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                {isToday ? "Today" : dateKey.slice(5)}
-              </motion.button>
-            );
-          })}
+          <div className="flex gap-2 items-center flex-1">
+            <span className="text-xs text-stone-400">Previous solves:</span>
+            <div className="flex gap-2 overflow-x-scroll flex-1">
+              {solvedDates.map((dateKey, i) => {
+                const isActive = viewingDate === dateKey;
+                const isToday = dateKey === getDateKey(currentDate);
+                return (
+                  <motion.button
+                    key={dateKey}
+                    onClick={() =>
+                      isToday ? backToToday() : viewSolve(dateKey)
+                    }
+                    className={`text-xs px-2 py-1 rounded shrink-0 ${
+                      isActive
+                        ? "bg-stone-700 text-white"
+                        : "bg-stone-100 hover:bg-stone-200 text-stone-600"
+                    }`}
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.03 }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    {isToday ? "Today" : dateKey.slice(5)}
+                  </motion.button>
+                );
+              })}
+            </div>
+          </div>
+          {!isViewingHistory && (
+            <div className="flex gap-2">
+              {(placedShapes.length > 0 || isSolved || elapsedTime > 0) && (
+                <motion.button
+                  onClick={resetToday}
+                  className="text-xs px-2 py-1 rounded-md bg-stone-100 hover:bg-stone-200 text-stone-500"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Reset
+                </motion.button>
+              )}
+              {isPlaying && (
+                <motion.button
+                  onClick={() => setIsPlaying(false)}
+                  className="text-xs px-3 py-1 rounded-md bg-stone-100 hover:bg-stone-200 text-stone-500"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Pause
+                </motion.button>
+              )}
+            </div>
+          )}
         </motion.div>
       )}
 
-
       {/* Header */}
-      <motion.div 
+      <motion.div
         className="flex flex-col items-center gap-2"
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.1 }}
       >
-        <h1 className="text-2xl font-light tracking-wide text-zinc-700">
-          {month} {dayNum} · {dayWord}
-        </h1>
-        
-        {/* Timer display */}
-        <motion.div 
-          className="font-mono text-lg text-zinc-500 flex gap-2"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        >
-          {isViewingHistory 
+        <h1 className="text-xl font-light tracking-wide text-stone-700">
+          {month} {dayNum}, {dayWord} ·{" "}
+          {isViewingHistory
             ? formatTime(history[viewingDate!]?.solveTime ?? 0)
-            : formatTime(isSolved && finalTime !== null ? finalTime : elapsedTime)}
-
+            : formatTime(
+                isSolved && finalTime !== null ? finalTime : elapsedTime
+              )}
           {(isSolved || isViewingHistory) && (
-            <motion.div 
+            <motion.div
               key="solved"
               className="flex flex-col items-center gap-1"
               initial={{ opacity: 0 }}
@@ -687,14 +924,14 @@ export default function Puzzle() {
               </span>
             </motion.div>
           )}
-        </motion.div>
-        
+        </h1>
+
         <AnimatePresence>
           {isViewingHistory && (
             <motion.button
               key="back"
               onClick={backToToday}
-              className="text-sm px-3 py-1 rounded-full bg-zinc-200 hover:bg-zinc-300 text-zinc-600"
+              className="text-sm px-3 py-1 rounded-full bg-stone-200 hover:bg-stone-300 text-stone-600"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               whileHover={{ scale: 1.02 }}
@@ -708,228 +945,282 @@ export default function Puzzle() {
 
       {/* Grid */}
       <motion.div
-        className="border-4 border-zinc-200 rounded-lg"
+        className="border-4 border-[#2B2B23] rounded-lg"
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.4, delay: 0.2 }}
       >
         <div
           ref={gridRef}
-          className="relative bg-zinc-50 rounded"
-          style={{ width: 7 * cellSize, height: 8 * cellSize }}
+          className="relative rounded"
+          style={{
+            width: 7 * cellSize,
+            height: 8 * cellSize,
+            touchAction: "none",
+          }}
         >
-        {grid.map((row, rowIdx) =>
-          row.map((cell, colIdx) => {
-            const cellInfo = getCellInfo(rowIdx, colIdx);
-            const isShaking = cellInfo && invalidShake === cellInfo.shapeId;
-            return (
-              <motion.div
-                key={`${rowIdx}-${colIdx}`}
-                className={`absolute flex items-center justify-center text-xs font-medium
-                  ${cell.isBlocked ? "bg-zinc-200" : cell.isTarget ? "bg-white border-2 border-zinc-400" : "bg-zinc-100 border border-zinc-200"}
-                  ${cell.isTarget ? "text-zinc-800" : "text-zinc-500"}
+          {grid.map((row, rowIdx) =>
+            row.map((cell, colIdx) => {
+              const cellInfo = getCellInfo(rowIdx, colIdx);
+              const isShaking = cellInfo && invalidShake === cellInfo.shapeId;
+              const isSelected =
+                cellInfo && cellInfo.shapeId === selectedShapeId;
+              return (
+                <motion.div
+                  key={`${rowIdx}-${colIdx}`}
+                  className={`absolute flex items-center justify-center text-xs font-medium pointer-events-none
+                  ${
+                    cell.isBlocked
+                      ? "bg-background"
+                      : cell.isTarget
+                      ? "bg-[#2B2B23]! font-bold! text-[#F1C7A2]!"
+                      : "bg-background"
+                  }
+                  ${cell.isTarget ? "text-foreground" : "text-background"}
                 `}
+                  style={{
+                    width: cellSize,
+                    height: cellSize,
+                    top: rowIdx * cellSize,
+                    left: colIdx * cellSize,
+                  }}
+                  animate={{
+                    backgroundColor: isShaking
+                      ? "#ef4444"
+                      : cellInfo?.color ||
+                        (cell.isBlocked
+                          ? "#2B2B23"
+                          : cell.isTarget
+                          ? "#f2ede7"
+                          : "white"),
+                    color: cellInfo
+                      ? "#ffffff"
+                      : cell.isTarget
+                      ? "#27272a"
+                      : "#71717a",
+                    x: isShaking ? [0, -4, 4, -4, 4, 0] : 0,
+                  }}
+                  transition={{
+                    backgroundColor: { duration: 0.2 },
+                    x: { duration: 0.3 },
+                  }}
+                >
+                  <span>{cell.label}</span>
+                </motion.div>
+              );
+            })
+          )}
+
+          {/* Hover preview when dragging */}
+          <AnimatePresence>
+            {hoverPreview &&
+              hoverPreview.cells.map(([r, c], i) => {
+                const row = hoverPreview.gridRow + r;
+                const col = hoverPreview.gridCol + c;
+                if (row < 0 || row >= 8 || col < 0 || col >= 7) return null;
+                return (
+                  <motion.div
+                    key={`preview-${i}`}
+                    className="absolute pointer-events-none rounded-sm"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 0.5 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.1 }}
+                    style={{
+                      width: cellSize - 2,
+                      height: cellSize - 2,
+                      top: row * cellSize + 1,
+                      left: col * cellSize + 1,
+                      backgroundColor: hoverPreview.isValid
+                        ? hoverPreview.color
+                        : "rgba(239, 68, 68, 0.5)",
+                      border: hoverPreview.isValid
+                        ? "2px solid rgba(255,255,255,0.8)"
+                        : "2px solid rgba(239, 68, 68, 0.8)",
+                    }}
+                  />
+                );
+              })}
+          </AnimatePresence>
+
+          {/* Placed shapes - individual cell hitboxes for accurate clicking */}
+          {!isViewingHistory &&
+            isPlaying &&
+            !isSolved &&
+            placedShapes.flatMap((placed) => {
+              const cells = shapeRotations[placed.id];
+              return cells.map(([r, c], i) => (
+                <div
+                  key={`${placed.id}-${i}`}
+                  className="absolute cursor-grab z-10"
+                  style={{
+                    width: cellSize,
+                    height: cellSize,
+                    top: (placed.gridRow + r) * cellSize,
+                    left: (placed.gridCol + c) * cellSize,
+                    touchAction: "none",
+                  }}
+                  onClick={() => setSelectedShapeId(placed.id)}
+                  onPointerDown={(e) => {
+                    setSelectedShapeId(placed.id);
+                    handlePointerDown(placed.id, e, true, { row: r, col: c });
+                  }}
+                />
+              ));
+            })}
+
+          {/* Blur overlay when paused or not started */}
+          <AnimatePresence>
+            {!isSolved && !isViewingHistory && !isPlaying && (
+              <motion.div
+                className="absolute inset-0 flex items-center justify-center z-10"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
                 style={{
-                  width: cellSize,
-                  height: cellSize,
-                  top: rowIdx * cellSize,
-                  left: colIdx * cellSize,
-                }}
-                animate={{
-                  backgroundColor: isShaking ? "#ef4444" : cellInfo?.color || (cell.isBlocked ? "#e4e4e7" : cell.isTarget ? "#ffffff" : "#f4f4f5"),
-                  color: cellInfo ? "#ffffff" : (cell.isTarget ? "#27272a" : "#71717a"),
-                  x: isShaking ? [0, -4, 4, -4, 4, 0] : 0,
-                }}
-                transition={{ 
-                  backgroundColor: { duration: 0.2 },
-                  x: { duration: 0.3 }
+                  backdropFilter: "blur(8px)",
+                  WebkitBackdropFilter: "blur(8px)",
                 }}
               >
-                <span style={{ textShadow: cellInfo ? "0 1px 2px rgba(0,0,0,0.3)" : undefined }}>
-                  {cell.label}
-                </span>
+                <div className="absolute inset-0 bg-white/60 rounded-lg" />
+                {!isSolved && (
+                  <motion.button
+                    onClick={() => setIsPlaying(true)}
+                    className="relative z-10 px-6 py-3 rounded-full bg-stone-800 text-white font-medium shadow-lg"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    initial={{ scale: 0.9 }}
+                    animate={{ scale: 1 }}
+                  >
+                    {elapsedTime > 0 ? "Resume" : "Start"}
+                  </motion.button>
+                )}
               </motion.div>
-            );
-          })
-        )}
-
-        {/* Hover preview when dragging */}
-        <AnimatePresence>
-          {hoverPreview && hoverPreview.cells.map(([r, c], i) => {
-            const row = hoverPreview.gridRow + r;
-            const col = hoverPreview.gridCol + c;
-            if (row < 0 || row >= 8 || col < 0 || col >= 7) return null;
-            return (
-              <motion.div
-                key={`preview-${i}`}
-                className="absolute pointer-events-none rounded-sm"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 0.5 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.1 }}
-                style={{
-                  width: cellSize - 2,
-                  height: cellSize - 2,
-                  top: row * cellSize + 1,
-                  left: col * cellSize + 1,
-                  backgroundColor: hoverPreview.isValid 
-                    ? hoverPreview.color 
-                    : "rgba(239, 68, 68, 0.5)",
-                  border: hoverPreview.isValid 
-                    ? "2px solid rgba(255,255,255,0.8)" 
-                    : "2px solid rgba(239, 68, 68, 0.8)",
-                }}
-              />
-            );
-          })}
-        </AnimatePresence>
-
-        {/* Placed shapes (invisible, for drag handling) */}
-        {!isViewingHistory && isPlaying && !isSolved && placedShapes.map((placed) => {
-          const cells = shapeRotations[placed.id];
-          const maxRow = Math.max(...cells.map(([r]) => r)) + 1;
-          const maxCol = Math.max(...cells.map(([, c]) => c)) + 1;
-          return (
-            <div
-              key={placed.id}
-              className="absolute cursor-grab"
-              style={{
-                width: maxCol * cellSize,
-                height: maxRow * cellSize,
-                top: placed.gridRow * cellSize,
-                left: placed.gridCol * cellSize,
-              }}
-              onMouseDown={(e) => handleDragStart(placed.id, e, true)}
-              onTouchStart={(e) => handleDragStart(placed.id, e, true)}
-            />
-          );
-        })}
-
-        {/* Blur overlay when paused or not started */}
-        <AnimatePresence>
-          {!isSolved && !isViewingHistory && !isPlaying && (
-            <motion.div
-              className="absolute inset-0 flex items-center justify-center z-10"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              style={{ backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" }}
-            >
-              <div className="absolute inset-0 bg-white/60 rounded-lg" />
-              {!isSolved && (
-                <motion.button
-                  onClick={() => setIsPlaying(true)}
-                  className="relative z-10 px-6 py-3 rounded-full bg-zinc-800 text-white font-medium shadow-lg"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  initial={{ scale: 0.9 }}
-                  animate={{ scale: 1 }}
-                >
-                  {elapsedTime > 0 ? "Resume" : "Start"}
-                </motion.button>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
+            )}
+          </AnimatePresence>
         </div>
       </motion.div>
 
-      {/* Pause button - shown when playing */}
-      <AnimatePresence>
-        {!isViewingHistory && isPlaying && !isSolved && (
-          <motion.button
-            onClick={() => setIsPlaying(false)}
-            className="text-xs px-3 py-1 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-500"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            Pause
-          </motion.button>
-        )}
-      </AnimatePresence>
-
-      {/* Shape palette - horizontal scrollable drawer */}
+      {/* Shape palette - horizontal scrollable drawer with controls */}
       {!isViewingHistory && isPlaying && !isSolved && (
-        <motion.div 
-          className="w-full max-w-lg overflow-x-auto pb-2"
+        <motion.div
+          className="w-full max-w-lg flex items-center gap-2"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 10 }}
           transition={{ duration: 0.4, delay: 0.3 }}
-          style={{ touchAction: "pan-x" }}
         >
-          <div className="flex gap-3 px-4 min-w-max">
-            <AnimatePresence mode="popLayout">
-              {availableShapes.map((shape) => {
+          {/* Scrollable shapes */}
+          <div
+            className="flex-1 overflow-x-auto pb-2"
+            style={{ touchAction: "pan-x" }}
+          >
+            <div className="flex gap-3 px-2 min-w-max">
+              {SHAPES.map((shape) => {
                 const cells = shapeRotations[shape.id];
-                const isDraggingThis = dragging?.shapeId === shape.id;
+                const isDraggingThis = dragState?.shapeId === shape.id;
+                const isSelected = selectedShapeId === shape.id;
+                const isPlaced = isShapePlaced(shape.id);
+
                 return (
-                  <motion.div 
-                    key={shape.id} 
-                    layout
-                    className="flex flex-col items-center gap-1 shrink-0"
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: isDraggingThis ? 0.3 : 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                  <motion.div
+                    key={shape.id}
+                    ref={(el) => {
+                      shapeRefs.current[shape.id] = el;
+                    }}
+                    className={`flex items-center justify-center p-1.5 rounded-md cursor-pointer transition-all ${
+                      isSelected ? "bg-stone-200/60" : "hover:bg-stone-100/50"
+                    }`}
+                    animate={{
+                      opacity: isDraggingThis ? 0.3 : 1,
+                    }}
+                    transition={{ duration: 0.15 }}
+                    onClick={() => setSelectedShapeId(shape.id)}
+                    onPointerDown={(e) => {
+                      setSelectedShapeId(shape.id);
+                      // Only start drag if not already placed
+                      if (!isPlaced) {
+                        handlePointerDown(shape.id, e, false);
+                      }
+                    }}
                   >
                     {renderShape(
                       shape.id,
                       cells,
                       shape.color,
-                      (e) => handleDragStart(shape.id, e, false),
-                      (e) => handleDragStart(shape.id, e, false),
-                      undefined,
-                      undefined,
+                      () => {}, // Handler is on parent
+                      {
+                        opacity: isPlaced && !isSelected ? 0.35 : 1,
+                        // If placed, make grayscale if not selected
+                        filter: isPlaced ? "grayscale(1)" : "none",
+                      },
                       PALETTE_CELL_SIZE
                     )}
-                    <div className="flex gap-1">
-                      <button
-                        onClick={() => handleRotate(shape.id)}
-                        className="w-5 h-5 flex items-center justify-center rounded bg-zinc-100 hover:bg-zinc-200 active:bg-zinc-300 text-zinc-500 text-xs"
-                        title="Rotate"
-                      >
-                        ↻
-                      </button>
-                      <button
-                        onClick={() => handleFlip(shape.id)}
-                        className="w-5 h-5 flex items-center justify-center rounded bg-zinc-100 hover:bg-zinc-200 active:bg-zinc-300 text-zinc-500 text-xs"
-                        title="Flip"
-                      >
-                        ⇆
-                      </button>
-                    </div>
                   </motion.div>
                 );
               })}
-            </AnimatePresence>
+            </div>
+          </div>
+
+          {/* Rotate/Flip controls */}
+          <div className="flex flex-col gap-1 shrink-0 pr-2">
+            <button
+              onClick={() =>
+                selectedShapeId &&
+                canRotateSelected &&
+                handleRotate(selectedShapeId)
+              }
+              disabled={!canRotateSelected}
+              className={`w-8 h-8 flex items-center justify-center rounded text-sm transition-colors ${
+                canRotateSelected
+                  ? "bg-stone-200 hover:bg-stone-300 active:bg-stone-400 text-stone-700"
+                  : "bg-stone-100 text-stone-300 cursor-not-allowed"
+              }`}
+              title="Rotate selected shape"
+            >
+              ↻
+            </button>
+            <button
+              onClick={() =>
+                selectedShapeId &&
+                canFlipSelected &&
+                handleFlip(selectedShapeId)
+              }
+              disabled={!canFlipSelected}
+              className={`w-8 h-8 flex items-center justify-center rounded text-sm transition-colors ${
+                canFlipSelected
+                  ? "bg-stone-200 hover:bg-stone-300 active:bg-stone-400 text-stone-700"
+                  : "bg-stone-100 text-stone-300 cursor-not-allowed"
+              }`}
+              title="Flip selected shape"
+            >
+              ⇆
+            </button>
           </div>
         </motion.div>
       )}
 
-      {/* Dragging preview - only show at full size after movement threshold */}
+      {/* Dragging preview - only show after movement threshold */}
       <AnimatePresence>
-        {dragging && dragPos && dragging.hasMoved && (
+        {dragState && dragState.hasMoved && (
           <motion.div
             className="fixed pointer-events-none z-50"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 0.8, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.15 }}
+            transition={{ duration: 0.1 }}
             style={{
-              left: dragPos.x - dragging.offsetX,
-              top: dragPos.y - dragging.offsetY,
+              left: dragState.currentX - dragState.offsetX,
+              top: dragState.currentY - dragState.offsetY,
             }}
           >
             {renderShape(
-              dragging.shapeId,
-              shapeRotations[dragging.shapeId],
-              hoverPreview && !hoverPreview.isValid ? "#ef4444" : SHAPES.find((s) => s.id === dragging.shapeId)!.color,
-              () => {},
+              dragState.shapeId,
+              shapeRotations[dragState.shapeId],
+              hoverPreview && !hoverPreview.isValid
+                ? "#ef4444"
+                : SHAPES.find((s) => s.id === dragState.shapeId)!.color,
               () => {}
             )}
           </motion.div>
@@ -937,35 +1228,22 @@ export default function Puzzle() {
       </AnimatePresence>
 
       <motion.div
-        className="flex items-center gap-4"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
       >
-        <p className="text-sm text-zinc-400 text-center">
-          {isViewingHistory 
-            ? "Viewing previous solve" 
+        <p className="text-sm text-stone-400 text-center">
+          {isViewingHistory
+            ? "Viewing previous solve"
             : isSolved
             ? "Play again tomorrow!"
             : isPlaying
-            ? "Drag all the shapes onto grid without touching the current day"
+            ? "Use all shapes without touching the current day"
             : elapsedTime > 0
             ? "Press Resume to continue"
             : "Press Start to begin"}
         </p>
-        
-        {!isViewingHistory && (placedShapes.length > 0 || isSolved || elapsedTime > 0) && (
-          <motion.button
-            onClick={resetToday}
-            className="text-xs px-2 py-1 rounded bg-zinc-100 hover:bg-zinc-200 text-zinc-500"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            Reset
-          </motion.button>
-        )}
       </motion.div>
     </motion.div>
   );
 }
-
