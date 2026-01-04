@@ -986,7 +986,7 @@ export default function Puzzle() {
                           ? "#2B2B23"
                           : cell.isTarget
                           ? "#f2ede7"
-                          : "#f2ede7"),
+                          : "white"),
                     color: cellInfo
                       ? "#ffffff"
                       : cell.isTarget
