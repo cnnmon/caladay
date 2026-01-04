@@ -47,7 +47,7 @@ export const SHAPES: Shape[] = [
   {
     id: "T",
     name: "T",
-    color: "#FDB80B", // yellow
+    color: "#E7920A", // yellow
     // . X .
     // . X .
     // X X X

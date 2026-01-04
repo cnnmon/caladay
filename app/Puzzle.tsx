@@ -832,7 +832,7 @@ export default function Puzzle() {
     >
       {hasMounted && (
         <motion.div
-          className="absolute top-0 left-0 p-2 flex flex-wrap gap-2 items-center bg-white w-full justify-between"
+          className="absolute top-0 left-0 p-2 flex flex-wrap gap-2 items-center bg-[#f2ede7] w-full justify-between"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -850,10 +850,10 @@ export default function Puzzle() {
                       onClick={() =>
                         isToday ? backToToday() : viewSolve(dateKey)
                       }
-                      className={`text-xs px-2 py-1 rounded shrink-0 ${
+                      className={`text-xs px-2 py-1 rounded shrink-0 hover:text-stone-200 ${
                         isActive
                           ? "bg-stone-700 text-white"
-                          : "bg-stone-100 hover:bg-stone-200 text-stone-600"
+                          : "bg-stone-300 hover:bg-stone-400 text-stone-600"
                       }`}
                       initial={{ opacity: 0, y: 5 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -871,9 +871,7 @@ export default function Puzzle() {
               {(placedShapes.length > 0 || isSolved || elapsedTime > 0) && (
                 <motion.button
                   onClick={resetToday}
-                  className="text-xs px-2 py-1 rounded-md bg-stone-100 hover:bg-stone-200 text-stone-500"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  className="text-xs px-2 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200"
                 >
                   Reset
                 </motion.button>
@@ -881,12 +879,10 @@ export default function Puzzle() {
               {isPlaying && (
                 <motion.button
                   onClick={() => setIsPlaying(false)}
-                  className="text-xs px-3 py-1 rounded-md bg-stone-100 hover:bg-stone-200 text-stone-500"
+                  className="text-xs px-3 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
                 >
                   Pause
                 </motion.button>
@@ -990,7 +986,7 @@ export default function Puzzle() {
                           ? "#2B2B23"
                           : cell.isTarget
                           ? "#f2ede7"
-                          : "white"),
+                          : "#f2ede7"),
                     color: cellInfo
                       ? "#ffffff"
                       : cell.isTarget
@@ -1170,11 +1166,7 @@ export default function Puzzle() {
                 handleRotate(selectedShapeId)
               }
               disabled={!canRotateSelected}
-              className={`w-8 h-8 flex items-center justify-center rounded text-sm transition-colors ${
-                canRotateSelected
-                  ? "bg-stone-200 hover:bg-stone-300 active:bg-stone-400 text-stone-700"
-                  : "bg-stone-100 text-stone-300 cursor-not-allowed"
-              }`}
+              className={`w-8 h-8 flex items-center justify-center rounded text-sm transition-colors bg-stone-300 hover:bg-stone-400 active:bg-stone-400 text-stone-700 disabled:opacity-30 disabled:cursor-not-allowed`}
               title="Rotate selected shape"
             >
               ↻
@@ -1186,11 +1178,7 @@ export default function Puzzle() {
                 handleFlip(selectedShapeId)
               }
               disabled={!canFlipSelected}
-              className={`w-8 h-8 flex items-center justify-center rounded text-sm transition-colors ${
-                canFlipSelected
-                  ? "bg-stone-200 hover:bg-stone-300 active:bg-stone-400 text-stone-700"
-                  : "bg-stone-100 text-stone-300 cursor-not-allowed"
-              }`}
+              className={`w-8 h-8 flex items-center justify-center rounded text-sm transition-colors bg-stone-300 hover:bg-stone-400 active:bg-stone-400 text-stone-700 disabled:opacity-30 disabled:cursor-not-allowed`}
               title="Flip selected shape"
             >
               ⇆
@@ -1236,7 +1224,7 @@ export default function Puzzle() {
             : isSolved
             ? "Play again tomorrow!"
             : isPlaying
-            ? "Use all shapes without touching the current day"
+            ? `Use all shapes (${placedShapes.length}/${SHAPES.length}) without touching the current day`
             : elapsedTime > 0
             ? "Press Resume to continue"
             : "Press Start to begin"}
