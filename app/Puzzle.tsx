@@ -487,13 +487,11 @@ export default function Puzzle() {
     }
   };
 
-  // Reset today's puzzle
+  // Reset today's puzzle (keeps timer running)
   const resetToday = () => {
     setPlacedShapes([]);
     setShapeRotations(Object.fromEntries(SHAPES.map((s) => [s.id, s.cells])));
     setIsSolved(false);
-    setIsPlaying(false);
-    setElapsedTime(0);
     setFinalTime(null);
     setSelectedShapeId(null);
     clearProgress();
@@ -832,42 +830,42 @@ export default function Puzzle() {
       onPointerUp={handlePointerUp}
       onPointerCancel={() => setDragState(null)}
     >
-      {hasMounted && solvedDates.length > 0 && (
+      {hasMounted && (
         <motion.div
           className="absolute top-0 left-0 p-2 flex flex-wrap gap-2 items-center bg-white w-full justify-between"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          <div className="flex gap-2 items-center flex-1">
-            <span className="text-xs text-stone-400">Previous solves:</span>
-            <div className="flex gap-2 overflow-x-scroll flex-1">
-              {solvedDates.map((dateKey, i) => {
-                const isActive = viewingDate === dateKey;
-                const isToday = dateKey === getDateKey(currentDate);
-                return (
-                  <motion.button
-                    key={dateKey}
-                    onClick={() =>
-                      isToday ? backToToday() : viewSolve(dateKey)
-                    }
-                    className={`text-xs px-2 py-1 rounded shrink-0 ${
-                      isActive
-                        ? "bg-stone-700 text-white"
-                        : "bg-stone-100 hover:bg-stone-200 text-stone-600"
-                    }`}
-                    initial={{ opacity: 0, y: 5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.03 }}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    {isToday ? "Today" : dateKey.slice(5)}
-                  </motion.button>
-                );
-              })}
+          {solvedDates.length > 0 && (
+            <div className="flex gap-2 items-center flex-1">
+              <span className="text-xs text-stone-400">Previous solves:</span>
+              <div className="flex gap-2 overflow-x-scroll flex-1">
+                {solvedDates.map((dateKey, i) => {
+                  const isActive = viewingDate === dateKey;
+                  const isToday = dateKey === getDateKey(currentDate);
+                  return (
+                    <motion.button
+                      key={dateKey}
+                      onClick={() =>
+                        isToday ? backToToday() : viewSolve(dateKey)
+                      }
+                      className={`text-xs px-2 py-1 rounded shrink-0 ${
+                        isActive
+                          ? "bg-stone-700 text-white"
+                          : "bg-stone-100 hover:bg-stone-200 text-stone-600"
+                      }`}
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.03 }}
+                    >
+                      {isToday ? "Today" : dateKey.slice(5)}
+                    </motion.button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
           {!isViewingHistory && (
             <div className="flex gap-2">
               {(placedShapes.length > 0 || isSolved || elapsedTime > 0) && (
@@ -945,7 +943,7 @@ export default function Puzzle() {
 
       {/* Grid */}
       <motion.div
-        className="border-4 border-[#2B2B23] rounded-lg"
+        className="border-4 border-[#2B2B23] bg-[#2B2B23] rounded-lg"
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.4, delay: 0.2 }}
@@ -974,7 +972,7 @@ export default function Puzzle() {
                       ? "bg-background"
                       : cell.isTarget
                       ? "bg-[#2B2B23]! font-bold! text-[#F1C7A2]!"
-                      : "bg-background"
+                      : "bg-background border border-[#2B2B23]"
                   }
                   ${cell.isTarget ? "text-foreground" : "text-background"}
                 `}
