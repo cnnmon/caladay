@@ -1,5 +1,5 @@
 mobile-friendly implementation of the caesar "calendar a day puzzle" (see: [physical puzzle](https://www.amazon.com/True-Genius-One-Day-Brainteasers/dp/B0CHWYG2PC))
 for each day, try to fit all the puzzle pieces on the board without touching the current day and month.
 
-<img width="547" height="705" alt="image" src="https://github.com/user-attachments/assets/bf24921d-d558-47fe-a1f7-d3843db5839f" />
-<img width="555" height="728" alt="image" src="https://github.com/user-attachments/assets/da0b6126-b54c-4164-8ff0-977326f54390" />
+<img width="1622" height="1054" alt="Screenshot 2026-01-04 at 4 34 28 PM" src="https://github.com/user-attachments/assets/d7a71d64-dbf1-4b38-bc4c-18b7e26e4b80" />
+<img width="1622" height="1054" alt="Screenshot 2026-01-04 at 4 34 31 PM" src="https://github.com/user-attachments/assets/b440c399-dad8-4b00-9ffb-0cbab37328aa" />
