@@ -32,6 +32,7 @@ export interface SavedPuzzleState {
   shapeRotations: Record<string, ShapeMatrix>;
   solvedAt?: string; // ISO timestamp when solved
   solveTime?: number; // Time in seconds to solve
+  gridTargets?: { month: string; dayNum: string; dayWord: string }; // What the grid was showing
 }
 
 // History of all solves keyed by date string (YYYY-MM-DD)

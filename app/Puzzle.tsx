@@ -413,8 +413,9 @@ export default function Puzzle() {
     if (solved && !isSolved) {
       setIsSolved(true);
       setFinalTime(elapsedTime);
-      // Save to history and clear progress (no longer in-progress)
+      // Save to history using the grid's date (currentDate determines grid targets)
       const dateKey = getDateKey(currentDate);
+      const { month, dayNum, dayWord } = getTargetsForDate(currentDate);
       const state: SavedPuzzleState = {
         placedShapes: placedShapes.map((p) => ({
           id: p.id,
@@ -425,6 +426,7 @@ export default function Puzzle() {
         shapeRotations: { ...shapeRotations },
         solvedAt: new Date().toISOString(),
         solveTime: elapsedTime,
+        gridTargets: { month, dayNum, dayWord }, // Store what the grid was showing
       };
       const newHistory = { ...history, [dateKey]: state };
       setHistory(newHistory);
@@ -975,13 +977,36 @@ export default function Puzzle() {
                 onClick={() => {
                   const historyData = loadHistory();
                   const progressData = loadProgress();
-                  const recentSolves = Object.entries(historyData)
+
+                  // Backfill gridTargets for old solves
+                  let updated = false;
+                  const backfilledHistory = { ...historyData };
+                  for (const [dateKey, state] of Object.entries(
+                    backfilledHistory
+                  )) {
+                    if (!state.gridTargets) {
+                      // Parse date key (YYYY-MM-DD) and compute targets
+                      const date = new Date(dateKey + "T12:00:00");
+                      const targets = getTargetsForDate(date);
+                      backfilledHistory[dateKey] = {
+                        ...state,
+                        gridTargets: targets,
+                      };
+                      updated = true;
+                    }
+                  }
+
+                  saveHistory(backfilledHistory);
+                  setHistory(backfilledHistory);
+                  console.log("✅ Backfilled gridTargets for old solves");
+
+                  const recentSolves = Object.entries(backfilledHistory)
                     .sort(([a], [b]) => b.localeCompare(a))
                     .slice(0, 5);
                   console.log("=== Caesar Puzzle Debug ===");
                   console.log("Current date key:", getDateKey(currentDate));
                   console.log("Recent solves:", recentSolves);
-                  console.log("Full history:", historyData);
+                  console.log("Full history:", backfilledHistory);
                   console.log("Current progress:", progressData);
                 }}
               >
