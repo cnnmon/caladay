@@ -1381,20 +1381,6 @@ export default function Puzzle() {
                   Resume
                 </motion.button>
               )}
-              <motion.button
-                onClick={copySolution}
-                className="text-xs px-2 py-1 rounded-md bg-blue-200 hover:bg-blue-300 text-blue-700"
-                title="Copy solution string"
-              >
-                📋
-              </motion.button>
-              <motion.button
-                onClick={pasteSolution}
-                className="text-xs px-2 py-1 rounded-md bg-green-200 hover:bg-green-300 text-green-700"
-                title="Paste solution string"
-              >
-                📥
-              </motion.button>
             </div>
           )}
         </motion.div>
@@ -1776,20 +1762,6 @@ export default function Puzzle() {
               Pause
             </motion.button>
           )}
-          <motion.button
-            onClick={copySolution}
-            className="text-xs px-2 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200"
-            title="Copy solution string to clipboard"
-          >
-            📋
-          </motion.button>
-          <motion.button
-            onClick={pasteSolution}
-            className="text-xs px-2 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200"
-            title="Paste solution string from clipboard"
-          >
-            📥
-          </motion.button>
         </div>
       </motion.div>
     </motion.div>
