@@ -16,7 +16,11 @@ const PROGRESS_KEY = "caesar-puzzle-progress";
 const SHAPES_VERSION = "v2"; // Increment when shapes change to clear cached rotations
 
 function getDateKey(date: Date = new Date()): string {
-  return date.toISOString().split("T")[0];
+  // Use local date to match grid targets (which also use local time)
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 function loadHistory(): SolveHistory {
