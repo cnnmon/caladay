@@ -665,7 +665,7 @@ export default function Puzzle() {
       })()
     : false;
 
-  // Keyboard hotkeys for rotate (R) and flip (F)
+  // Keyboard hotkeys for rotate (R), flip (F), and remove (Backspace/Delete/X)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!selectedShapeId || !isPlaying || isSolved) return;
@@ -674,6 +674,12 @@ export default function Puzzle() {
         handleRotate(selectedShapeId);
       } else if (key === "f" && canFlipSelected) {
         handleFlip(selectedShapeId);
+      } else if (
+        (key === "backspace" || key === "delete" || key === "x") &&
+        isShapePlaced(selectedShapeId)
+      ) {
+        e.preventDefault();
+        setPlacedShapes((prev) => prev.filter((p) => p.id !== selectedShapeId));
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -686,6 +692,7 @@ export default function Puzzle() {
     canFlipSelected,
     handleRotate,
     handleFlip,
+    isShapePlaced,
   ]);
 
   // Pointer event handlers (unified mouse + touch)
@@ -863,37 +870,46 @@ export default function Puzzle() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          {solvedDates.length > 0 && (
-            <div className="flex gap-2 items-center flex-1">
-              <span className="text-xs text-stone-400">Previous solves:</span>
-              <div className="flex gap-2 overflow-x-scroll flex-1">
-                {solvedDates.map((dateKey, i) => {
-                  const isActive = viewingDate === dateKey;
-                  const isToday = dateKey === getDateKey(currentDate);
-                  return (
-                    <motion.button
-                      key={dateKey}
-                      onClick={() =>
-                        isToday ? backToToday() : viewSolve(dateKey)
-                      }
-                      className={`text-xs px-2 py-1 rounded shrink-0 hover:text-stone-200 ${
-                        isActive
-                          ? "bg-stone-700 text-white"
-                          : "bg-stone-300 hover:bg-stone-400 text-stone-600"
-                      }`}
-                      initial={{ opacity: 0, y: 5 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.03 }}
-                    >
-                      {isToday ? "Today" : dateKey.slice(5)}
-                    </motion.button>
-                  );
-                })}
+          <div className="flex flex-col gap-2 px-2 p-1">
+            {solvedDates.length > 0 && (
+              <div className="flex gap-2 items-center flex-1">
+                <span className="text-xs text-stone-400">Previous solves:</span>
+                <div className="flex gap-2 overflow-x-scroll flex-1">
+                  {solvedDates.map((dateKey, i) => {
+                    const isActive = viewingDate === dateKey;
+                    const isToday = dateKey === getDateKey(currentDate);
+                    return (
+                      <motion.button
+                        key={dateKey}
+                        onClick={() =>
+                          isToday ? backToToday() : viewSolve(dateKey)
+                        }
+                        className={`text-xs px-2 py-1 rounded shrink-0 hover:text-stone-200 ${
+                          isActive
+                            ? "bg-stone-700 text-white"
+                            : "bg-stone-300 hover:bg-stone-400 text-stone-600"
+                        }`}
+                        initial={{ opacity: 0, y: 5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.03 }}
+                      >
+                        {isToday ? "Today" : dateKey.slice(5)}
+                      </motion.button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+            <p className="text-xs text-stone-400 hidden sm:block">
+              <b>Hotkeys:</b>
+              <br />R = rotate
+              <br />F = flip
+              <br />
+              Backspace/Delete/X = remove
+            </p>
+          </div>
           {!isViewingHistory && (
-            <div className="flex gap-2 md:hidden">
+            <div className="flex gap-2 sm:hidden">
               {(placedShapes.length > 0 || isSolved || elapsedTime > 0) && (
                 <motion.button
                   onClick={resetToday}
@@ -1267,7 +1283,7 @@ export default function Puzzle() {
             ? "Press Resume to continue"
             : "Press Start to begin"}
         </p>
-        <div className="gap-2 items-center md:flex hidden">
+        <div className="gap-2 items-center sm:flex hidden">
           {(placedShapes.length > 0 || isSolved || elapsedTime > 0) && (
             <motion.button
               onClick={resetToday}
