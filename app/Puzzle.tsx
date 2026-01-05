@@ -665,6 +665,29 @@ export default function Puzzle() {
       })()
     : false;
 
+  // Keyboard hotkeys for rotate (R) and flip (F)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!selectedShapeId || !isPlaying || isSolved) return;
+      const key = e.key.toLowerCase();
+      if (key === "r" && canRotateSelected) {
+        handleRotate(selectedShapeId);
+      } else if (key === "f" && canFlipSelected) {
+        handleFlip(selectedShapeId);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [
+    selectedShapeId,
+    isPlaying,
+    isSolved,
+    canRotateSelected,
+    canFlipSelected,
+    handleRotate,
+    handleFlip,
+  ]);
+
   // Pointer event handlers (unified mouse + touch)
   const handlePointerDown = useCallback(
     (
@@ -1138,7 +1161,7 @@ export default function Puzzle() {
                       shapeRefs.current[shape.id] = el;
                     }}
                     className={`flex items-center justify-center p-1.5 rounded-md cursor-pointer transition-all ${
-                      isSelected ? "bg-stone-200/60" : "hover:bg-stone-100/50"
+                      isSelected ? "bg-stone-300/60" : "hover:bg-stone-300/40"
                     }`}
                     animate={{
                       opacity: isDraggingThis ? 0.3 : 1,
@@ -1181,7 +1204,7 @@ export default function Puzzle() {
               }
               disabled={!canRotateSelected}
               className={`w-8 h-8 flex items-center justify-center rounded text-sm transition-colors bg-stone-300 hover:bg-stone-400 active:bg-stone-400 text-stone-700 disabled:opacity-30 disabled:cursor-not-allowed`}
-              title="Rotate selected shape"
+              title="Rotate selected shape (R)"
             >
               ↻
             </button>
@@ -1193,7 +1216,7 @@ export default function Puzzle() {
               }
               disabled={!canFlipSelected}
               className={`w-8 h-8 flex items-center justify-center rounded text-sm transition-colors bg-stone-300 hover:bg-stone-400 active:bg-stone-400 text-stone-700 disabled:opacity-30 disabled:cursor-not-allowed`}
-              title="Flip selected shape"
+              title="Flip selected shape (F)"
             >
               ⇆
             </button>
