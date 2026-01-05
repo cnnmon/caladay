@@ -373,6 +373,7 @@ describe('Timezone-consistent date handling', () => {
 
     it('should compute correct gridTargets from real faulty data', () => {
       // Real faulty data: saved as "2026-01-05" but grid was showing Jan 4
+      // Jan 4, 2026 is a SUNDAY
       const faultyPlacedShapes = [
         { id: "V", gridRow: 5, gridCol: 4, cells: [[0,2],[1,2],[2,2],[2,1],[2,0]] as ShapeMatrix },
         { id: "O", gridRow: 4, gridCol: 4, cells: [[2,1],[2,0],[1,1],[0,2],[0,1]] as ShapeMatrix },
@@ -388,11 +389,11 @@ describe('Timezone-consistent date handling', () => {
       
       const targets = computeGridTargetsFromShapes(faultyPlacedShapes);
       
-      // The grid should show Jan 4, Sat (not Jan 5, Mon as the faulty key suggests)
+      // The grid should show Jan 4, Sun (not Jan 5, Mon as the faulty key suggests)
       expect(targets).not.toBeNull();
       expect(targets?.month).toBe("Jan");
       expect(targets?.dayNum).toBe("4");
-      expect(targets?.dayWord).toBe("Sat");
+      expect(targets?.dayWord).toBe("Sun");
     });
 
     it('should NOT trust the date key for gridTargets', () => {
@@ -491,21 +492,21 @@ describe('Timezone-consistent date handling', () => {
 
   describe('gridTargetsToDateKey', () => {
     it('should convert valid gridTargets to date key', () => {
-      // Jan 4, 2026 is a Saturday
-      const targets = { month: "Jan", dayNum: "4", dayWord: "Sat" };
+      // Jan 4, 2026 is a Sunday
+      const targets = { month: "Jan", dayNum: "4", dayWord: "Sun" };
       const key = gridTargetsToDateKey(targets, 2026);
       expect(key).toBe("2026-01-04");
     });
 
     it('should return null for invalid day of week', () => {
-      // Jan 4, 2026 is Saturday, not Monday
+      // Jan 4, 2026 is Sunday, not Monday
       const targets = { month: "Jan", dayNum: "4", dayWord: "Mon" };
       const key = gridTargetsToDateKey(targets, 2026);
       expect(key).toBeNull();
     });
 
     it('should return null for invalid month', () => {
-      const targets = { month: "Foo", dayNum: "4", dayWord: "Sat" };
+      const targets = { month: "Foo", dayNum: "4", dayWord: "Sun" };
       const key = gridTargetsToDateKey(targets, 2026);
       expect(key).toBeNull();
     });
@@ -513,7 +514,8 @@ describe('Timezone-consistent date handling', () => {
 
   describe('migrateHistory', () => {
     it('should migrate real faulty data with wrong date key', () => {
-      // Real faulty data: saved as "2026-01-05" but grid was showing Jan 4, Sat
+      // Real faulty data: saved as "2026-01-05" but grid was showing Jan 4, Sun
+      // Jan 4, 2026 is a Sunday
       const faultyHistory: Record<string, SavedPuzzleState> = {
         "2026-01-05": {
           placedShapes: [
@@ -544,11 +546,11 @@ describe('Timezone-consistent date handling', () => {
       expect(migrated["2026-01-05"]).toBeUndefined();
       expect(migrated["2026-01-04"]).toBeDefined();
       
-      // gridTargets should be computed from shapes
+      // gridTargets should be computed from shapes (Jan 4, 2026 is a Sunday)
       expect(migrated["2026-01-04"].gridTargets).toEqual({
         month: "Jan",
         dayNum: "4",
-        dayWord: "Sat",
+        dayWord: "Sun",
       });
       
       // startedAt should be backfilled from solveTime
@@ -559,13 +561,14 @@ describe('Timezone-consistent date handling', () => {
     });
 
     it('should not modify already correct data', () => {
+      // Jan 4, 2026 is a Sunday
       const correctHistory: Record<string, SavedPuzzleState> = {
         "2026-01-04": {
           placedShapes: [{ id: "L", gridRow: 0, gridCol: 0, cells: [[0, 0]] }],
           shapeRotations: {},
           startedAt: "2026-01-04T20:00:00.000Z",
           solvedAt: "2026-01-04T20:05:00.000Z",
-          gridTargets: { month: "Jan", dayNum: "4", dayWord: "Sat" },
+          gridTargets: { month: "Jan", dayNum: "4", dayWord: "Sun" },
         },
       };
 
@@ -576,7 +579,7 @@ describe('Timezone-consistent date handling', () => {
       expect(migrated["2026-01-04"].gridTargets).toEqual({
         month: "Jan",
         dayNum: "4",
-        dayWord: "Sat",
+        dayWord: "Sun",
       });
     });
   });

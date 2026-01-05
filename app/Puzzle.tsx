@@ -279,10 +279,10 @@ function gridTargetsToDateKey(
   const year = referenceYear ?? new Date().getFullYear();
   const monthIndex = MONTHS.indexOf(targets.month);
   if (monthIndex === -1) return null;
-  
+
   const day = parseInt(targets.dayNum, 10);
   if (isNaN(day) || day < 1 || day > 31) return null;
-  
+
   // Validate the day of week matches
   const date = new Date(year, monthIndex, day);
   const expectedDayWord = DAYS[date.getDay()];
@@ -294,12 +294,16 @@ function gridTargetsToDateKey(
     }
     return null; // Day of week doesn't match
   }
-  
+
   return getDateKey(date);
 }
 
 // Check if gridTargets match today's date
-function isGridTargetsToday(targets: { month: string; dayNum: string; dayWord: string }): boolean {
+function isGridTargetsToday(targets: {
+  month: string;
+  dayNum: string;
+  dayWord: string;
+}): boolean {
   const today = new Date();
   const todayTargets = getTargetsForDate(today);
   return (
@@ -310,29 +314,35 @@ function isGridTargetsToday(targets: { month: string; dayNum: string; dayWord: s
 }
 
 // Migrate old storage format to new format
-function migrateHistory(history: SolveHistory): { migrated: SolveHistory; changed: boolean } {
+function migrateHistory(history: SolveHistory): {
+  migrated: SolveHistory;
+  changed: boolean;
+} {
   let changed = false;
   const migrated: SolveHistory = {};
-  
+
   for (const [oldKey, state] of Object.entries(history)) {
     // Compute gridTargets from shapes if missing
     let gridTargets = state.gridTargets;
     if (!gridTargets) {
-      gridTargets = computeGridTargetsFromShapes(state.placedShapes) ?? undefined;
+      gridTargets =
+        computeGridTargetsFromShapes(state.placedShapes) ?? undefined;
       changed = true;
     }
-    
+
     // Backfill startedAt from old solveTime format
     let startedAt = state.startedAt;
     if (!startedAt && state.solvedAt) {
       const oldFormat = state as unknown as { solveTime?: number };
       if (oldFormat.solveTime !== undefined) {
         const solvedAtMs = new Date(state.solvedAt).getTime();
-        startedAt = new Date(solvedAtMs - oldFormat.solveTime * 1000).toISOString();
+        startedAt = new Date(
+          solvedAtMs - oldFormat.solveTime * 1000
+        ).toISOString();
         changed = true;
       }
     }
-    
+
     // Determine the correct key from gridTargets
     let correctKey = oldKey;
     if (gridTargets) {
@@ -342,14 +352,14 @@ function migrateHistory(history: SolveHistory): { migrated: SolveHistory; change
         changed = true;
       }
     }
-    
+
     migrated[correctKey] = {
       ...state,
       gridTargets,
       startedAt,
     };
   }
-  
+
   return { migrated, changed };
 }
 
@@ -388,7 +398,7 @@ export default function Puzzle() {
   // Load history after mount to avoid hydration mismatch
   useEffect(() => {
     const rawHistory = loadHistory();
-    
+
     // Migrate old format to new format (fixes timezone issues, adds gridTargets)
     const { migrated, changed } = migrateHistory(rawHistory);
     if (changed) {
@@ -405,7 +415,7 @@ export default function Puzzle() {
         state.gridTargets.dayNum === todayTargets.dayNum &&
         state.gridTargets.dayWord === todayTargets.dayWord
     );
-    
+
     if (todayState) {
       const restored = todayState.placedShapes.map((s) => {
         const shape = SHAPES.find((sh) => sh.id === s.id)!;
