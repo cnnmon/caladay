@@ -211,12 +211,17 @@ function formatTime(seconds: number): string {
   return `${mins}:${secs.toString().padStart(2, "0")}`;
 }
 
-// Get solve time in seconds from a saved state
+// Get solve time in seconds from a saved state (handles both old and new format)
 function getSolveTime(state: SavedPuzzleState): number {
   if (state.startedAt && state.solvedAt) {
     const start = new Date(state.startedAt).getTime();
     const end = new Date(state.solvedAt).getTime();
     return Math.floor((end - start) / 1000);
+  }
+  // Fallback for old format with solveTime
+  const oldFormat = state as unknown as { solveTime?: number };
+  if (oldFormat.solveTime !== undefined) {
+    return oldFormat.solveTime;
   }
   return 0;
 }
@@ -265,6 +270,89 @@ function computeGridTargetsFromShapes(
   return null;
 }
 
+// Convert gridTargets to a date key (YYYY-MM-DD) for the current year
+// Returns null if the targets don't form a valid date
+function gridTargetsToDateKey(
+  targets: { month: string; dayNum: string; dayWord: string },
+  referenceYear?: number
+): string | null {
+  const year = referenceYear ?? new Date().getFullYear();
+  const monthIndex = MONTHS.indexOf(targets.month);
+  if (monthIndex === -1) return null;
+  
+  const day = parseInt(targets.dayNum, 10);
+  if (isNaN(day) || day < 1 || day > 31) return null;
+  
+  // Validate the day of week matches
+  const date = new Date(year, monthIndex, day);
+  const expectedDayWord = DAYS[date.getDay()];
+  if (expectedDayWord !== targets.dayWord) {
+    // Try previous year (for cases near year boundary)
+    const prevYearDate = new Date(year - 1, monthIndex, day);
+    if (DAYS[prevYearDate.getDay()] === targets.dayWord) {
+      return getDateKey(prevYearDate);
+    }
+    return null; // Day of week doesn't match
+  }
+  
+  return getDateKey(date);
+}
+
+// Check if gridTargets match today's date
+function isGridTargetsToday(targets: { month: string; dayNum: string; dayWord: string }): boolean {
+  const today = new Date();
+  const todayTargets = getTargetsForDate(today);
+  return (
+    targets.month === todayTargets.month &&
+    targets.dayNum === todayTargets.dayNum &&
+    targets.dayWord === todayTargets.dayWord
+  );
+}
+
+// Migrate old storage format to new format
+function migrateHistory(history: SolveHistory): { migrated: SolveHistory; changed: boolean } {
+  let changed = false;
+  const migrated: SolveHistory = {};
+  
+  for (const [oldKey, state] of Object.entries(history)) {
+    // Compute gridTargets from shapes if missing
+    let gridTargets = state.gridTargets;
+    if (!gridTargets) {
+      gridTargets = computeGridTargetsFromShapes(state.placedShapes) ?? undefined;
+      changed = true;
+    }
+    
+    // Backfill startedAt from old solveTime format
+    let startedAt = state.startedAt;
+    if (!startedAt && state.solvedAt) {
+      const oldFormat = state as unknown as { solveTime?: number };
+      if (oldFormat.solveTime !== undefined) {
+        const solvedAtMs = new Date(state.solvedAt).getTime();
+        startedAt = new Date(solvedAtMs - oldFormat.solveTime * 1000).toISOString();
+        changed = true;
+      }
+    }
+    
+    // Determine the correct key from gridTargets
+    let correctKey = oldKey;
+    if (gridTargets) {
+      const computedKey = gridTargetsToDateKey(gridTargets);
+      if (computedKey && computedKey !== oldKey) {
+        correctKey = computedKey;
+        changed = true;
+      }
+    }
+    
+    migrated[correctKey] = {
+      ...state,
+      gridTargets,
+      startedAt,
+    };
+  }
+  
+  return { migrated, changed };
+}
+
 export default function Puzzle() {
   const [currentDate, setCurrentDate] = useState(() => new Date());
   const [viewingDate, setViewingDate] = useState<string | null>(null); // null = playing today
@@ -299,12 +387,25 @@ export default function Puzzle() {
 
   // Load history after mount to avoid hydration mismatch
   useEffect(() => {
-    const loadedHistory = loadHistory();
-    setHistory(loadedHistory);
+    const rawHistory = loadHistory();
+    
+    // Migrate old format to new format (fixes timezone issues, adds gridTargets)
+    const { migrated, changed } = migrateHistory(rawHistory);
+    if (changed) {
+      saveHistory(migrated);
+    }
+    setHistory(migrated);
 
-    // Check if today was already solved and restore that state
-    const todayKey = getDateKey(currentDate);
-    const todayState = loadedHistory[todayKey];
+    // Check if today was already solved by comparing gridTargets (not date key)
+    const todayTargets = getTargetsForDate(currentDate);
+    const todayState = Object.values(migrated).find(
+      (state) =>
+        state.gridTargets &&
+        state.gridTargets.month === todayTargets.month &&
+        state.gridTargets.dayNum === todayTargets.dayNum &&
+        state.gridTargets.dayWord === todayTargets.dayWord
+    );
+    
     if (todayState) {
       const restored = todayState.placedShapes.map((s) => {
         const shape = SHAPES.find((sh) => sh.id === s.id)!;
@@ -538,9 +639,15 @@ export default function Puzzle() {
     setPlacedShapes([]);
     setShapeRotations(Object.fromEntries(SHAPES.map((s) => [s.id, s.cells])));
 
-    // Restore today's progress if solved
-    const todayKey = getDateKey(currentDate);
-    const todayState = history[todayKey];
+    // Restore today's progress if solved (check by gridTargets, not date key)
+    const todayTargets = getTargetsForDate(currentDate);
+    const todayState = Object.values(history).find(
+      (state) =>
+        state.gridTargets &&
+        state.gridTargets.month === todayTargets.month &&
+        state.gridTargets.dayNum === todayTargets.dayNum &&
+        state.gridTargets.dayWord === todayTargets.dayWord
+    );
     if (todayState) {
       const restored = todayState.placedShapes.map((s) => {
         const shape = SHAPES.find((sh) => sh.id === s.id)!;
@@ -947,7 +1054,10 @@ export default function Puzzle() {
                 <div className="flex gap-2 overflow-x-scroll flex-1">
                   {solvedDates.map((dateKey, i) => {
                     const isActive = viewingDate === dateKey;
-                    const isToday = dateKey === getDateKey(currentDate);
+                    const state = history[dateKey];
+                    const isToday = state?.gridTargets
+                      ? isGridTargetsToday(state.gridTargets)
+                      : dateKey === getDateKey(currentDate);
                     return (
                       <motion.button
                         key={dateKey}
@@ -1038,64 +1148,7 @@ export default function Puzzle() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              <span
-                className="text-lg font-medium text-green-600 cursor-pointer"
-                onClick={() => {
-                  const historyData = loadHistory();
-                  const progressData = loadProgress();
-
-                  // Backfill old solves with new format
-                  const backfilledHistory = { ...historyData };
-                  for (const [dateKey, state] of Object.entries(
-                    backfilledHistory
-                  )) {
-                    let needsUpdate = false;
-                    const updates: Partial<SavedPuzzleState> = {};
-
-                    // Backfill gridTargets from uncovered cells
-                    if (!state.gridTargets) {
-                      const computed = computeGridTargetsFromShapes(
-                        state.placedShapes
-                      );
-                      if (computed) {
-                        updates.gridTargets = computed;
-                        needsUpdate = true;
-                      }
-                    }
-
-                    // Backfill startedAt from old solveTime format
-                    if (!state.startedAt && state.solvedAt) {
-                      const oldSolveTime = (
-                        state as unknown as { solveTime?: number }
-                      ).solveTime;
-                      if (oldSolveTime !== undefined) {
-                        const solvedAtMs = new Date(state.solvedAt).getTime();
-                        updates.startedAt = new Date(
-                          solvedAtMs - oldSolveTime * 1000
-                        ).toISOString();
-                        needsUpdate = true;
-                      }
-                    }
-
-                    if (needsUpdate) {
-                      backfilledHistory[dateKey] = { ...state, ...updates };
-                    }
-                  }
-
-                  saveHistory(backfilledHistory);
-                  setHistory(backfilledHistory);
-                  console.log("✅ Backfilled old solves with new format");
-
-                  const recentSolves = Object.entries(backfilledHistory)
-                    .sort(([a], [b]) => b.localeCompare(a))
-                    .slice(0, 5);
-                  console.log("=== Caesar Puzzle Debug ===");
-                  console.log("Current date key:", getDateKey(currentDate));
-                  console.log("Recent solves:", recentSolves);
-                  console.log("Full history:", backfilledHistory);
-                  console.log("Current progress:", progressData);
-                }}
-              >
+              <span className="text-lg font-medium text-green-600">
                 {isViewingHistory ? "✓ Solved" : "🎉 Congratulations!"}
               </span>
             </motion.div>
