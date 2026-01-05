@@ -211,6 +211,60 @@ function formatTime(seconds: number): string {
   return `${mins}:${secs.toString().padStart(2, "0")}`;
 }
 
+// Get solve time in seconds from a saved state
+function getSolveTime(state: SavedPuzzleState): number {
+  if (state.startedAt && state.solvedAt) {
+    const start = new Date(state.startedAt).getTime();
+    const end = new Date(state.solvedAt).getTime();
+    return Math.floor((end - start) / 1000);
+  }
+  return 0;
+}
+
+// Compute gridTargets from placed shapes by finding uncovered cells
+function computeGridTargetsFromShapes(
+  placedShapes: SavedPuzzleState["placedShapes"]
+): { month: string; dayNum: string; dayWord: string } | null {
+  const grid = buildGrid();
+  const covered = new Set<string>();
+
+  // Mark all cells covered by shapes
+  for (const shape of placedShapes) {
+    for (const [r, c] of shape.cells) {
+      const row = shape.gridRow + r;
+      const col = shape.gridCol + c;
+      covered.add(`${row},${col}`);
+    }
+  }
+
+  // Find uncovered non-blocked cells - these are the targets
+  let month = "";
+  let dayNum = "";
+  let dayWord = "";
+
+  for (const row of grid) {
+    for (const cell of row) {
+      if (cell.isBlocked) continue;
+      const key = `${cell.row},${cell.col}`;
+      if (!covered.has(key)) {
+        // This cell is uncovered - it's a target
+        if (MONTHS.includes(cell.label)) {
+          month = cell.label;
+        } else if (DAYS.includes(cell.label)) {
+          dayWord = cell.label;
+        } else if (/^\d+$/.test(cell.label)) {
+          dayNum = cell.label;
+        }
+      }
+    }
+  }
+
+  if (month && dayNum && dayWord) {
+    return { month, dayNum, dayWord };
+  }
+  return null;
+}
+
 export default function Puzzle() {
   const [currentDate, setCurrentDate] = useState(() => new Date());
   const [viewingDate, setViewingDate] = useState<string | null>(null); // null = playing today
@@ -264,7 +318,7 @@ export default function Puzzle() {
       setPlacedShapes(restored);
       setShapeRotations(todayState.shapeRotations);
       setIsSolved(true);
-      setFinalTime(todayState.solveTime ?? null);
+      setFinalTime(getSolveTime(todayState));
     }
 
     setHasMounted(true);
@@ -274,6 +328,14 @@ export default function Puzzle() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [finalTime, setFinalTime] = useState<number | null>(null);
+  const [startedAt, setStartedAt] = useState<string | null>(null);
+
+  // Track when timer starts
+  useEffect(() => {
+    if (isPlaying && !startedAt && !isSolved) {
+      setStartedAt(new Date().toISOString());
+    }
+  }, [isPlaying, startedAt, isSolved]);
 
   // Timer effect
   useEffect(() => {
@@ -424,8 +486,8 @@ export default function Puzzle() {
           cells: shapeRotations[p.id],
         })),
         shapeRotations: { ...shapeRotations },
+        startedAt: startedAt ?? new Date().toISOString(),
         solvedAt: new Date().toISOString(),
-        solveTime: elapsedTime,
         gridTargets: { month, dayNum, dayWord }, // Store what the grid was showing
       };
       const newHistory = { ...history, [dateKey]: state };
@@ -442,6 +504,7 @@ export default function Puzzle() {
     history,
     viewingDate,
     elapsedTime,
+    startedAt,
   ]);
 
   // View a previous solve
@@ -452,7 +515,7 @@ export default function Puzzle() {
     const date = new Date(dateKey + "T12:00:00");
     setViewingDate(dateKey);
     setGrid(markTargets(buildGrid(), date));
-    setFinalTime(state.solveTime ?? null);
+    setFinalTime(getSolveTime(state));
 
     // Restore placed shapes
     const restored = state.placedShapes.map((s) => {
@@ -503,6 +566,7 @@ export default function Puzzle() {
     setIsSolved(false);
     setFinalTime(null);
     setSelectedShapeId(null);
+    setStartedAt(null);
     clearProgress();
   };
 
@@ -961,7 +1025,9 @@ export default function Puzzle() {
         <h1 className="text-xl font-light tracking-wide text-stone-700">
           {month} {dayNum}, {dayWord} ·{" "}
           {isViewingHistory
-            ? formatTime(history[viewingDate!]?.solveTime ?? 0)
+            ? formatTime(
+                history[viewingDate!] ? getSolveTime(history[viewingDate!]) : 0
+              )
             : formatTime(
                 isSolved && finalTime !== null ? finalTime : elapsedTime
               )}
@@ -978,27 +1044,47 @@ export default function Puzzle() {
                   const historyData = loadHistory();
                   const progressData = loadProgress();
 
-                  // Backfill gridTargets for old solves
-                  let updated = false;
+                  // Backfill old solves with new format
                   const backfilledHistory = { ...historyData };
                   for (const [dateKey, state] of Object.entries(
                     backfilledHistory
                   )) {
+                    let needsUpdate = false;
+                    const updates: Partial<SavedPuzzleState> = {};
+
+                    // Backfill gridTargets from uncovered cells
                     if (!state.gridTargets) {
-                      // Parse date key (YYYY-MM-DD) and compute targets
-                      const date = new Date(dateKey + "T12:00:00");
-                      const targets = getTargetsForDate(date);
-                      backfilledHistory[dateKey] = {
-                        ...state,
-                        gridTargets: targets,
-                      };
-                      updated = true;
+                      const computed = computeGridTargetsFromShapes(
+                        state.placedShapes
+                      );
+                      if (computed) {
+                        updates.gridTargets = computed;
+                        needsUpdate = true;
+                      }
+                    }
+
+                    // Backfill startedAt from old solveTime format
+                    if (!state.startedAt && state.solvedAt) {
+                      const oldSolveTime = (
+                        state as unknown as { solveTime?: number }
+                      ).solveTime;
+                      if (oldSolveTime !== undefined) {
+                        const solvedAtMs = new Date(state.solvedAt).getTime();
+                        updates.startedAt = new Date(
+                          solvedAtMs - oldSolveTime * 1000
+                        ).toISOString();
+                        needsUpdate = true;
+                      }
+                    }
+
+                    if (needsUpdate) {
+                      backfilledHistory[dateKey] = { ...state, ...updates };
                     }
                   }
 
                   saveHistory(backfilledHistory);
                   setHistory(backfilledHistory);
-                  console.log("✅ Backfilled gridTargets for old solves");
+                  console.log("✅ Backfilled old solves with new format");
 
                   const recentSolves = Object.entries(backfilledHistory)
                     .sort(([a], [b]) => b.localeCompare(a))
