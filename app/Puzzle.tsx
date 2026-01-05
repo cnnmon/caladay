@@ -367,6 +367,11 @@ function migrateHistory(history: SolveHistory): {
 export default function Puzzle() {
   const [currentDate, setCurrentDate] = useState(() => new Date());
   const [viewingDate, setViewingDate] = useState<string | null>(null); // null = playing today
+  const [viewingImported, setViewingImported] = useState(false); // true = previewing imported solution
+  const [importedShapes, setImportedShapes] = useState<PlacedShape[]>([]);
+  const [importedRotations, setImportedRotations] = useState<
+    Record<string, ShapeMatrix>
+  >({});
   const [history, setHistory] = useState<SolveHistory>({});
   const [isSolved, setIsSolved] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
@@ -407,15 +412,18 @@ export default function Puzzle() {
     }
     setHistory(migrated);
 
-    // Check if today was already solved by comparing gridTargets (not date key)
+    // Check if today was already solved by comparing gridTargets (find most recent)
     const todayTargets = getTargetsForDate(currentDate);
-    const todayState = Object.values(migrated).find(
-      (state) =>
-        state.gridTargets &&
-        state.gridTargets.month === todayTargets.month &&
-        state.gridTargets.dayNum === todayTargets.dayNum &&
-        state.gridTargets.dayWord === todayTargets.dayWord
-    );
+    const todaySolves = Object.values(migrated)
+      .filter(
+        (state) =>
+          state.gridTargets &&
+          state.gridTargets.month === todayTargets.month &&
+          state.gridTargets.dayNum === todayTargets.dayNum &&
+          state.gridTargets.dayWord === todayTargets.dayWord
+      )
+      .sort((a, b) => (b.solvedAt || "").localeCompare(a.solvedAt || ""));
+    const todayState = todaySolves[0];
 
     if (todayState) {
       const restored = todayState.placedShapes.map((s) => {
@@ -592,8 +600,9 @@ export default function Puzzle() {
     if (solved && !isSolved) {
       setIsSolved(true);
       setFinalTime(elapsedTime);
-      // Save to history using the grid's date (currentDate determines grid targets)
-      const dateKey = getDateKey(currentDate);
+      // Save to history using a unique solve ID (timestamp-based)
+      const solvedAt = new Date().toISOString();
+      const solveId = `solve_${solvedAt}`;
       const { month, dayNum, dayWord } = getTargetsForDate(currentDate);
       const state: SavedPuzzleState = {
         placedShapes: placedShapes.map((p) => ({
@@ -603,11 +612,11 @@ export default function Puzzle() {
           cells: shapeRotations[p.id],
         })),
         shapeRotations: { ...shapeRotations },
-        startedAt: startedAt ?? new Date().toISOString(),
-        solvedAt: new Date().toISOString(),
+        startedAt: startedAt ?? solvedAt,
+        solvedAt,
         gridTargets: { month, dayNum, dayWord }, // Store what the grid was showing
       };
-      const newHistory = { ...history, [dateKey]: state };
+      const newHistory = { ...history, [solveId]: state };
       setHistory(newHistory);
       saveHistory(newHistory);
       clearProgress();
@@ -625,12 +634,25 @@ export default function Puzzle() {
   ]);
 
   // View a previous solve
-  const viewSolve = (dateKey: string) => {
-    const state = history[dateKey];
+  const viewSolve = (solveId: string) => {
+    const state = history[solveId];
     if (!state) return;
 
-    const date = new Date(dateKey + "T12:00:00");
-    setViewingDate(dateKey);
+    // Use gridTargets to determine the date, or fall back to parsing solvedAt/solveId
+    let date: Date;
+    if (state.gridTargets) {
+      const dateKey = gridTargetsToDateKey(state.gridTargets);
+      date = dateKey ? new Date(dateKey + "T12:00:00") : new Date();
+    } else if (state.solvedAt) {
+      date = new Date(state.solvedAt);
+    } else if (solveId.startsWith("solve_")) {
+      date = new Date(solveId.slice(6));
+    } else {
+      // Legacy date-based key
+      date = new Date(solveId + "T12:00:00");
+    }
+
+    setViewingDate(solveId);
     setGrid(markTargets(buildGrid(), date));
     setFinalTime(getSolveTime(state));
 
@@ -651,19 +673,25 @@ export default function Puzzle() {
   // Return to today's puzzle
   const backToToday = () => {
     setViewingDate(null);
+    setViewingImported(false);
+    setImportedShapes([]);
+    setImportedRotations({});
     setGrid(markTargets(buildGrid(), currentDate));
     setPlacedShapes([]);
     setShapeRotations(Object.fromEntries(SHAPES.map((s) => [s.id, s.cells])));
 
     // Restore today's progress if solved (check by gridTargets, not date key)
     const todayTargets = getTargetsForDate(currentDate);
-    const todayState = Object.values(history).find(
-      (state) =>
-        state.gridTargets &&
-        state.gridTargets.month === todayTargets.month &&
-        state.gridTargets.dayNum === todayTargets.dayNum &&
-        state.gridTargets.dayWord === todayTargets.dayWord
-    );
+    const todaySolves = Object.values(history)
+      .filter(
+        (state) =>
+          state.gridTargets &&
+          state.gridTargets.month === todayTargets.month &&
+          state.gridTargets.dayNum === todayTargets.dayNum &&
+          state.gridTargets.dayWord === todayTargets.dayWord
+      )
+      .sort((a, b) => (b.solvedAt || "").localeCompare(a.solvedAt || ""));
+    const todayState = todaySolves[0];
     if (todayState) {
       const restored = todayState.placedShapes.map((s) => {
         const shape = SHAPES.find((sh) => sh.id === s.id)!;
@@ -695,8 +723,14 @@ export default function Puzzle() {
     clearProgress();
   };
 
-  // Get sorted list of solved dates
-  const solvedDates = Object.keys(history).sort().reverse();
+  // Get sorted list of solve IDs (sorted by solvedAt timestamp, most recent first)
+  const solveIds = Object.entries(history)
+    .sort((a, b) => {
+      const aTime = a[1].solvedAt || a[0];
+      const bTime = b[1].solvedAt || b[0];
+      return bTime.localeCompare(aTime);
+    })
+    .map(([id]) => id);
 
   // Check if a shape is placed on the grid
   const isShapePlaced = useCallback(
@@ -715,11 +749,13 @@ export default function Puzzle() {
     }
   }, [selectedShapeId]);
 
-  // Get cell info based on placed shapes
+  // Get cell info based on placed shapes (or imported shapes when previewing)
   const getCellInfo = useCallback(
     (row: number, col: number): { color: string; shapeId: string } | null => {
-      for (const placed of placedShapes) {
-        const cells = shapeRotations[placed.id];
+      const shapes = viewingImported ? importedShapes : placedShapes;
+      const rotations = viewingImported ? importedRotations : shapeRotations;
+      for (const placed of shapes) {
+        const cells = rotations[placed.id];
         for (const [r, c] of cells) {
           if (placed.gridRow + r === row && placed.gridCol + c === col) {
             return { color: placed.color, shapeId: placed.id };
@@ -728,8 +764,187 @@ export default function Puzzle() {
       }
       return null;
     },
-    [placedShapes, shapeRotations]
+    [
+      placedShapes,
+      shapeRotations,
+      viewingImported,
+      importedShapes,
+      importedRotations,
+    ]
   );
+
+  // Export grid state as a 56-character string (7 cols × 8 rows)
+  // Format: Shape letters (L,J,T,S,Z,I,O,P,U,V), '.' for empty, '#' for blocked
+  const exportSolution = useCallback((): string => {
+    let result = "";
+    for (let row = 0; row < 8; row++) {
+      for (let col = 0; col < 7; col++) {
+        const cell = grid[row]?.[col];
+        if (!cell || cell.isBlocked) {
+          result += "#";
+        } else {
+          const cellInfo = getCellInfo(row, col);
+          result += cellInfo ? cellInfo.shapeId : ".";
+        }
+      }
+    }
+    return result;
+  }, [grid, getCellInfo]);
+
+  // Import solution from a 56-character string
+  const importSolution = useCallback(
+    (
+      solutionStr: string
+    ): {
+      success: boolean;
+      error?: string;
+      shapes?: PlacedShape[];
+      rotations?: Record<string, ShapeMatrix>;
+    } => {
+      // Validate length
+      if (solutionStr.length !== 56) {
+        return {
+          success: false,
+          error: `Invalid length: ${solutionStr.length} (expected 56)`,
+        };
+      }
+
+      // Parse the string into a grid map
+      const shapePositions: Record<string, Array<[number, number]>> = {};
+
+      for (let i = 0; i < 56; i++) {
+        const row = Math.floor(i / 7);
+        const col = i % 7;
+        const char = solutionStr[i].toUpperCase();
+
+        if (char !== "." && char !== "#") {
+          if (!shapePositions[char]) {
+            shapePositions[char] = [];
+          }
+          shapePositions[char].push([row, col]);
+        }
+      }
+
+      // Validate each shape
+      const validShapeIds = SHAPES.map((s) => s.id);
+      const newPlacedShapes: PlacedShape[] = [];
+      const newRotations: Record<string, ShapeMatrix> = {};
+
+      for (const [shapeId, positions] of Object.entries(shapePositions)) {
+        // Check if it's a valid shape ID
+        if (!validShapeIds.includes(shapeId)) {
+          return { success: false, error: `Unknown shape: ${shapeId}` };
+        }
+
+        const shape = SHAPES.find((s) => s.id === shapeId)!;
+
+        // Check cell count matches
+        const expectedCells = shape.cells.length;
+        if (positions.length !== expectedCells) {
+          return {
+            success: false,
+            error: `Shape ${shapeId} has ${positions.length} cells (expected ${expectedCells})`,
+          };
+        }
+
+        // Find the top-left corner (overall min row and min col)
+        const minRow = Math.min(...positions.map(([r]) => r));
+        const minCol = Math.min(...positions.map(([, c]) => c));
+
+        // Compute cells relative to top-left
+        const relativeCells: ShapeMatrix = positions.map(([r, c]) => [
+          r - minRow,
+          c - minCol,
+        ]);
+
+        // Normalize the cells (sort for comparison)
+        const normalizeForCompare = (cells: ShapeMatrix): string =>
+          [...cells]
+            .sort((a, b) => a[0] - b[0] || a[1] - b[1])
+            .map(([r, c]) => `${r},${c}`)
+            .join("|");
+
+        const normalizedInput = normalizeForCompare(relativeCells);
+
+        // Try to find a matching rotation
+        let foundRotation: ShapeMatrix | null = null;
+        let testCells = shape.cells;
+
+        for (let rot = 0; rot < 4; rot++) {
+          // Normalize and compare
+          const normalized = normalizeShape(testCells);
+          if (normalizeForCompare(normalized) === normalizedInput) {
+            foundRotation = normalized;
+            break;
+          }
+          // Also try flipped
+          const flipped = normalizeShape(flipShape(testCells));
+          if (normalizeForCompare(flipped) === normalizedInput) {
+            foundRotation = flipped;
+            break;
+          }
+          // Rotate for next iteration
+          testCells = rotateShape(testCells);
+        }
+
+        if (!foundRotation) {
+          return {
+            success: false,
+            error: `Shape ${shapeId} cells don't match any valid rotation`,
+          };
+        }
+
+        newPlacedShapes.push({
+          ...shape,
+          gridRow: minRow,
+          gridCol: minCol,
+          cells: foundRotation,
+        });
+        newRotations[shapeId] = foundRotation;
+      }
+
+      // Return the parsed solution (don't apply directly)
+      return {
+        success: true,
+        shapes: newPlacedShapes,
+        rotations: newRotations,
+      };
+    },
+    []
+  );
+
+  // Copy solution to clipboard
+  const copySolution = useCallback(() => {
+    const solution = exportSolution();
+    navigator.clipboard.writeText(solution);
+  }, [exportSolution]);
+
+  // Paste solution from clipboard (shows preview, doesn't affect actual state)
+  const pasteSolution = useCallback(async () => {
+    const processImport = (text: string) => {
+      const result = importSolution(text.trim());
+      if (!result.success) {
+        alert(`Import failed: ${result.error}`);
+        return;
+      }
+      // Show preview of imported solution
+      setViewingImported(true);
+      setViewingDate(null);
+      setImportedShapes(result.shapes!);
+      setImportedRotations(result.rotations!);
+    };
+
+    try {
+      const text = await navigator.clipboard.readText();
+      processImport(text);
+    } catch {
+      // Fallback: prompt for input
+      const text = prompt("Paste solution string (56 characters):");
+      if (text) {
+        processImport(text);
+      }
+    }
+  }, [importSolution]);
 
   // Check if placement is valid
   const isValidPlacement = useCallback(
@@ -1041,7 +1256,11 @@ export default function Puzzle() {
     ? new Date(viewingDate + "T12:00:00")
     : currentDate;
   const { month, dayNum, dayWord } = getTargetsForDate(displayDate);
-  const isViewingHistory = viewingDate !== null;
+  const isViewingHistory = viewingDate !== null || viewingImported;
+
+  // Use imported shapes when previewing, otherwise use placed shapes
+  const displayShapes = viewingImported ? importedShapes : placedShapes;
+  const displayRotations = viewingImported ? importedRotations : shapeRotations;
 
   return (
     <motion.div
@@ -1066,21 +1285,45 @@ export default function Puzzle() {
           exit={{ opacity: 0 }}
         >
           <div className="flex flex-col gap-2 px-2 p-1">
-            {solvedDates.length > 0 && (
+            {solveIds.length > 0 && (
               <div className="flex gap-2 items-center flex-1">
                 <span className="text-xs text-stone-400">Previous solves:</span>
                 <div className="flex gap-2 overflow-x-scroll flex-1">
-                  {solvedDates.map((dateKey, i) => {
-                    const isActive = viewingDate === dateKey;
-                    const state = history[dateKey];
+                  {solveIds.map((solveId, i) => {
+                    const isActive = viewingDate === solveId;
+                    const state = history[solveId];
                     const isToday = state?.gridTargets
                       ? isGridTargetsToday(state.gridTargets)
-                      : dateKey === getDateKey(currentDate);
+                      : false;
+                    // Format label: show date + time for clarity
+                    const solvedAt = state?.solvedAt
+                      ? new Date(state.solvedAt)
+                      : null;
+                    const label = isToday
+                      ? solvedAt
+                        ? `Today ${solvedAt.toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}`
+                        : "Today"
+                      : solvedAt
+                      ? `${(solvedAt.getMonth() + 1)
+                          .toString()
+                          .padStart(2, "0")}-${solvedAt
+                          .getDate()
+                          .toString()
+                          .padStart(2, "0")} ${solvedAt.toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}`
+                      : solveId.slice(6, 16);
                     return (
                       <motion.button
-                        key={dateKey}
+                        key={solveId}
                         onClick={() =>
-                          isToday ? backToToday() : viewSolve(dateKey)
+                          isToday && !viewingDate
+                            ? backToToday()
+                            : viewSolve(solveId)
                         }
                         className={`text-xs px-2 py-1 rounded shrink-0 hover:text-stone-200 ${
                           isActive
@@ -1091,7 +1334,7 @@ export default function Puzzle() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.03 }}
                       >
-                        {isToday ? "Today" : dateKey.slice(5)}
+                        {label}
                       </motion.button>
                     );
                   })}
@@ -1113,7 +1356,7 @@ export default function Puzzle() {
                   onClick={resetToday}
                   className="text-xs px-2 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200"
                 >
-                  Reset
+                  {isSolved ? "Try again" : "Reset"}
                 </motion.button>
               )}
               {isPlaying && (
@@ -1138,6 +1381,20 @@ export default function Puzzle() {
                   Resume
                 </motion.button>
               )}
+              <motion.button
+                onClick={copySolution}
+                className="text-xs px-2 py-1 rounded-md bg-blue-200 hover:bg-blue-300 text-blue-700"
+                title="Copy solution string"
+              >
+                📋
+              </motion.button>
+              <motion.button
+                onClick={pasteSolution}
+                className="text-xs px-2 py-1 rounded-md bg-green-200 hover:bg-green-300 text-green-700"
+                title="Paste solution string"
+              >
+                📥
+              </motion.button>
             </div>
           )}
         </motion.div>
@@ -1151,15 +1408,31 @@ export default function Puzzle() {
         transition={{ duration: 0.4, delay: 0.1 }}
       >
         <h1 className="text-xl font-light tracking-wide text-stone-700">
-          {month} {dayNum}, {dayWord} ·{" "}
-          {isViewingHistory
-            ? formatTime(
-                history[viewingDate!] ? getSolveTime(history[viewingDate!]) : 0
-              )
-            : formatTime(
-                isSolved && finalTime !== null ? finalTime : elapsedTime
-              )}
-          {(isSolved || isViewingHistory) && (
+          {month} {dayNum}, {dayWord}
+          {!viewingImported && (
+            <>
+              {" · "}
+              {viewingDate
+                ? formatTime(
+                    history[viewingDate]
+                      ? getSolveTime(history[viewingDate])
+                      : 0
+                  )
+                : formatTime(
+                    isSolved && finalTime !== null ? finalTime : elapsedTime
+                  )}
+            </>
+          )}
+          {viewingImported ? (
+            <motion.div
+              key="solved"
+              className="flex flex-col items-center gap-1"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <span className="text-lg font-medium text-blue-600">Preview</span>
+            </motion.div>
+          ) : isSolved || isViewingHistory ? (
             <motion.div
               key="solved"
               className="flex flex-col items-center gap-1"
@@ -1170,7 +1443,7 @@ export default function Puzzle() {
                 {isViewingHistory ? "✓ Solved" : "🎉 Congratulations!"}
               </span>
             </motion.div>
-          )}
+          ) : null}
         </h1>
 
         <AnimatePresence>
@@ -1489,7 +1762,7 @@ export default function Puzzle() {
               onClick={resetToday}
               className="text-xs px-2 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200"
             >
-              Reset
+              {isSolved ? "Try again" : "Reset"}
             </motion.button>
           )}
           {isPlaying && (
@@ -1503,6 +1776,20 @@ export default function Puzzle() {
               Pause
             </motion.button>
           )}
+          <motion.button
+            onClick={copySolution}
+            className="text-xs px-2 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200"
+            title="Copy solution string to clipboard"
+          >
+            📋
+          </motion.button>
+          <motion.button
+            onClick={pasteSolution}
+            className="text-xs px-2 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200"
+            title="Paste solution string from clipboard"
+          >
+            📥
+          </motion.button>
         </div>
       </motion.div>
     </motion.div>
