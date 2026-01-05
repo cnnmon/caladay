@@ -50,6 +50,7 @@ interface ProgressState {
   }>;
   shapeRotations: Record<string, ShapeMatrix>;
   elapsedTime?: number;
+  startedAt?: string; // ISO timestamp when timer started
 }
 
 function loadProgress(): ProgressState | null {
@@ -489,6 +490,9 @@ export default function Puzzle() {
       if (progress.elapsedTime !== undefined) {
         setElapsedTime(progress.elapsedTime);
       }
+      if (progress.startedAt) {
+        setStartedAt(progress.startedAt);
+      }
     } else if (progress && progress.dateKey !== todayKey) {
       // Old progress from different day, clear it
       clearProgress();
@@ -513,6 +517,7 @@ export default function Puzzle() {
       })),
       shapeRotations: { ...shapeRotations },
       elapsedTime,
+      startedAt: startedAt ?? undefined, // Save timer start time
     };
     saveProgress(state);
   }, [
@@ -523,6 +528,7 @@ export default function Puzzle() {
     viewingDate,
     elapsedTime,
     isSolved,
+    startedAt,
   ]);
 
   // Check if puzzle is solved (all placeable cells are covered)
@@ -671,8 +677,10 @@ export default function Puzzle() {
       setPlacedShapes(restored);
       setShapeRotations(todayState.shapeRotations);
       setIsSolved(true);
+      setFinalTime(getSolveTime(todayState)); // Restore the correct solve time
     } else {
       setIsSolved(false);
+      setFinalTime(null);
     }
   };
 

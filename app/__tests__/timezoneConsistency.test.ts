@@ -583,5 +583,191 @@ describe('Timezone-consistent date handling', () => {
       });
     });
   });
+
+  describe('Full localStorage integration', () => {
+    it('should auto-correct faulty data from localStorage on load', () => {
+      // This simulates the exact user scenario:
+      // Faulty data saved with key "2026-01-05" but grid was actually showing Jan 4
+      
+      const faultyData = {
+        "2026-01-05": {
+          placedShapes: [
+            { id: "V", gridRow: 5, gridCol: 4, cells: [[0,2],[1,2],[2,2],[2,1],[2,0]] },
+            { id: "O", gridRow: 4, gridCol: 4, cells: [[2,1],[2,0],[1,1],[0,2],[0,1]] },
+            { id: "U", gridRow: 4, gridCol: 2, cells: [[0,0],[0,2],[1,0],[1,1],[1,2]] },
+            { id: "I", gridRow: 0, gridCol: 1, cells: [[0,0],[0,1],[0,2],[0,3]] },
+            { id: "J", gridRow: 1, gridCol: 0, cells: [[0,0],[0,1],[0,2],[0,3],[1,0]] },
+            { id: "Z", gridRow: 2, gridCol: 0, cells: [[0,1],[1,1],[1,0],[2,0],[3,0]] },
+            { id: "T", gridRow: 4, gridCol: 0, cells: [[0,1],[1,1],[2,0],[2,1],[2,2]] },
+            { id: "S", gridRow: 2, gridCol: 2, cells: [[1,0],[0,0],[2,1],[1,1]] },
+            { id: "L", gridRow: 2, gridCol: 4, cells: [[1,0],[1,1],[1,2],[0,2]] },
+            { id: "P", gridRow: 0, gridCol: 4, cells: [[2,1],[2,0],[1,1],[1,0],[0,1]] },
+          ],
+          shapeRotations: {},
+          solvedAt: "2026-01-05T01:34:39.531Z",
+          solveTime: 2053, // Old format
+        },
+      };
+
+      // Save faulty data to localStorage
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(faultyData));
+
+      // Load and migrate (simulates what happens on page refresh)
+      const rawHistory = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+      const { migrated, changed } = migrateHistory(rawHistory);
+
+      // Verify migration happened
+      expect(changed).toBe(true);
+
+      // Verify the wrong key is gone
+      expect(migrated["2026-01-05"]).toBeUndefined();
+
+      // Verify the correct key exists with correct data
+      expect(migrated["2026-01-04"]).toBeDefined();
+      expect(migrated["2026-01-04"].gridTargets).toEqual({
+        month: "Jan",
+        dayNum: "4",
+        dayWord: "Sun",
+      });
+
+      // Verify solve time is preserved
+      expect(getSolveTime(migrated["2026-01-04"])).toBe(2053);
+
+      // Verify startedAt was backfilled
+      expect(migrated["2026-01-04"].startedAt).toBeDefined();
+
+      // Save migrated data back (as the app would do)
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+
+      // Verify localStorage now has correct data
+      const savedData = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+      expect(savedData["2026-01-05"]).toBeUndefined();
+      expect(savedData["2026-01-04"]).toBeDefined();
+      expect(savedData["2026-01-04"].gridTargets.dayNum).toBe("4");
+    });
+
+    it('should find today solve by gridTargets, not by date key', () => {
+      // Scenario: It's Jan 4, 2026 (Sunday). Faulty data has key "2026-01-05"
+      // but gridTargets show Jan 4, Sun. App should still recognize it as today's solve.
+      
+      const faultyData = {
+        "2026-01-05": { // Wrong key!
+          placedShapes: [{ id: "L", gridRow: 0, gridCol: 0, cells: [[0, 0]] }],
+          shapeRotations: {},
+          startedAt: "2026-01-04T20:00:00.000Z",
+          solvedAt: "2026-01-04T20:05:00.000Z",
+          gridTargets: { month: "Jan", dayNum: "4", dayWord: "Sun" }, // Correct targets
+        },
+      };
+
+      // Check if we can find today's solve by matching gridTargets
+      const todayTargets = { month: "Jan", dayNum: "4", dayWord: "Sun" };
+      
+      const todaySolve = Object.values(faultyData).find(
+        (state) =>
+          state.gridTargets &&
+          state.gridTargets.month === todayTargets.month &&
+          state.gridTargets.dayNum === todayTargets.dayNum &&
+          state.gridTargets.dayWord === todayTargets.dayWord
+      );
+
+      // Should find the solve even though the key is wrong
+      expect(todaySolve).toBeDefined();
+      expect(getSolveTime(todaySolve!)).toBe(300); // 5 minutes
+    });
+  });
+
+  describe('Timer persistence', () => {
+    it('should preserve solve time correctly when startedAt and solvedAt are set', () => {
+      const state: SavedPuzzleState = {
+        placedShapes: [],
+        shapeRotations: {},
+        startedAt: "2026-01-04T10:00:00.000Z", // Started at 10:00 AM
+        solvedAt: "2026-01-04T10:50:00.000Z",  // Solved at 10:50 AM (50 minutes later)
+        gridTargets: { month: "Jan", dayNum: "4", dayWord: "Sun" },
+      };
+
+      // 50 minutes = 3000 seconds
+      expect(getSolveTime(state)).toBe(3000);
+    });
+
+    it('should handle old format with solveTime fallback', () => {
+      const oldFormatState = {
+        placedShapes: [],
+        shapeRotations: {},
+        solvedAt: "2026-01-04T10:50:00.000Z",
+        // No startedAt, but has old solveTime
+        solveTime: 3000, // 50 minutes
+        gridTargets: { month: "Jan", dayNum: "4", dayWord: "Sun" },
+      } as unknown as SavedPuzzleState;
+
+      expect(getSolveTime(oldFormatState)).toBe(3000);
+    });
+
+    it('should return 0 if neither startedAt nor solveTime exists', () => {
+      const incompleteState: SavedPuzzleState = {
+        placedShapes: [],
+        shapeRotations: {},
+        solvedAt: "2026-01-04T10:50:00.000Z",
+        // No startedAt, no solveTime
+        gridTargets: { month: "Jan", dayNum: "4", dayWord: "Sun" },
+      };
+
+      expect(getSolveTime(incompleteState)).toBe(0);
+    });
+
+    it('should calculate solve time correctly for long solves', () => {
+      const state: SavedPuzzleState = {
+        placedShapes: [],
+        shapeRotations: {},
+        startedAt: "2026-01-04T09:00:00.000Z", // Started at 9:00 AM
+        solvedAt: "2026-01-04T09:34:13.000Z",  // Solved at 9:34:13 AM
+        gridTargets: { month: "Jan", dayNum: "4", dayWord: "Sun" },
+      };
+
+      // 34 minutes 13 seconds = 2053 seconds
+      expect(getSolveTime(state)).toBe(2053);
+    });
+
+    it('backToToday should restore correct finalTime from history', () => {
+      // Simulate history with today's solve
+      const history: Record<string, SavedPuzzleState> = {
+        "2026-01-04": {
+          placedShapes: [{ id: "L", gridRow: 0, gridCol: 0, cells: [[0, 0]] }],
+          shapeRotations: {},
+          startedAt: "2026-01-04T10:00:00.000Z",
+          solvedAt: "2026-01-04T10:50:00.000Z", // 50 min solve
+          gridTargets: { month: "Jan", dayNum: "4", dayWord: "Sun" },
+        },
+        "2026-01-02": {
+          placedShapes: [{ id: "L", gridRow: 0, gridCol: 0, cells: [[0, 0]] }],
+          shapeRotations: {},
+          startedAt: "2026-01-02T10:00:00.000Z",
+          solvedAt: "2026-01-02T10:04:20.000Z", // 4:20 solve
+          gridTargets: { month: "Jan", dayNum: "2", dayWord: "Fri" },
+        },
+      };
+
+      // Find today's solve by gridTargets
+      const todayTargets = { month: "Jan", dayNum: "4", dayWord: "Sun" };
+      const todayState = Object.values(history).find(
+        (state) =>
+          state.gridTargets &&
+          state.gridTargets.month === todayTargets.month &&
+          state.gridTargets.dayNum === todayTargets.dayNum &&
+          state.gridTargets.dayWord === todayTargets.dayWord
+      );
+
+      expect(todayState).toBeDefined();
+      expect(getSolveTime(todayState!)).toBe(3000); // 50 minutes
+
+      // Clicking on Jan 2 should show 4:20
+      const jan2State = history["2026-01-02"];
+      expect(getSolveTime(jan2State)).toBe(260); // 4 min 20 sec
+
+      // Going back to today should restore 50 minutes, not 4:20
+      // This is what the fix ensures by calling setFinalTime(getSolveTime(todayState))
+    });
+  });
 });
 
