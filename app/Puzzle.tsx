@@ -970,7 +970,21 @@ export default function Puzzle() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              <span className="text-lg font-medium text-green-600">
+              <span
+                className="text-lg font-medium text-green-600 cursor-pointer"
+                onClick={() => {
+                  const historyData = loadHistory();
+                  const progressData = loadProgress();
+                  const recentSolves = Object.entries(historyData)
+                    .sort(([a], [b]) => b.localeCompare(a))
+                    .slice(0, 5);
+                  console.log("=== Caesar Puzzle Debug ===");
+                  console.log("Current date key:", getDateKey(currentDate));
+                  console.log("Recent solves:", recentSolves);
+                  console.log("Full history:", historyData);
+                  console.log("Current progress:", progressData);
+                }}
+              >
                 {isViewingHistory ? "✓ Solved" : "🎉 Congratulations!"}
               </span>
             </motion.div>
