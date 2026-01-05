@@ -284,6 +284,9 @@ export default function Puzzle() {
 
   // Load saved progress on mount (only if not already solved)
   useEffect(() => {
+    // Wait for history to be checked first
+    if (!hasMounted) return;
+
     // Skip if today was already solved (already restored from history)
     if (isSolved) {
       setHasLoadedProgress(true);
@@ -314,7 +317,7 @@ export default function Puzzle() {
       clearProgress();
     }
     setHasLoadedProgress(true);
-  }, [isSolved]);
+  }, [hasMounted, isSolved]);
 
   // Save progress whenever state changes (debounced to avoid excessive writes)
   useEffect(() => {
@@ -867,7 +870,7 @@ export default function Puzzle() {
             </div>
           )}
           {!isViewingHistory && (
-            <div className="flex gap-2">
+            <div className="flex gap-2 md:hidden">
               {(placedShapes.length > 0 || isSolved || elapsedTime > 0) && (
                 <motion.button
                   onClick={resetToday}
@@ -885,6 +888,17 @@ export default function Puzzle() {
                   exit={{ opacity: 0, y: -10 }}
                 >
                   Pause
+                </motion.button>
+              )}
+              {!isPlaying && (
+                <motion.button
+                  onClick={() => setIsPlaying(true)}
+                  className="text-xs px-3 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                >
+                  Resume
                 </motion.button>
               )}
             </div>
@@ -1217,6 +1231,7 @@ export default function Puzzle() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
+        className="flex flex-col gap-2 items-center"
       >
         <p className="text-sm text-stone-400 text-center">
           {isViewingHistory
@@ -1229,6 +1244,27 @@ export default function Puzzle() {
             ? "Press Resume to continue"
             : "Press Start to begin"}
         </p>
+        <div className="gap-2 items-center md:flex hidden">
+          {(placedShapes.length > 0 || isSolved || elapsedTime > 0) && (
+            <motion.button
+              onClick={resetToday}
+              className="text-xs px-2 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200"
+            >
+              Reset
+            </motion.button>
+          )}
+          {isPlaying && (
+            <motion.button
+              onClick={() => setIsPlaying(false)}
+              className="text-xs px-3 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+            >
+              Pause
+            </motion.button>
+          )}
+        </div>
       </motion.div>
     </motion.div>
   );
