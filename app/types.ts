@@ -23,16 +23,10 @@ export interface GridCell {
 
 // Saved state for a single solve
 export interface SavedPuzzleState {
-  placedShapes: Array<{
-    id: string;
-    gridRow: number;
-    gridCol: number;
-    cells: ShapeMatrix;
-  }>;
-  shapeRotations: Record<string, ShapeMatrix>;
+  grid: string; // String representation of the grid (7x8, 56 chars)
+  day: string; // Date key (YYYY-MM-DD)
   startedAt?: string; // ISO timestamp when timer started
   solvedAt?: string; // ISO timestamp when solved (duration = solvedAt - startedAt)
-  gridTargets?: { month: string; dayNum: string; dayWord: string }; // What the grid was showing
 }
 
 // History of all solves keyed by date string (YYYY-MM-DD)

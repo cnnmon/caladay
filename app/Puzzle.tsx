@@ -11,8 +11,10 @@ import {
   SolveHistory,
 } from "./types";
 
-const STORAGE_KEY = "caesar-puzzle-history";
-const PROGRESS_KEY = "caesar-puzzle-progress";
+const STORAGE_KEY = "caesar-v2";
+const PROGRESS_KEY = "caesar-progress-v2";
+const OLD_STORAGE_KEY = "caesar-puzzle-history";
+const OLD_PROGRESS_KEY = "caesar-puzzle-progress";
 const SHAPES_VERSION = "v2"; // Increment when shapes change to clear cached rotations
 
 function getDateKey(date: Date = new Date()): string {
@@ -23,9 +25,17 @@ function getDateKey(date: Date = new Date()): string {
   return `${year}-${month}-${day}`;
 }
 
+function clearOldKeys(): void {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(OLD_STORAGE_KEY);
+  localStorage.removeItem(OLD_PROGRESS_KEY);
+}
+
 function loadHistory(): SolveHistory {
   if (typeof window === "undefined") return {};
   try {
+    // Clear old keys on first load
+    clearOldKeys();
     const data = localStorage.getItem(STORAGE_KEY);
     if (!data) return {};
     return JSON.parse(data);
@@ -81,6 +91,116 @@ function saveProgress(state: ProgressState): void {
 function clearProgress(): void {
   if (typeof window === "undefined") return;
   localStorage.removeItem(PROGRESS_KEY);
+}
+
+// Convert placed shapes to a 56-character grid string
+function gridToString(
+  placedShapes: PlacedShape[],
+  shapeRotations: Record<string, ShapeMatrix>,
+  grid: GridCell[][]
+): string {
+  // Build a map of which shape covers each cell
+  const cellMap = new Map<string, string>();
+  for (const shape of placedShapes) {
+    const cells = shapeRotations[shape.id];
+    for (const [r, c] of cells) {
+      const row = shape.gridRow + r;
+      const col = shape.gridCol + c;
+      cellMap.set(`${row},${col}`, shape.id);
+    }
+  }
+
+  let result = "";
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 7; col++) {
+      const cell = grid[row]?.[col];
+      if (!cell || cell.isBlocked) {
+        result += "#";
+      } else {
+        const shapeId = cellMap.get(`${row},${col}`);
+        result += shapeId || ".";
+      }
+    }
+  }
+  return result;
+}
+
+// Parse a 56-character grid string back to placed shapes and rotations
+function stringToPlacedShapes(
+  gridStr: string
+): { shapes: PlacedShape[]; rotations: Record<string, ShapeMatrix> } | null {
+  if (gridStr.length !== 56) return null;
+
+  // Parse positions for each shape
+  const shapePositions: Record<string, Array<[number, number]>> = {};
+  for (let i = 0; i < 56; i++) {
+    const row = Math.floor(i / 7);
+    const col = i % 7;
+    const char = gridStr[i].toUpperCase();
+    if (char !== "." && char !== "#") {
+      if (!shapePositions[char]) {
+        shapePositions[char] = [];
+      }
+      shapePositions[char].push([row, col]);
+    }
+  }
+
+  const newPlacedShapes: PlacedShape[] = [];
+  const newRotations: Record<string, ShapeMatrix> = Object.fromEntries(
+    SHAPES.map((s) => [s.id, s.cells])
+  );
+
+  for (const [shapeId, positions] of Object.entries(shapePositions)) {
+    const shape = SHAPES.find((s) => s.id === shapeId);
+    if (!shape || positions.length !== shape.cells.length) return null;
+
+    // Find the top-left corner
+    const minRow = Math.min(...positions.map(([r]) => r));
+    const minCol = Math.min(...positions.map(([, c]) => c));
+
+    // Compute relative cells
+    const relativeCells: ShapeMatrix = positions.map(([r, c]) => [
+      r - minRow,
+      c - minCol,
+    ]);
+
+    // Find matching rotation
+    const normalizeForCompare = (cells: ShapeMatrix): string =>
+      [...cells]
+        .sort((a, b) => a[0] - b[0] || a[1] - b[1])
+        .map(([r, c]) => `${r},${c}`)
+        .join("|");
+
+    const normalizedInput = normalizeForCompare(relativeCells);
+    let matchedRotation: ShapeMatrix | null = null;
+    let testCells = shape.cells;
+
+    for (let rot = 0; rot < 4; rot++) {
+      const normalized = normalizeShape(testCells);
+      if (normalizeForCompare(normalized) === normalizedInput) {
+        matchedRotation = normalized;
+        break;
+      }
+      const flipped = normalizeShape(flipShape(testCells));
+      if (normalizeForCompare(flipped) === normalizedInput) {
+        matchedRotation = flipped;
+        break;
+      }
+      testCells = rotateShape(testCells);
+    }
+
+    if (!matchedRotation) return null;
+
+    newRotations[shapeId] = matchedRotation;
+    newPlacedShapes.push({
+      ...shape,
+      gridRow: minRow,
+      gridCol: minCol,
+      cells: matchedRotation,
+    });
+  }
+
+  return { shapes: newPlacedShapes, rotations: newRotations };
 }
 
 // Build the grid structure
@@ -212,156 +332,14 @@ function formatTime(seconds: number): string {
   return `${mins}:${secs.toString().padStart(2, "0")}`;
 }
 
-// Get solve time in seconds from a saved state (handles both old and new format)
+// Get solve time in seconds from a saved state
 function getSolveTime(state: SavedPuzzleState): number {
   if (state.startedAt && state.solvedAt) {
     const start = new Date(state.startedAt).getTime();
     const end = new Date(state.solvedAt).getTime();
     return Math.floor((end - start) / 1000);
   }
-  // Fallback for old format with solveTime
-  const oldFormat = state as unknown as { solveTime?: number };
-  if (oldFormat.solveTime !== undefined) {
-    return oldFormat.solveTime;
-  }
   return 0;
-}
-
-// Compute gridTargets from placed shapes by finding uncovered cells
-function computeGridTargetsFromShapes(
-  placedShapes: SavedPuzzleState["placedShapes"]
-): { month: string; dayNum: string; dayWord: string } | null {
-  const grid = buildGrid();
-  const covered = new Set<string>();
-
-  // Mark all cells covered by shapes
-  for (const shape of placedShapes) {
-    for (const [r, c] of shape.cells) {
-      const row = shape.gridRow + r;
-      const col = shape.gridCol + c;
-      covered.add(`${row},${col}`);
-    }
-  }
-
-  // Find uncovered non-blocked cells - these are the targets
-  let month = "";
-  let dayNum = "";
-  let dayWord = "";
-
-  for (const row of grid) {
-    for (const cell of row) {
-      if (cell.isBlocked) continue;
-      const key = `${cell.row},${cell.col}`;
-      if (!covered.has(key)) {
-        // This cell is uncovered - it's a target
-        if (MONTHS.includes(cell.label)) {
-          month = cell.label;
-        } else if (DAYS.includes(cell.label)) {
-          dayWord = cell.label;
-        } else if (/^\d+$/.test(cell.label)) {
-          dayNum = cell.label;
-        }
-      }
-    }
-  }
-
-  if (month && dayNum && dayWord) {
-    return { month, dayNum, dayWord };
-  }
-  return null;
-}
-
-// Convert gridTargets to a date key (YYYY-MM-DD) for the current year
-// Returns null if the targets don't form a valid date
-function gridTargetsToDateKey(
-  targets: { month: string; dayNum: string; dayWord: string },
-  referenceYear?: number
-): string | null {
-  const year = referenceYear ?? new Date().getFullYear();
-  const monthIndex = MONTHS.indexOf(targets.month);
-  if (monthIndex === -1) return null;
-
-  const day = parseInt(targets.dayNum, 10);
-  if (isNaN(day) || day < 1 || day > 31) return null;
-
-  // Validate the day of week matches
-  const date = new Date(year, monthIndex, day);
-  const expectedDayWord = DAYS[date.getDay()];
-  if (expectedDayWord !== targets.dayWord) {
-    // Try previous year (for cases near year boundary)
-    const prevYearDate = new Date(year - 1, monthIndex, day);
-    if (DAYS[prevYearDate.getDay()] === targets.dayWord) {
-      return getDateKey(prevYearDate);
-    }
-    return null; // Day of week doesn't match
-  }
-
-  return getDateKey(date);
-}
-
-// Check if gridTargets match today's date
-function isGridTargetsToday(targets: {
-  month: string;
-  dayNum: string;
-  dayWord: string;
-}): boolean {
-  const today = new Date();
-  const todayTargets = getTargetsForDate(today);
-  return (
-    targets.month === todayTargets.month &&
-    targets.dayNum === todayTargets.dayNum &&
-    targets.dayWord === todayTargets.dayWord
-  );
-}
-
-// Migrate old storage format to new format
-function migrateHistory(history: SolveHistory): {
-  migrated: SolveHistory;
-  changed: boolean;
-} {
-  let changed = false;
-  const migrated: SolveHistory = {};
-
-  for (const [oldKey, state] of Object.entries(history)) {
-    // Compute gridTargets from shapes if missing
-    let gridTargets = state.gridTargets;
-    if (!gridTargets) {
-      gridTargets =
-        computeGridTargetsFromShapes(state.placedShapes) ?? undefined;
-      changed = true;
-    }
-
-    // Backfill startedAt from old solveTime format
-    let startedAt = state.startedAt;
-    if (!startedAt && state.solvedAt) {
-      const oldFormat = state as unknown as { solveTime?: number };
-      if (oldFormat.solveTime !== undefined) {
-        const solvedAtMs = new Date(state.solvedAt).getTime();
-        startedAt = new Date(
-          solvedAtMs - oldFormat.solveTime * 1000
-        ).toISOString();
-        changed = true;
-      }
-    }
-
-    // Determine the correct key from gridTargets
-    let correctKey = oldKey;
-    if (gridTargets) {
-      const computedKey = gridTargetsToDateKey(gridTargets);
-      if (computedKey && computedKey !== oldKey) {
-        correctKey = computedKey;
-        changed = true;
-      }
-    }
-
-    migrated[correctKey] = {
-      ...state,
-      gridTargets,
-      startedAt,
-    };
-  }
-
-  return { migrated, changed };
 }
 
 export default function Puzzle() {
@@ -403,42 +381,21 @@ export default function Puzzle() {
 
   // Load history after mount to avoid hydration mismatch
   useEffect(() => {
-    const rawHistory = loadHistory();
+    const loadedHistory = loadHistory();
+    setHistory(loadedHistory);
 
-    // Migrate old format to new format (fixes timezone issues, adds gridTargets)
-    const { migrated, changed } = migrateHistory(rawHistory);
-    if (changed) {
-      saveHistory(migrated);
-    }
-    setHistory(migrated);
-
-    // Check if today was already solved by comparing gridTargets (find most recent)
-    const todayTargets = getTargetsForDate(currentDate);
-    const todaySolves = Object.values(migrated)
-      .filter(
-        (state) =>
-          state.gridTargets &&
-          state.gridTargets.month === todayTargets.month &&
-          state.gridTargets.dayNum === todayTargets.dayNum &&
-          state.gridTargets.dayWord === todayTargets.dayWord
-      )
-      .sort((a, b) => (b.solvedAt || "").localeCompare(a.solvedAt || ""));
-    const todayState = todaySolves[0];
+    // Check if today was already solved
+    const todayKey = getDateKey(currentDate);
+    const todayState = loadedHistory[todayKey];
 
     if (todayState) {
-      const restored = todayState.placedShapes.map((s) => {
-        const shape = SHAPES.find((sh) => sh.id === s.id)!;
-        return {
-          ...shape,
-          gridRow: s.gridRow,
-          gridCol: s.gridCol,
-          cells: s.cells,
-        };
-      });
-      setPlacedShapes(restored);
-      setShapeRotations(todayState.shapeRotations);
-      setIsSolved(true);
-      setFinalTime(getSolveTime(todayState));
+      const parsed = stringToPlacedShapes(todayState.grid);
+      if (parsed) {
+        setPlacedShapes(parsed.shapes);
+        setShapeRotations(parsed.rotations);
+        setIsSolved(true);
+        setFinalTime(getSolveTime(todayState));
+      }
     }
 
     setHasMounted(true);
@@ -600,23 +557,16 @@ export default function Puzzle() {
     if (solved && !isSolved) {
       setIsSolved(true);
       setFinalTime(elapsedTime);
-      // Save to history using a unique solve ID (timestamp-based)
+      // Save to history keyed by day
       const solvedAt = new Date().toISOString();
-      const solveId = `solve_${solvedAt}`;
-      const { month, dayNum, dayWord } = getTargetsForDate(currentDate);
+      const dayKey = getDateKey(currentDate);
       const state: SavedPuzzleState = {
-        placedShapes: placedShapes.map((p) => ({
-          id: p.id,
-          gridRow: p.gridRow,
-          gridCol: p.gridCol,
-          cells: shapeRotations[p.id],
-        })),
-        shapeRotations: { ...shapeRotations },
+        grid: gridToString(placedShapes, shapeRotations, grid),
+        day: dayKey,
         startedAt: startedAt ?? solvedAt,
         solvedAt,
-        gridTargets: { month, dayNum, dayWord }, // Store what the grid was showing
       };
-      const newHistory = { ...history, [solveId]: state };
+      const newHistory = { ...history, [dayKey]: state };
       setHistory(newHistory);
       saveHistory(newHistory);
       clearProgress();
@@ -634,40 +584,23 @@ export default function Puzzle() {
   ]);
 
   // View a previous solve
-  const viewSolve = (solveId: string) => {
-    const state = history[solveId];
+  const viewSolve = (dayKey: string) => {
+    const state = history[dayKey];
     if (!state) return;
 
-    // Use gridTargets to determine the date, or fall back to parsing solvedAt/solveId
-    let date: Date;
-    if (state.gridTargets) {
-      const dateKey = gridTargetsToDateKey(state.gridTargets);
-      date = dateKey ? new Date(dateKey + "T12:00:00") : new Date();
-    } else if (state.solvedAt) {
-      date = new Date(state.solvedAt);
-    } else if (solveId.startsWith("solve_")) {
-      date = new Date(solveId.slice(6));
-    } else {
-      // Legacy date-based key
-      date = new Date(solveId + "T12:00:00");
-    }
+    // Use day key to determine the date
+    const date = new Date(state.day + "T12:00:00");
 
-    setViewingDate(solveId);
+    setViewingDate(dayKey);
     setGrid(markTargets(buildGrid(), date));
     setFinalTime(getSolveTime(state));
 
-    // Restore placed shapes
-    const restored = state.placedShapes.map((s) => {
-      const shape = SHAPES.find((sh) => sh.id === s.id)!;
-      return {
-        ...shape,
-        gridRow: s.gridRow,
-        gridCol: s.gridCol,
-        cells: s.cells,
-      };
-    });
-    setPlacedShapes(restored);
-    setShapeRotations(state.shapeRotations);
+    // Restore placed shapes from grid string
+    const parsed = stringToPlacedShapes(state.grid);
+    if (parsed) {
+      setPlacedShapes(parsed.shapes);
+      setShapeRotations(parsed.rotations);
+    }
   };
 
   // Return to today's puzzle
@@ -680,32 +613,17 @@ export default function Puzzle() {
     setPlacedShapes([]);
     setShapeRotations(Object.fromEntries(SHAPES.map((s) => [s.id, s.cells])));
 
-    // Restore today's progress if solved (check by gridTargets, not date key)
-    const todayTargets = getTargetsForDate(currentDate);
-    const todaySolves = Object.values(history)
-      .filter(
-        (state) =>
-          state.gridTargets &&
-          state.gridTargets.month === todayTargets.month &&
-          state.gridTargets.dayNum === todayTargets.dayNum &&
-          state.gridTargets.dayWord === todayTargets.dayWord
-      )
-      .sort((a, b) => (b.solvedAt || "").localeCompare(a.solvedAt || ""));
-    const todayState = todaySolves[0];
+    // Restore today's progress if solved
+    const todayKey = getDateKey(currentDate);
+    const todayState = history[todayKey];
     if (todayState) {
-      const restored = todayState.placedShapes.map((s) => {
-        const shape = SHAPES.find((sh) => sh.id === s.id)!;
-        return {
-          ...shape,
-          gridRow: s.gridRow,
-          gridCol: s.gridCol,
-          cells: s.cells,
-        };
-      });
-      setPlacedShapes(restored);
-      setShapeRotations(todayState.shapeRotations);
-      setIsSolved(true);
-      setFinalTime(getSolveTime(todayState)); // Restore the correct solve time
+      const parsed = stringToPlacedShapes(todayState.grid);
+      if (parsed) {
+        setPlacedShapes(parsed.shapes);
+        setShapeRotations(parsed.rotations);
+        setIsSolved(true);
+        setFinalTime(getSolveTime(todayState));
+      }
     } else {
       setIsSolved(false);
       setFinalTime(null);
@@ -1292,31 +1210,10 @@ export default function Puzzle() {
                   {solveIds.map((solveId, i) => {
                     const isActive = viewingDate === solveId;
                     const state = history[solveId];
-                    const isToday = state?.gridTargets
-                      ? isGridTargetsToday(state.gridTargets)
-                      : false;
-                    // Format label: show date + time for clarity
-                    const solvedAt = state?.solvedAt
-                      ? new Date(state.solvedAt)
-                      : null;
-                    const label = isToday
-                      ? solvedAt
-                        ? `Today ${solvedAt.toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}`
-                        : "Today"
-                      : solvedAt
-                      ? `${(solvedAt.getMonth() + 1)
-                          .toString()
-                          .padStart(2, "0")}-${solvedAt
-                          .getDate()
-                          .toString()
-                          .padStart(2, "0")} ${solvedAt.toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}`
-                      : solveId.slice(6, 16);
+                    const todayKey = getDateKey(new Date());
+                    const isToday = state?.day === todayKey;
+                    // Format label: show date
+                    const label = isToday ? "Today" : state?.day || solveId;
                     return (
                       <motion.button
                         key={solveId}

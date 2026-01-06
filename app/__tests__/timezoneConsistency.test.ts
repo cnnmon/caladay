@@ -6,9 +6,9 @@
  * of what the UTC time is.
  */
 
-import { SavedPuzzleState, ShapeMatrix } from '../types';
+import { SavedPuzzleState } from '../types';
 
-const STORAGE_KEY = "caesar-puzzle-history";
+const STORAGE_KEY = "caesar-v2";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -26,199 +26,18 @@ function getDateKeyUTC(date: Date = new Date()): string {
   return date.toISOString().split("T")[0];
 }
 
-// Grid building logic (simplified from Puzzle.tsx)
-interface GridCell {
-  row: number;
-  col: number;
-  label: string;
-  isBlocked: boolean;
-}
-
-function buildGrid(): GridCell[][] {
-  const grid: GridCell[][] = [];
-
-  // Row 0: Jan-Jun + blocked
-  grid.push([
-    ...MONTHS.slice(0, 6).map((m, i) => ({ row: 0, col: i, label: m, isBlocked: false })),
-    { row: 0, col: 6, label: "", isBlocked: true },
-  ]);
-
-  // Row 1: Jul-Dec + blocked
-  grid.push([
-    ...MONTHS.slice(6, 12).map((m, i) => ({ row: 1, col: i, label: m, isBlocked: false })),
-    { row: 1, col: 6, label: "", isBlocked: true },
-  ]);
-
-  // Rows 2-6: Days 1-31
-  for (let rowIdx = 2; rowIdx <= 6; rowIdx++) {
-    const row: GridCell[] = [];
-    for (let col = 0; col < 7; col++) {
-      const dayNum = (rowIdx - 2) * 7 + col + 1;
-      if (rowIdx === 6 && col >= 3) {
-        const dayWord = DAYS[col - 3];
-        row.push({ row: rowIdx, col, label: dayWord, isBlocked: false });
-      } else if (dayNum <= 31) {
-        row.push({ row: rowIdx, col, label: String(dayNum), isBlocked: false });
-      } else {
-        row.push({ row: rowIdx, col, label: "", isBlocked: true });
-      }
-    }
-    grid.push(row);
-  }
-
-  // Row 7: blocked, blocked, blocked, blocked, Thu, Fri, Sat
-  grid.push([
-    { row: 7, col: 0, label: "", isBlocked: true },
-    { row: 7, col: 1, label: "", isBlocked: true },
-    { row: 7, col: 2, label: "", isBlocked: true },
-    { row: 7, col: 3, label: "", isBlocked: true },
-    { row: 7, col: 4, label: "Thu", isBlocked: false },
-    { row: 7, col: 5, label: "Fri", isBlocked: false },
-    { row: 7, col: 6, label: "Sat", isBlocked: false },
-  ]);
-
-  return grid;
-}
-
-// Compute gridTargets from placed shapes by finding uncovered cells
-function computeGridTargetsFromShapes(
-  placedShapes: Array<{ gridRow: number; gridCol: number; cells: ShapeMatrix }>
-): { month: string; dayNum: string; dayWord: string } | null {
-  const grid = buildGrid();
-  const covered = new Set<string>();
-
-  for (const shape of placedShapes) {
-    for (const [r, c] of shape.cells) {
-      const row = shape.gridRow + r;
-      const col = shape.gridCol + c;
-      covered.add(`${row},${col}`);
-    }
-  }
-
-  let month = "";
-  let dayNum = "";
-  let dayWord = "";
-
-  for (const row of grid) {
-    for (const cell of row) {
-      if (cell.isBlocked) continue;
-      const key = `${cell.row},${cell.col}`;
-      if (!covered.has(key)) {
-        if (MONTHS.includes(cell.label)) {
-          month = cell.label;
-        } else if (DAYS.includes(cell.label)) {
-          dayWord = cell.label;
-        } else if (/^\d+$/.test(cell.label)) {
-          dayNum = cell.label;
-        }
-      }
-    }
-  }
-
-  if (month && dayNum && dayWord) {
-    return { month, dayNum, dayWord };
-  }
-  return null;
-}
-
-// Get solve time from startedAt/solvedAt (handles both old and new format)
+// Get solve time from startedAt/solvedAt
 function getSolveTime(state: SavedPuzzleState): number {
   if (state.startedAt && state.solvedAt) {
     const start = new Date(state.startedAt).getTime();
     const end = new Date(state.solvedAt).getTime();
     return Math.floor((end - start) / 1000);
   }
-  // Fallback for old format with solveTime
-  const oldFormat = state as unknown as { solveTime?: number };
-  if (oldFormat.solveTime !== undefined) {
-    return oldFormat.solveTime;
-  }
   return 0;
 }
 
-// Convert gridTargets to a date key (YYYY-MM-DD)
-function gridTargetsToDateKey(
-  targets: { month: string; dayNum: string; dayWord: string },
-  referenceYear?: number
-): string | null {
-  const year = referenceYear ?? new Date().getFullYear();
-  const monthIndex = MONTHS.indexOf(targets.month);
-  if (monthIndex === -1) return null;
-  
-  const day = parseInt(targets.dayNum, 10);
-  if (isNaN(day) || day < 1 || day > 31) return null;
-  
-  // Validate the day of week matches
-  const date = new Date(year, monthIndex, day);
-  const expectedDayWord = DAYS[date.getDay()];
-  if (expectedDayWord !== targets.dayWord) {
-    // Try previous year
-    const prevYearDate = new Date(year - 1, monthIndex, day);
-    if (DAYS[prevYearDate.getDay()] === targets.dayWord) {
-      return getDateKey(prevYearDate);
-    }
-    return null;
-  }
-  
-  return getDateKey(date);
-}
-
-// Check if gridTargets match today's date
-function isGridTargetsToday(targets: { month: string; dayNum: string; dayWord: string }): boolean {
-  const today = new Date();
-  const todayMonth = MONTHS[today.getMonth()];
-  const todayDayNum = String(today.getDate());
-  const todayDayWord = DAYS[today.getDay()];
-  return (
-    targets.month === todayMonth &&
-    targets.dayNum === todayDayNum &&
-    targets.dayWord === todayDayWord
-  );
-}
-
-// Migrate old storage format to new format
-function migrateHistory(history: Record<string, SavedPuzzleState>): { migrated: Record<string, SavedPuzzleState>; changed: boolean } {
-  let changed = false;
-  const migrated: Record<string, SavedPuzzleState> = {};
-  
-  for (const [oldKey, state] of Object.entries(history)) {
-    // Compute gridTargets from shapes if missing
-    let gridTargets = state.gridTargets;
-    if (!gridTargets) {
-      gridTargets = computeGridTargetsFromShapes(state.placedShapes) ?? undefined;
-      changed = true;
-    }
-    
-    // Backfill startedAt from old solveTime format
-    let startedAt = state.startedAt;
-    if (!startedAt && state.solvedAt) {
-      const oldFormat = state as unknown as { solveTime?: number };
-      if (oldFormat.solveTime !== undefined) {
-        const solvedAtMs = new Date(state.solvedAt).getTime();
-        startedAt = new Date(solvedAtMs - oldFormat.solveTime * 1000).toISOString();
-        changed = true;
-      }
-    }
-    
-    // Determine the correct key from gridTargets
-    let correctKey = oldKey;
-    if (gridTargets) {
-      const computedKey = gridTargetsToDateKey(gridTargets);
-      if (computedKey && computedKey !== oldKey) {
-        correctKey = computedKey;
-        changed = true;
-      }
-    }
-    
-    migrated[correctKey] = {
-      ...state,
-      gridTargets,
-      startedAt,
-    };
-  }
-  
-  return { migrated, changed };
-}
+// Sample grid string for testing
+const SAMPLE_GRID = ".ZZZOO#LLLZZO#SSLJ.OOTSSJJJJTTTIIIITPPUUUVPPPU.UV####VVV";
 
 describe('Timezone-consistent date handling', () => {
   beforeEach(() => {
@@ -254,74 +73,11 @@ describe('Timezone-consistent date handling', () => {
     });
   });
 
-  describe('computeGridTargetsFromShapes', () => {
-    it('should find the last uncovered cell of each type as targets', () => {
-      // With only one cell covered, there are still many uncovered cells
-      // The function iterates through and captures the last seen of each type
-      
-      const placedShapes = [
-        // Cover cell at row 0, col 1 (Feb)
-        { gridRow: 0, gridCol: 1, cells: [[0, 0]] as ShapeMatrix },
-      ];
-      
-      const targets = computeGridTargetsFromShapes(placedShapes);
-      
-      // With only Feb covered, we still have:
-      // - Many months uncovered (Jan, Mar-Dec) - last one is Dec
-      // - All day numbers uncovered (1-31) - last one is 31
-      // - All weekdays uncovered - last one is Sat
-      expect(targets).not.toBeNull();
-      expect(targets?.month).toBe("Dec");
-      expect(targets?.dayNum).toBe("31");
-      expect(targets?.dayWord).toBe("Sat");
-    });
-
-    it('should return correct targets when puzzle is solved', () => {
-      // Create a complete solve where only Jan (0,0), 4 (2,3), and Sun (6,3) are uncovered
-      const grid = buildGrid();
-      const allCells: Array<{ row: number; col: number }> = [];
-      
-      // Collect all non-blocked cells
-      for (const row of grid) {
-        for (const cell of row) {
-          if (!cell.isBlocked) {
-            allCells.push({ row: cell.row, col: cell.col });
-          }
-        }
-      }
-      
-      // Target cells to leave uncovered: Jan (0,0), 4 (2,3), Sun (6,3)
-      const targetCells = [
-        { row: 0, col: 0 }, // Jan
-        { row: 2, col: 3 }, // 4
-        { row: 6, col: 3 }, // Sun
-      ];
-      
-      // Create one giant shape covering everything except targets
-      const coveredCells = allCells.filter(
-        c => !targetCells.some(t => t.row === c.row && t.col === c.col)
-      );
-      
-      const placedShapes = [{
-        gridRow: 0,
-        gridCol: 0,
-        cells: coveredCells.map(c => [c.row, c.col] as [number, number]),
-      }];
-      
-      const targets = computeGridTargetsFromShapes(placedShapes);
-      
-      expect(targets).not.toBeNull();
-      expect(targets?.month).toBe("Jan");
-      expect(targets?.dayNum).toBe("4");
-      expect(targets?.dayWord).toBe("Sun");
-    });
-  });
-
   describe('getSolveTime from startedAt/solvedAt', () => {
     it('should compute duration correctly', () => {
       const state: SavedPuzzleState = {
-        placedShapes: [],
-        shapeRotations: {},
+        grid: SAMPLE_GRID,
+        day: "2026-01-04",
         startedAt: "2026-01-04T23:00:00.000Z",
         solvedAt: "2026-01-04T23:05:30.000Z", // 5 min 30 sec later
       };
@@ -331,8 +87,8 @@ describe('Timezone-consistent date handling', () => {
 
     it('should handle missing startedAt gracefully', () => {
       const state: SavedPuzzleState = {
-        placedShapes: [],
-        shapeRotations: {},
+        grid: SAMPLE_GRID,
+        day: "2026-01-04",
         solvedAt: "2026-01-04T23:05:30.000Z",
       };
       
@@ -342,8 +98,8 @@ describe('Timezone-consistent date handling', () => {
     it('should handle UTC times correctly', () => {
       // Even if times are in UTC, the duration calculation is correct
       const state: SavedPuzzleState = {
-        placedShapes: [],
-        shapeRotations: {},
+        grid: SAMPLE_GRID,
+        day: "2026-01-04",
         startedAt: "2026-01-05T01:00:00.000Z", // Jan 5 1 AM UTC (could be Jan 4 local)
         solvedAt: "2026-01-05T01:34:39.531Z",  // Same as the user's example
       };
@@ -370,44 +126,6 @@ describe('Timezone-consistent date handling', () => {
       // The UTC key would be wrong for this use case
       // (depending on timezone, it might be "2026-01-05")
     });
-
-    it('should compute correct gridTargets from real faulty data', () => {
-      // Real faulty data: saved as "2026-01-05" but grid was showing Jan 4
-      // Jan 4, 2026 is a SUNDAY
-      const faultyPlacedShapes = [
-        { id: "V", gridRow: 5, gridCol: 4, cells: [[0,2],[1,2],[2,2],[2,1],[2,0]] as ShapeMatrix },
-        { id: "O", gridRow: 4, gridCol: 4, cells: [[2,1],[2,0],[1,1],[0,2],[0,1]] as ShapeMatrix },
-        { id: "U", gridRow: 4, gridCol: 2, cells: [[0,0],[0,2],[1,0],[1,1],[1,2]] as ShapeMatrix },
-        { id: "I", gridRow: 0, gridCol: 1, cells: [[0,0],[0,1],[0,2],[0,3]] as ShapeMatrix },
-        { id: "J", gridRow: 1, gridCol: 0, cells: [[0,0],[0,1],[0,2],[0,3],[1,0]] as ShapeMatrix },
-        { id: "Z", gridRow: 2, gridCol: 0, cells: [[0,1],[1,1],[1,0],[2,0],[3,0]] as ShapeMatrix },
-        { id: "T", gridRow: 4, gridCol: 0, cells: [[0,1],[1,1],[2,0],[2,1],[2,2]] as ShapeMatrix },
-        { id: "S", gridRow: 2, gridCol: 2, cells: [[1,0],[0,0],[2,1],[1,1]] as ShapeMatrix },
-        { id: "L", gridRow: 2, gridCol: 4, cells: [[1,0],[1,1],[1,2],[0,2]] as ShapeMatrix },
-        { id: "P", gridRow: 0, gridCol: 4, cells: [[2,1],[2,0],[1,1],[1,0],[0,1]] as ShapeMatrix },
-      ];
-      
-      const targets = computeGridTargetsFromShapes(faultyPlacedShapes);
-      
-      // The grid should show Jan 4, Sun (not Jan 5, Mon as the faulty key suggests)
-      expect(targets).not.toBeNull();
-      expect(targets?.month).toBe("Jan");
-      expect(targets?.dayNum).toBe("4");
-      expect(targets?.dayWord).toBe("Sun");
-    });
-
-    it('should NOT trust the date key for gridTargets', () => {
-      // The faulty save: key is "2026-01-05" but shapes actually solved Jan 4 grid
-      const faultySave: SavedPuzzleState = {
-        placedShapes: [], // Would have the actual shapes here
-        shapeRotations: {},
-        solvedAt: "2026-01-05T01:34:39.531Z", // UTC Jan 5
-        // gridTargets is missing - needs backfill from shapes
-      };
-      
-      // Key assertion: we should NOT trust the date key for gridTargets
-      expect(faultySave.gridTargets).toBeUndefined();
-    });
   });
 
   describe('Refresh behavior with timezone edge cases', () => {
@@ -416,9 +134,8 @@ describe('Timezone-consistent date handling', () => {
       // 1. User solves puzzle at 11:30 PM local on Jan 4
       // 2. UTC time is 7:30 AM Jan 5
       // 3. Solve is saved with key "2026-01-04" (local)
-      // 4. gridTargets: { month: "Jan", dayNum: "4", dayWord: "Sun" }
-      // 5. User refreshes at 12:30 AM local on Jan 5
-      // 6. Should still show Jan 4 solve when viewing history
+      // 4. User refreshes at 12:30 AM local on Jan 5
+      // 5. Should still show Jan 4 solve when viewing history
       
       const solveDate = new Date(2026, 0, 4, 23, 30, 0);
       const dateKey = getDateKey(solveDate);
@@ -426,11 +143,10 @@ describe('Timezone-consistent date handling', () => {
       expect(dateKey).toBe("2026-01-04");
       
       const savedState: SavedPuzzleState = {
-        placedShapes: [],
-        shapeRotations: {},
+        grid: SAMPLE_GRID,
+        day: dateKey,
         startedAt: solveDate.toISOString(),
         solvedAt: new Date(solveDate.getTime() + 300000).toISOString(), // +5 min
-        gridTargets: { month: "Jan", dayNum: "4", dayWord: "Sun" },
       };
       
       // Save with local date key
@@ -451,11 +167,7 @@ describe('Timezone-consistent date handling', () => {
       
       // But Jan 4 solve is available in history
       expect(history["2026-01-04"]).toBeDefined();
-      expect(history["2026-01-04"].gridTargets).toEqual({
-        month: "Jan",
-        dayNum: "4",
-        dayWord: "Sun",
-      });
+      expect(history["2026-01-04"].day).toBe("2026-01-04");
     });
 
     it('should show solved state on refresh if same local day', () => {
@@ -470,11 +182,10 @@ describe('Timezone-consistent date handling', () => {
       expect(solveDateKey).toBe(refreshDateKey); // Same day
       
       const savedState: SavedPuzzleState = {
-        placedShapes: [{ id: "L", gridRow: 0, gridCol: 0, cells: [[0, 0]] }],
-        shapeRotations: {},
+        grid: SAMPLE_GRID,
+        day: solveDateKey,
         startedAt: solveDate.toISOString(),
         solvedAt: new Date(solveDate.getTime() + 300000).toISOString(),
-        gridTargets: { month: "Jan", dayNum: "4", dayWord: "Sun" },
       };
       
       localStorage.setItem(STORAGE_KEY, JSON.stringify({ [solveDateKey]: savedState }));
@@ -484,233 +195,31 @@ describe('Timezone-consistent date handling', () => {
       const todayState = history[refreshDateKey];
       
       expect(todayState).toBeDefined();
-      expect(todayState.gridTargets).toEqual({ month: "Jan", dayNum: "4", dayWord: "Sun" });
+      expect(todayState.day).toBe("2026-01-04");
       
       // App should restore this state and show "Congratulations"
-    });
-  });
-
-  describe('gridTargetsToDateKey', () => {
-    it('should convert valid gridTargets to date key', () => {
-      // Jan 4, 2026 is a Sunday
-      const targets = { month: "Jan", dayNum: "4", dayWord: "Sun" };
-      const key = gridTargetsToDateKey(targets, 2026);
-      expect(key).toBe("2026-01-04");
-    });
-
-    it('should return null for invalid day of week', () => {
-      // Jan 4, 2026 is Sunday, not Monday
-      const targets = { month: "Jan", dayNum: "4", dayWord: "Mon" };
-      const key = gridTargetsToDateKey(targets, 2026);
-      expect(key).toBeNull();
-    });
-
-    it('should return null for invalid month', () => {
-      const targets = { month: "Foo", dayNum: "4", dayWord: "Sun" };
-      const key = gridTargetsToDateKey(targets, 2026);
-      expect(key).toBeNull();
-    });
-  });
-
-  describe('migrateHistory', () => {
-    it('should migrate real faulty data with wrong date key', () => {
-      // Real faulty data: saved as "2026-01-05" but grid was showing Jan 4, Sun
-      // Jan 4, 2026 is a Sunday
-      const faultyHistory: Record<string, SavedPuzzleState> = {
-        "2026-01-05": {
-          placedShapes: [
-            { id: "V", gridRow: 5, gridCol: 4, cells: [[0,2],[1,2],[2,2],[2,1],[2,0]] },
-            { id: "O", gridRow: 4, gridCol: 4, cells: [[2,1],[2,0],[1,1],[0,2],[0,1]] },
-            { id: "U", gridRow: 4, gridCol: 2, cells: [[0,0],[0,2],[1,0],[1,1],[1,2]] },
-            { id: "I", gridRow: 0, gridCol: 1, cells: [[0,0],[0,1],[0,2],[0,3]] },
-            { id: "J", gridRow: 1, gridCol: 0, cells: [[0,0],[0,1],[0,2],[0,3],[1,0]] },
-            { id: "Z", gridRow: 2, gridCol: 0, cells: [[0,1],[1,1],[1,0],[2,0],[3,0]] },
-            { id: "T", gridRow: 4, gridCol: 0, cells: [[0,1],[1,1],[2,0],[2,1],[2,2]] },
-            { id: "S", gridRow: 2, gridCol: 2, cells: [[1,0],[0,0],[2,1],[1,1]] },
-            { id: "L", gridRow: 2, gridCol: 4, cells: [[1,0],[1,1],[1,2],[0,2]] },
-            { id: "P", gridRow: 0, gridCol: 4, cells: [[2,1],[2,0],[1,1],[1,0],[0,1]] },
-          ],
-          shapeRotations: {},
-          solvedAt: "2026-01-05T01:34:39.531Z",
-          // Old format with solveTime instead of startedAt
-        },
-      };
-      // Add old solveTime
-      (faultyHistory["2026-01-05"] as unknown as { solveTime: number }).solveTime = 2053;
-
-      const { migrated, changed } = migrateHistory(faultyHistory);
-
-      expect(changed).toBe(true);
-      
-      // The key should be corrected to 2026-01-04 (based on gridTargets computed from shapes)
-      expect(migrated["2026-01-05"]).toBeUndefined();
-      expect(migrated["2026-01-04"]).toBeDefined();
-      
-      // gridTargets should be computed from shapes (Jan 4, 2026 is a Sunday)
-      expect(migrated["2026-01-04"].gridTargets).toEqual({
-        month: "Jan",
-        dayNum: "4",
-        dayWord: "Sun",
-      });
-      
-      // startedAt should be backfilled from solveTime
-      expect(migrated["2026-01-04"].startedAt).toBeDefined();
-      
-      // Solve time should still be accessible
-      expect(getSolveTime(migrated["2026-01-04"])).toBe(2053);
-    });
-
-    it('should not modify already correct data', () => {
-      // Jan 4, 2026 is a Sunday
-      const correctHistory: Record<string, SavedPuzzleState> = {
-        "2026-01-04": {
-          placedShapes: [{ id: "L", gridRow: 0, gridCol: 0, cells: [[0, 0]] }],
-          shapeRotations: {},
-          startedAt: "2026-01-04T20:00:00.000Z",
-          solvedAt: "2026-01-04T20:05:00.000Z",
-          gridTargets: { month: "Jan", dayNum: "4", dayWord: "Sun" },
-        },
-      };
-
-      const { migrated, changed } = migrateHistory(correctHistory);
-
-      expect(changed).toBe(false);
-      expect(migrated["2026-01-04"]).toBeDefined();
-      expect(migrated["2026-01-04"].gridTargets).toEqual({
-        month: "Jan",
-        dayNum: "4",
-        dayWord: "Sun",
-      });
-    });
-  });
-
-  describe('Full localStorage integration', () => {
-    it('should auto-correct faulty data from localStorage on load', () => {
-      // This simulates the exact user scenario:
-      // Faulty data saved with key "2026-01-05" but grid was actually showing Jan 4
-      
-      const faultyData = {
-        "2026-01-05": {
-          placedShapes: [
-            { id: "V", gridRow: 5, gridCol: 4, cells: [[0,2],[1,2],[2,2],[2,1],[2,0]] },
-            { id: "O", gridRow: 4, gridCol: 4, cells: [[2,1],[2,0],[1,1],[0,2],[0,1]] },
-            { id: "U", gridRow: 4, gridCol: 2, cells: [[0,0],[0,2],[1,0],[1,1],[1,2]] },
-            { id: "I", gridRow: 0, gridCol: 1, cells: [[0,0],[0,1],[0,2],[0,3]] },
-            { id: "J", gridRow: 1, gridCol: 0, cells: [[0,0],[0,1],[0,2],[0,3],[1,0]] },
-            { id: "Z", gridRow: 2, gridCol: 0, cells: [[0,1],[1,1],[1,0],[2,0],[3,0]] },
-            { id: "T", gridRow: 4, gridCol: 0, cells: [[0,1],[1,1],[2,0],[2,1],[2,2]] },
-            { id: "S", gridRow: 2, gridCol: 2, cells: [[1,0],[0,0],[2,1],[1,1]] },
-            { id: "L", gridRow: 2, gridCol: 4, cells: [[1,0],[1,1],[1,2],[0,2]] },
-            { id: "P", gridRow: 0, gridCol: 4, cells: [[2,1],[2,0],[1,1],[1,0],[0,1]] },
-          ],
-          shapeRotations: {},
-          solvedAt: "2026-01-05T01:34:39.531Z",
-          solveTime: 2053, // Old format
-        },
-      };
-
-      // Save faulty data to localStorage
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(faultyData));
-
-      // Load and migrate (simulates what happens on page refresh)
-      const rawHistory = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-      const { migrated, changed } = migrateHistory(rawHistory);
-
-      // Verify migration happened
-      expect(changed).toBe(true);
-
-      // Verify the wrong key is gone
-      expect(migrated["2026-01-05"]).toBeUndefined();
-
-      // Verify the correct key exists with correct data
-      expect(migrated["2026-01-04"]).toBeDefined();
-      expect(migrated["2026-01-04"].gridTargets).toEqual({
-        month: "Jan",
-        dayNum: "4",
-        dayWord: "Sun",
-      });
-
-      // Verify solve time is preserved
-      expect(getSolveTime(migrated["2026-01-04"])).toBe(2053);
-
-      // Verify startedAt was backfilled
-      expect(migrated["2026-01-04"].startedAt).toBeDefined();
-
-      // Save migrated data back (as the app would do)
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
-
-      // Verify localStorage now has correct data
-      const savedData = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-      expect(savedData["2026-01-05"]).toBeUndefined();
-      expect(savedData["2026-01-04"]).toBeDefined();
-      expect(savedData["2026-01-04"].gridTargets.dayNum).toBe("4");
-    });
-
-    it('should find today solve by gridTargets, not by date key', () => {
-      // Scenario: It's Jan 4, 2026 (Sunday). Faulty data has key "2026-01-05"
-      // but gridTargets show Jan 4, Sun. App should still recognize it as today's solve.
-      
-      const faultyData = {
-        "2026-01-05": { // Wrong key!
-          placedShapes: [{ id: "L", gridRow: 0, gridCol: 0, cells: [[0, 0]] }],
-          shapeRotations: {},
-          startedAt: "2026-01-04T20:00:00.000Z",
-          solvedAt: "2026-01-04T20:05:00.000Z",
-          gridTargets: { month: "Jan", dayNum: "4", dayWord: "Sun" }, // Correct targets
-        },
-      };
-
-      // Check if we can find today's solve by matching gridTargets
-      const todayTargets = { month: "Jan", dayNum: "4", dayWord: "Sun" };
-      
-      const todaySolve = Object.values(faultyData).find(
-        (state) =>
-          state.gridTargets &&
-          state.gridTargets.month === todayTargets.month &&
-          state.gridTargets.dayNum === todayTargets.dayNum &&
-          state.gridTargets.dayWord === todayTargets.dayWord
-      );
-
-      // Should find the solve even though the key is wrong
-      expect(todaySolve).toBeDefined();
-      expect(getSolveTime(todaySolve!)).toBe(300); // 5 minutes
     });
   });
 
   describe('Timer persistence', () => {
     it('should preserve solve time correctly when startedAt and solvedAt are set', () => {
       const state: SavedPuzzleState = {
-        placedShapes: [],
-        shapeRotations: {},
+        grid: SAMPLE_GRID,
+        day: "2026-01-04",
         startedAt: "2026-01-04T10:00:00.000Z", // Started at 10:00 AM
         solvedAt: "2026-01-04T10:50:00.000Z",  // Solved at 10:50 AM (50 minutes later)
-        gridTargets: { month: "Jan", dayNum: "4", dayWord: "Sun" },
       };
 
       // 50 minutes = 3000 seconds
       expect(getSolveTime(state)).toBe(3000);
     });
 
-    it('should handle old format with solveTime fallback', () => {
-      const oldFormatState = {
-        placedShapes: [],
-        shapeRotations: {},
-        solvedAt: "2026-01-04T10:50:00.000Z",
-        // No startedAt, but has old solveTime
-        solveTime: 3000, // 50 minutes
-        gridTargets: { month: "Jan", dayNum: "4", dayWord: "Sun" },
-      } as unknown as SavedPuzzleState;
-
-      expect(getSolveTime(oldFormatState)).toBe(3000);
-    });
-
-    it('should return 0 if neither startedAt nor solveTime exists', () => {
+    it('should return 0 if startedAt is missing', () => {
       const incompleteState: SavedPuzzleState = {
-        placedShapes: [],
-        shapeRotations: {},
+        grid: SAMPLE_GRID,
+        day: "2026-01-04",
         solvedAt: "2026-01-04T10:50:00.000Z",
-        // No startedAt, no solveTime
-        gridTargets: { month: "Jan", dayNum: "4", dayWord: "Sun" },
+        // No startedAt
       };
 
       expect(getSolveTime(incompleteState)).toBe(0);
@@ -718,56 +227,68 @@ describe('Timezone-consistent date handling', () => {
 
     it('should calculate solve time correctly for long solves', () => {
       const state: SavedPuzzleState = {
-        placedShapes: [],
-        shapeRotations: {},
+        grid: SAMPLE_GRID,
+        day: "2026-01-04",
         startedAt: "2026-01-04T09:00:00.000Z", // Started at 9:00 AM
         solvedAt: "2026-01-04T09:34:13.000Z",  // Solved at 9:34:13 AM
-        gridTargets: { month: "Jan", dayNum: "4", dayWord: "Sun" },
       };
 
       // 34 minutes 13 seconds = 2053 seconds
       expect(getSolveTime(state)).toBe(2053);
     });
 
-    it('backToToday should restore correct finalTime from history', () => {
-      // Simulate history with today's solve
+    it('should find today solve by date key', () => {
+      // Simulate history with today's and past solves
       const history: Record<string, SavedPuzzleState> = {
         "2026-01-04": {
-          placedShapes: [{ id: "L", gridRow: 0, gridCol: 0, cells: [[0, 0]] }],
-          shapeRotations: {},
+          grid: SAMPLE_GRID,
+          day: "2026-01-04",
           startedAt: "2026-01-04T10:00:00.000Z",
           solvedAt: "2026-01-04T10:50:00.000Z", // 50 min solve
-          gridTargets: { month: "Jan", dayNum: "4", dayWord: "Sun" },
         },
         "2026-01-02": {
-          placedShapes: [{ id: "L", gridRow: 0, gridCol: 0, cells: [[0, 0]] }],
-          shapeRotations: {},
+          grid: SAMPLE_GRID,
+          day: "2026-01-02",
           startedAt: "2026-01-02T10:00:00.000Z",
           solvedAt: "2026-01-02T10:04:20.000Z", // 4:20 solve
-          gridTargets: { month: "Jan", dayNum: "2", dayWord: "Fri" },
         },
       };
 
-      // Find today's solve by gridTargets
-      const todayTargets = { month: "Jan", dayNum: "4", dayWord: "Sun" };
-      const todayState = Object.values(history).find(
-        (state) =>
-          state.gridTargets &&
-          state.gridTargets.month === todayTargets.month &&
-          state.gridTargets.dayNum === todayTargets.dayNum &&
-          state.gridTargets.dayWord === todayTargets.dayWord
-      );
+      // Find today's solve directly by key
+      const todayKey = "2026-01-04";
+      const todayState = history[todayKey];
 
       expect(todayState).toBeDefined();
-      expect(getSolveTime(todayState!)).toBe(3000); // 50 minutes
+      expect(getSolveTime(todayState)).toBe(3000); // 50 minutes
 
-      // Clicking on Jan 2 should show 4:20
+      // Past solve
       const jan2State = history["2026-01-02"];
       expect(getSolveTime(jan2State)).toBe(260); // 4 min 20 sec
+    });
+  });
 
-      // Going back to today should restore 50 minutes, not 4:20
-      // This is what the fix ensures by calling setFinalTime(getSolveTime(todayState))
+  describe('Grid string storage', () => {
+    it('should store grid as 56-character string', () => {
+      const state: SavedPuzzleState = {
+        grid: SAMPLE_GRID,
+        day: "2026-01-04",
+        startedAt: "2026-01-04T10:00:00.000Z",
+        solvedAt: "2026-01-04T10:05:00.000Z",
+      };
+
+      expect(state.grid.length).toBe(56); // 7 cols × 8 rows
+    });
+
+    it('should use day field as the date key', () => {
+      const state: SavedPuzzleState = {
+        grid: SAMPLE_GRID,
+        day: "2026-01-04",
+        startedAt: "2026-01-04T10:00:00.000Z",
+        solvedAt: "2026-01-04T10:05:00.000Z",
+      };
+
+      // day field matches the expected format
+      expect(state.day).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     });
   });
 });
-
