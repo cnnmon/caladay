@@ -1559,12 +1559,12 @@ export default function Puzzle() {
           exit={{ opacity: 0, y: 10 }}
           transition={{ duration: 0.4, delay: 0.3 }}
         >
-          {/* Scrollable shapes */}
+          {/* Scrollable shapes on mobile, two rows on desktop */}
           <div
-            className="flex-1 overflow-x-auto pb-4"
+            className="flex-1 overflow-x-auto md:overflow-x-visible pb-4"
             style={{ touchAction: "pan-x" }}
           >
-            <div className="flex gap-3 px-2 min-w-max">
+            <div className="flex gap-3 px-2 min-w-max md:min-w-0 md:flex-wrap md:gap-2 md:justify-center">
               {SHAPES.map((shape) => {
                 const cells = shapeRotations[shape.id];
                 const isDraggingThis = dragState?.shapeId === shape.id;
