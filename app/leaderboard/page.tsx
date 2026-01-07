@@ -121,22 +121,24 @@ export default function LeaderboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f2ede7] p-6">
-      <div className="max-w-2xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-between mb-6"
+    <div className="min-h-screen bg-[#f2ede7] px-6 py-4">
+      {/* Full-width header */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex items-center justify-between mb-6"
+      >
+        <h1 className="text-xl font-light text-stone-700">Leaderboard</h1>
+        <Link
+          href="/"
+          className="px-3 py-1 rounded-full bg-stone-300 hover:bg-stone-400 text-stone-600 transition-colors w-fit"
         >
-          <h1 className="text-2xl font-light text-stone-700">Leaderboard</h1>
-          <Link
-            href="/"
-            className="px-3 py-1 rounded-full bg-stone-300 hover:bg-stone-400 text-stone-600 transition-colors w-fit"
-          >
-            ← Back to puzzle
-          </Link>
-        </motion.div>
+          Back to puzzle →
+        </Link>
+      </motion.div>
 
+      {/* Narrower content */}
+      <div className="max-w-2xl mx-auto">
         {!solutions ? (
           <div className="text-center text-stone-400 py-8">Loading...</div>
         ) : solutions.length === 0 ? (
@@ -146,7 +148,7 @@ export default function LeaderboardPage() {
         ) : (
           <>
             {/* Day tabs */}
-            <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
+            <div className="flex gap-2 mb-3 overflow-x-auto">
               {sortedDays.map((day) => {
                 const isToday = day === getDateKey();
                 const isActive = day === selectedDay;
@@ -171,7 +173,7 @@ export default function LeaderboardPage() {
               key={selectedDay}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white rounded-lg shadow-sm overflow-hidden"
+              className="bg-white rounded-lg overflow-hidden"
             >
               {sortedSolutions.length === 0 ? (
                 <div className="text-center text-stone-400 py-8">

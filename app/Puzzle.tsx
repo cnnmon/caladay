@@ -1535,7 +1535,7 @@ export default function Puzzle() {
                 {!isSolved && (
                   <motion.button
                     onClick={() => setIsPlaying(true)}
-                    className="relative z-10 px-6 py-3 rounded-full bg-stone-800 text-white font-medium shadow-lg"
+                    className="relative z-10 px-6 py-3 rounded-full bg-stone-800 text-white font-medium"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     initial={{ scale: 0.9 }}
