@@ -21,6 +21,10 @@ export interface GridCell {
   isTarget: boolean; // current date cells that must stay uncovered
 }
 
+export type Solution = {
+  username: string;
+} & SavedPuzzleState;
+
 // Saved state for a single solve
 export interface SavedPuzzleState {
   grid: string; // String representation of the grid (7x8, 56 chars)

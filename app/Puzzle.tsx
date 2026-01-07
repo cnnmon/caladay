@@ -1,8 +1,17 @@
 "use client";
 
+import { useMutation } from "convex/react";
 import { AnimatePresence, motion } from "framer-motion";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { SHAPES, flipShape, normalizeShape, rotateShape } from "./shapes";
+import { api } from "../convex/_generated/api";
+import LeaderboardModal, {
+  addSolutionId,
+  getSavedUsername,
+  ModalMode,
+} from "./LeaderboardModal";
+import { flipShape, normalizeShape, rotateShape, SHAPES } from "./shapes";
 import {
   GridCell,
   PlacedShape,
@@ -343,6 +352,9 @@ function getSolveTime(state: SavedPuzzleState): number {
 }
 
 export default function Puzzle() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
   const [currentDate, setCurrentDate] = useState(() => new Date());
   const [viewingDate, setViewingDate] = useState<string | null>(null); // null = playing today
   const [viewingImported, setViewingImported] = useState(false); // true = previewing imported solution
@@ -353,6 +365,34 @@ export default function Puzzle() {
   const [history, setHistory] = useState<SolveHistory>({});
   const [isSolved, setIsSolved] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
+  const [showLeaderboardModal, setShowLeaderboardModal] = useState(false);
+  const [modalMode, setModalMode] = useState<ModalMode>("submit");
+  const [pendingSolution, setPendingSolution] =
+    useState<SavedPuzzleState | null>(null);
+  const [currentUsername, setCurrentUsername] = useState<string | null>(null);
+
+  const createSolution = useMutation(api.solutions.create);
+
+  // Load username on mount
+  useEffect(() => {
+    const saved = getSavedUsername();
+    if (saved) setCurrentUsername(saved);
+  }, []);
+
+  // Handle preview param from URL (leaderboard click)
+  useEffect(() => {
+    const previewGrid = searchParams.get("preview");
+    if (previewGrid) {
+      const parsed = stringToPlacedShapes(previewGrid);
+      if (parsed) {
+        setViewingImported(true);
+        setImportedShapes(parsed.shapes);
+        setImportedRotations(parsed.rotations);
+      }
+      // Clear the URL param without full navigation
+      router.replace("/", { scroll: false });
+    }
+  }, [searchParams, router]);
 
   const [grid, setGrid] = useState(() => markTargets(buildGrid(), currentDate));
   const [placedShapes, setPlacedShapes] = useState<PlacedShape[]>([]);
@@ -570,6 +610,26 @@ export default function Puzzle() {
       setHistory(newHistory);
       saveHistory(newHistory);
       clearProgress();
+
+      // Check if user has a saved username - auto-submit if so
+      const savedUsername = getSavedUsername();
+      if (savedUsername) {
+        // Auto-submit to leaderboard
+        createSolution({
+          username: savedUsername,
+          grid: state.grid,
+          day: state.day,
+          startedAt: state.startedAt,
+          solvedAt: state.solvedAt,
+        }).then((solutionId) => {
+          addSolutionId(solutionId);
+        });
+      } else {
+        // Show modal to ask for name
+        setPendingSolution(state);
+        setModalMode("submit");
+        setShowLeaderboardModal(true);
+      }
     }
   }, [
     placedShapes,
@@ -581,6 +641,7 @@ export default function Puzzle() {
     viewingDate,
     elapsedTime,
     startedAt,
+    grid,
   ]);
 
   // View a previous solve
@@ -1197,48 +1258,19 @@ export default function Puzzle() {
     >
       {hasMounted && (
         <motion.div
-          className="absolute top-0 left-0 p-2 flex flex-wrap gap-2 items-center bg-[#f2ede7] w-full justify-between"
+          className="absolute top-0 left-0 p-2 flex gap-2 items-start bg-[#f2ede7] w-full justify-between"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
           <div className="flex flex-col gap-2 px-2 p-1">
-            {solveIds.length > 0 && (
-              <div className="flex gap-2 items-center flex-1">
-                <span className="text-xs text-stone-400">Previous solves:</span>
-                <div className="flex gap-2 overflow-x-scroll flex-1">
-                  {solveIds.map((solveId, i) => {
-                    const isActive = viewingDate === solveId;
-                    const state = history[solveId];
-                    const todayKey = getDateKey(new Date());
-                    const isToday = state?.day === todayKey;
-                    // Format label: show date
-                    const label = isToday ? "Today" : state?.day || solveId;
-                    return (
-                      <motion.button
-                        key={solveId}
-                        onClick={() =>
-                          isToday && !viewingDate
-                            ? backToToday()
-                            : viewSolve(solveId)
-                        }
-                        className={`text-xs px-2 py-1 rounded shrink-0 hover:text-stone-200 ${
-                          isActive
-                            ? "bg-stone-700 text-white"
-                            : "bg-stone-300 hover:bg-stone-400 text-stone-600"
-                        }`}
-                        initial={{ opacity: 0, y: 5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.03 }}
-                      >
-                        {label}
-                      </motion.button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-            <p className="text-xs text-stone-400 hidden sm:block">
+            <Link
+              href="/leaderboard"
+              className="px-3 py-1 rounded-full bg-stone-300 hover:bg-stone-400 text-stone-600 transition-colors w-fit"
+            >
+              ← Go to leaderboard
+            </Link>
+            <p className="text-stone-700 hidden sm:block">
               <b>Hotkeys:</b>
               <br />R = rotate
               <br />F = flip
@@ -1246,40 +1278,55 @@ export default function Puzzle() {
               Backspace/Delete/X = remove
             </p>
           </div>
-          {!isViewingHistory && (
-            <div className="flex gap-2 sm:hidden">
-              {(placedShapes.length > 0 || isSolved || elapsedTime > 0) && (
-                <motion.button
-                  onClick={resetToday}
-                  className="text-xs px-2 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200"
-                >
-                  {isSolved ? "Try again" : "Reset"}
-                </motion.button>
-              )}
-              {isPlaying && (
-                <motion.button
-                  onClick={() => setIsPlaying(false)}
-                  className="text-xs px-3 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200"
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                >
-                  Pause
-                </motion.button>
-              )}
-              {!isPlaying && (
-                <motion.button
-                  onClick={() => setIsPlaying(true)}
-                  className="text-xs px-3 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200"
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                >
-                  Resume
-                </motion.button>
-              )}
-            </div>
-          )}
+          <div className="flex items-start gap-2">
+            {/* Username display */}
+            {currentUsername && (
+              <button
+                onClick={() => {
+                  setModalMode("edit");
+                  setShowLeaderboardModal(true);
+                }}
+                className="px-2 py-1 rounded-md bg-stone-700 text-white hover:bg-stone-600 font-mono tracking-wider"
+                title="Click to change name"
+              >
+                {currentUsername}
+              </button>
+            )}
+            {!isViewingHistory && (
+              <div className="flex gap-2 sm:hidden">
+                {(placedShapes.length > 0 || isSolved || elapsedTime > 0) && (
+                  <motion.button
+                    onClick={resetToday}
+                    className="px-2 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200"
+                  >
+                    {isSolved ? "Try again" : "Reset"}
+                  </motion.button>
+                )}
+                {isPlaying && (
+                  <motion.button
+                    onClick={() => setIsPlaying(false)}
+                    className="px-3 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                  >
+                    Pause
+                  </motion.button>
+                )}
+                {!isPlaying && (
+                  <motion.button
+                    onClick={() => setIsPlaying(true)}
+                    className="px-3 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                  >
+                    Resume
+                  </motion.button>
+                )}
+              </div>
+            )}
+          </div>
         </motion.div>
       )}
 
@@ -1334,7 +1381,7 @@ export default function Puzzle() {
             <motion.button
               key="back"
               onClick={backToToday}
-              className="text-sm px-3 py-1 rounded-full bg-stone-200 hover:bg-stone-300 text-stone-600"
+              className="px-3 py-1 rounded-full bg-stone-200 hover:bg-stone-300 text-stone-600"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               whileHover={{ scale: 1.02 }}
@@ -1366,18 +1413,16 @@ export default function Puzzle() {
             row.map((cell, colIdx) => {
               const cellInfo = getCellInfo(rowIdx, colIdx);
               const isShaking = cellInfo && invalidShake === cellInfo.shapeId;
-              const isSelected =
-                cellInfo && cellInfo.shapeId === selectedShapeId;
               return (
                 <motion.div
                   key={`${rowIdx}-${colIdx}`}
-                  className={`absolute flex items-center justify-center text-xs font-medium pointer-events-none
+                  className={`absolute flex items-center justify-center font-medium pointer-events-none
                   ${
                     cell.isBlocked
                       ? "bg-background"
                       : cell.isTarget
-                      ? "bg-[#2B2B23]! font-bold! text-[#F1C7A2]!"
-                      : "bg-background border border-[#2B2B23]"
+                        ? "bg-[#2B2B23]! font-bold! text-[#F1C7A2]!"
+                        : "bg-background border border-[#2B2B23]"
                   }
                   ${cell.isTarget ? "text-foreground" : "text-background"}
                 `}
@@ -1394,13 +1439,13 @@ export default function Puzzle() {
                         (cell.isBlocked
                           ? "#2B2B23"
                           : cell.isTarget
-                          ? "#f2ede7"
-                          : "white"),
+                            ? "#f2ede7"
+                            : "white"),
                     color: cellInfo
                       ? "#ffffff"
                       : cell.isTarget
-                      ? "#27272a"
-                      : "#71717a",
+                        ? "#27272a"
+                        : "#71717a",
                     x: isShaking ? [0, -4, 4, -4, 4, 0] : 0,
                   }}
                   transition={{
@@ -1622,28 +1667,55 @@ export default function Puzzle() {
         )}
       </AnimatePresence>
 
+      {/* Leaderboard submission modal */}
+      <LeaderboardModal
+        isOpen={showLeaderboardModal}
+        onClose={() => {
+          setShowLeaderboardModal(false);
+          // Refresh username after modal closes
+          const saved = getSavedUsername();
+          setCurrentUsername(saved);
+        }}
+        mode={modalMode}
+        onSubmit={
+          modalMode === "submit"
+            ? async (username: string) => {
+                if (!pendingSolution) throw new Error("No pending solution");
+                const id = await createSolution({
+                  username,
+                  grid: pendingSolution.grid,
+                  day: pendingSolution.day,
+                  startedAt: pendingSolution.startedAt,
+                  solvedAt: pendingSolution.solvedAt,
+                });
+                return id;
+              }
+            : undefined
+        }
+      />
+
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
         className="flex flex-col gap-2 items-center"
       >
-        <p className="text-sm text-stone-400 text-center">
+        <p className="text-stone-400 text-center">
           {isViewingHistory
             ? "Viewing previous solve"
             : isSolved
-            ? "Play again tomorrow!"
-            : isPlaying
-            ? `Use all shapes (${placedShapes.length}/${SHAPES.length}) without touching the current day`
-            : elapsedTime > 0
-            ? "Press Resume to continue"
-            : "Press Start to begin"}
+              ? "Play again tomorrow!"
+              : isPlaying
+                ? `Use all shapes (${placedShapes.length}/${SHAPES.length}) without touching the current day`
+                : elapsedTime > 0
+                  ? "Press Resume to continue"
+                  : "Press Start to begin"}
         </p>
         <div className="gap-2 items-center sm:flex hidden">
           {(placedShapes.length > 0 || isSolved || elapsedTime > 0) && (
             <motion.button
               onClick={resetToday}
-              className="text-xs px-2 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200"
+              className="px-2 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200"
             >
               {isSolved ? "Try again" : "Reset"}
             </motion.button>
@@ -1651,7 +1723,7 @@ export default function Puzzle() {
           {isPlaying && (
             <motion.button
               onClick={() => setIsPlaying(false)}
-              className="text-xs px-3 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200"
+              className="px-3 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
