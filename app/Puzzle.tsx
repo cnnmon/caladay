@@ -1561,7 +1561,7 @@ export default function Puzzle() {
         >
           {/* Scrollable shapes */}
           <div
-            className="flex-1 overflow-x-auto pb-2"
+            className="flex-1 overflow-x-auto pb-4"
             style={{ touchAction: "pan-x" }}
           >
             <div className="flex gap-3 px-2 min-w-max">
