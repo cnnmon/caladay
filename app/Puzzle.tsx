@@ -22,6 +22,7 @@ import {
 
 const STORAGE_KEY = "caesar-v2";
 const PROGRESS_KEY = "caesar-progress-v2";
+const IN_PROGRESS_KEY = "CALADAY_IN_PROGRESS";
 const OLD_STORAGE_KEY = "caesar-puzzle-history";
 const OLD_PROGRESS_KEY = "caesar-puzzle-progress";
 const SHAPES_VERSION = "v2"; // Increment when shapes change to clear cached rotations
@@ -100,6 +101,41 @@ function saveProgress(state: ProgressState): void {
 function clearProgress(): void {
   if (typeof window === "undefined") return;
   localStorage.removeItem(PROGRESS_KEY);
+}
+
+// In-progress grid state (for showing/sharing current progress)
+interface InProgressState {
+  dateKey: string;
+  grid: string; // 56-char grid string
+}
+
+function loadInProgress(): InProgressState | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const data = localStorage.getItem(IN_PROGRESS_KEY);
+    if (!data) return null;
+    const parsed = JSON.parse(data);
+    // Invalidate if it's not for today
+    const todayKey = getDateKey();
+    if (parsed.dateKey !== todayKey) {
+      localStorage.removeItem(IN_PROGRESS_KEY);
+      return null;
+    }
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function saveInProgress(dateKey: string, gridStr: string): void {
+  if (typeof window === "undefined") return;
+  const state: InProgressState = { dateKey, grid: gridStr };
+  localStorage.setItem(IN_PROGRESS_KEY, JSON.stringify(state));
+}
+
+function clearInProgress(): void {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(IN_PROGRESS_KEY);
 }
 
 // Convert placed shapes to a 56-character grid string
@@ -424,10 +460,18 @@ export default function Puzzle() {
     const loadedHistory = loadHistory();
     setHistory(loadedHistory);
 
-    // Check if today was already solved
     const todayKey = getDateKey(currentDate);
     const todayState = loadedHistory[todayKey];
 
+    // Check if there's in-progress state - takes priority over solved
+    const inProgress = loadInProgress();
+    if (inProgress && inProgress.dateKey === todayKey) {
+      // Have in-progress state for today, don't load solved state
+      setHasMounted(true);
+      return;
+    }
+
+    // No in-progress, check if today was already solved
     if (todayState) {
       const parsed = stringToPlacedShapes(todayState.grid);
       if (parsed) {
@@ -580,6 +624,7 @@ export default function Puzzle() {
         setIsSolved(false);
         setViewingDate(null);
         clearProgress();
+        clearInProgress(); // Clear in-progress when day changes
       }
     };
 
@@ -610,6 +655,7 @@ export default function Puzzle() {
       setHistory(newHistory);
       saveHistory(newHistory);
       clearProgress();
+      clearInProgress(); // Clear in-progress when solved
 
       // Check if user has a saved username - auto-submit if so
       const savedUsername = getSavedUsername();
@@ -642,6 +688,29 @@ export default function Puzzle() {
     elapsedTime,
     startedAt,
     grid,
+  ]);
+
+  // Save in-progress grid when shapes change
+  useEffect(() => {
+    if (!hasLoadedProgress) return; // Wait for initial load
+    if (viewingDate) return; // Don't save when viewing history
+    if (isSolved) return; // Don't save when solved
+    if (placedShapes.length === 0) {
+      clearInProgress(); // Clear if no shapes placed
+      return;
+    }
+
+    const dayKey = getDateKey(currentDate);
+    const gridStr = gridToString(placedShapes, shapeRotations, grid);
+    saveInProgress(dayKey, gridStr);
+  }, [
+    placedShapes,
+    shapeRotations,
+    grid,
+    viewingDate,
+    isSolved,
+    currentDate,
+    hasLoadedProgress,
   ]);
 
   // View a previous solve
@@ -691,7 +760,7 @@ export default function Puzzle() {
     }
   };
 
-  // Reset today's puzzle (keeps timer running)
+  // Reset today's puzzle (resets timer too)
   const resetToday = () => {
     setPlacedShapes([]);
     setShapeRotations(Object.fromEntries(SHAPES.map((s) => [s.id, s.cells])));
@@ -699,7 +768,9 @@ export default function Puzzle() {
     setFinalTime(null);
     setSelectedShapeId(null);
     setStartedAt(null);
+    setElapsedTime(0); // Reset timer
     clearProgress();
+    clearInProgress();
   };
 
   // Get sorted list of solve IDs (sorted by solvedAt timestamp, most recent first)
@@ -1297,7 +1368,7 @@ export default function Puzzle() {
                 {(placedShapes.length > 0 || isSolved || elapsedTime > 0) && (
                   <motion.button
                     onClick={resetToday}
-                    className="px-2 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200"
+                    className="px-2 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200 cursor-pointer"
                   >
                     {isSolved ? "Try again" : "Reset"}
                   </motion.button>
@@ -1375,22 +1446,6 @@ export default function Puzzle() {
             </motion.div>
           ) : null}
         </h1>
-
-        <AnimatePresence>
-          {isViewingHistory && (
-            <motion.button
-              key="back"
-              onClick={backToToday}
-              className="px-3 py-1 rounded-full bg-stone-200 hover:bg-stone-300 text-stone-600"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              ← Back to today
-            </motion.button>
-          )}
-        </AnimatePresence>
       </motion.div>
 
       {/* Grid */}
