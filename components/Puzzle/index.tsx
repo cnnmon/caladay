@@ -1,26 +1,31 @@
 "use client";
 
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { api } from "../convex/_generated/api";
-import LeaderboardModal, {
-  addSolutionId,
-  addSubmittedGrid,
-  getSavedUsername,
-  isGridAlreadySubmitted,
-  ModalMode,
-} from "./LeaderboardModal";
-import { flipShape, normalizeShape, rotateShape, SHAPES } from "./shapes";
+import { api } from "../../convex/_generated/api";
+import {
+  flipShape,
+  normalizeShape,
+  rotateShape,
+  SHAPES,
+} from "../../lib/shapes";
 import {
   GridCell,
   PlacedShape,
   SavedPuzzleState,
   ShapeMatrix,
   SolveHistory,
-} from "./types";
+} from "../../lib/types";
+import LeaderboardModal, {
+  addSolutionId,
+  addSubmittedGrid,
+  getSavedUsername,
+  isGridAlreadySubmitted,
+  ModalMode,
+} from "../LeaderboardModal";
 
 const STORAGE_KEY = "caesar-v2";
 const PROGRESS_KEY = "caesar-progress-v2";
@@ -398,8 +403,13 @@ export default function Puzzle() {
   const [importedRotations, setImportedRotations] = useState<
     Record<string, ShapeMatrix>
   >({});
-  const [importedTime, setImportedTime] = useState<number | null>(null); // time in ms for previewed solution
-  const [importedUsername, setImportedUsername] = useState<string | null>(null); // username for previewed solution
+  const [previewSolutionId, setPreviewSolutionId] = useState<string | null>(
+    null
+  );
+  const previewSolution = useQuery(
+    api.solutions.getById,
+    previewSolutionId ? { id: previewSolutionId as never } : "skip"
+  );
   const [history, setHistory] = useState<SolveHistory>({});
   const [isSolved, setIsSolved] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
@@ -419,24 +429,27 @@ export default function Puzzle() {
     if (saved) setCurrentUsername(saved);
   }, []);
 
-  // Handle preview param from URL (leaderboard click)
+  // Handle solution param from URL (leaderboard click)
   useEffect(() => {
-    const previewGrid = searchParams.get("preview");
-    const previewTime = searchParams.get("time");
-    const previewUser = searchParams.get("user");
-    if (previewGrid) {
-      const parsed = stringToPlacedShapes(previewGrid);
-      if (parsed) {
-        setViewingImported(true);
-        setImportedShapes(parsed.shapes);
-        setImportedRotations(parsed.rotations);
-        setImportedTime(previewTime ? parseInt(previewTime, 10) : null);
-        setImportedUsername(previewUser);
-      }
+    const solutionId = searchParams.get("solution");
+    if (solutionId) {
+      setPreviewSolutionId(solutionId);
       // Clear the URL param without full navigation
       router.replace("/", { scroll: false });
     }
   }, [searchParams, router]);
+
+  // Load preview solution when fetched from DB
+  useEffect(() => {
+    if (previewSolution) {
+      const parsed = stringToPlacedShapes(previewSolution.grid);
+      if (parsed) {
+        setViewingImported(true);
+        setImportedShapes(parsed.shapes);
+        setImportedRotations(parsed.rotations);
+      }
+    }
+  }, [previewSolution]);
 
   const [grid, setGrid] = useState(() => markTargets(buildGrid(), currentDate));
   const [placedShapes, setPlacedShapes] = useState<PlacedShape[]>([]);
@@ -753,8 +766,7 @@ export default function Puzzle() {
     setViewingImported(false);
     setImportedShapes([]);
     setImportedRotations({});
-    setImportedTime(null);
-    setImportedUsername(null);
+    setPreviewSolutionId(null);
     setGrid(markTargets(buildGrid(), currentDate));
     setPlacedShapes([]);
     setShapeRotations(Object.fromEntries(SHAPES.map((s) => [s.id, s.cells])));
@@ -788,7 +800,6 @@ export default function Puzzle() {
     clearProgress();
     clearInProgress();
   };
-
 
   // Check if a shape is placed on the grid
   const isShapePlaced = useCallback(
@@ -970,39 +981,6 @@ export default function Puzzle() {
     },
     []
   );
-
-  // Copy solution to clipboard
-  const copySolution = useCallback(() => {
-    const solution = exportSolution();
-    navigator.clipboard.writeText(solution);
-  }, [exportSolution]);
-
-  // Paste solution from clipboard (shows preview, doesn't affect actual state)
-  const pasteSolution = useCallback(async () => {
-    const processImport = (text: string) => {
-      const result = importSolution(text.trim());
-      if (!result.success) {
-        alert(`Import failed: ${result.error}`);
-        return;
-      }
-      // Show preview of imported solution
-      setViewingImported(true);
-      setViewingDate(null);
-      setImportedShapes(result.shapes!);
-      setImportedRotations(result.rotations!);
-    };
-
-    try {
-      const text = await navigator.clipboard.readText();
-      processImport(text);
-    } catch {
-      // Fallback: prompt for input
-      const text = prompt("Paste solution string (56 characters):");
-      if (text) {
-        processImport(text);
-      }
-    }
-  }, [importSolution]);
 
   // Check if placement is valid
   const isValidPlacement = useCallback(
@@ -1343,11 +1321,11 @@ export default function Puzzle() {
               href="/leaderboard"
               className="px-3 py-1 rounded-full bg-stone-300 hover:bg-stone-400 text-stone-600 transition-colors w-fit"
             >
-              ← Go to leaderboard
+              ← Leaderboard
             </Link>
             <button
               onClick={() => setShowHelpModal(true)}
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-stone-300 hover:bg-stone-400 text-stone-600 text-lg font-bold transition-colors cursor-pointer"
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-stone-300 hover:bg-stone-400 text-stone-600 text-lg font-bold transition-colors"
               title="Help & Hotkeys"
             >
               ?
@@ -1361,7 +1339,7 @@ export default function Puzzle() {
                   setModalMode("edit");
                   setShowLeaderboardModal(true);
                 }}
-                className="px-2 py-1 rounded-md bg-stone-700 text-white hover:bg-stone-600 font-mono tracking-wider cursor-pointer"
+                className="px-2 py-1 rounded-md bg-stone-700 text-white hover:bg-stone-600 font-mono tracking-wider"
                 title="Click to change name"
               >
                 {currentUsername}
@@ -1372,7 +1350,7 @@ export default function Puzzle() {
                 {(placedShapes.length > 0 || isSolved || elapsedTime > 0) && (
                   <motion.button
                     onClick={resetToday}
-                    className="px-2 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200 cursor-pointer"
+                    className="px-2 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200"
                   >
                     {isSolved ? "Try again" : "Reset"}
                   </motion.button>
@@ -1380,7 +1358,7 @@ export default function Puzzle() {
                 {isPlaying && !isSolved && (
                   <motion.button
                     onClick={() => setIsPlaying(false)}
-                    className="px-3 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200 cursor-pointer"
+                    className="px-3 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200"
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
@@ -1427,10 +1405,10 @@ export default function Puzzle() {
                     isSolved && finalTime !== null ? finalTime : elapsedTime
                   )}
             </>
-          ) : importedTime !== null ? (
+          ) : previewSolution?.timeElapsed !== undefined ? (
             <>
               {" · "}
-              {formatTime(Math.floor(importedTime / 1000))}
+              {formatTime(Math.floor(previewSolution.timeElapsed / 1000))}
             </>
           ) : null}
           {viewingImported ? (
@@ -1441,7 +1419,9 @@ export default function Puzzle() {
               animate={{ opacity: 1 }}
             >
               <span className="text-lg font-medium text-blue-600">
-                {importedUsername ? `${importedUsername}'s solution` : "Preview"}
+                {previewSolution?.username
+                  ? `${previewSolution.username}'s solution`
+                  : "Preview"}
               </span>
             </motion.div>
           ) : isSolved || isViewingHistory ? (
@@ -1601,7 +1581,7 @@ export default function Puzzle() {
                 {!isSolved && (
                   <motion.button
                     onClick={() => setIsPlaying(true)}
-                    className="relative z-10 px-6 py-3 rounded-full bg-stone-800 text-white font-medium cursor-pointer"
+                    className="relative z-10 px-6 py-3 rounded-full bg-stone-800 text-white font-medium"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     initial={{ scale: 0.9 }}
@@ -1896,7 +1876,7 @@ export default function Puzzle() {
           {(placedShapes.length > 0 || isSolved || elapsedTime > 0) && (
             <motion.button
               onClick={resetToday}
-              className="px-2 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200 cursor-pointer"
+              className="px-2 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200"
             >
               {isSolved ? "Try again" : "Reset"}
             </motion.button>
@@ -1904,7 +1884,7 @@ export default function Puzzle() {
           {isPlaying && !isSolved && (
             <motion.button
               onClick={() => setIsPlaying(false)}
-              className="px-3 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200 cursor-pointer"
+              className="px-3 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}

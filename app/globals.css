@@ -23,6 +23,10 @@ body {
   -webkit-overflow-scrolling: none;
 }
 
+button {
+  cursor: pointer !important;
+}
+
 @keyframes shake {
   0%,
   100% {

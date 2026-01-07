@@ -39,3 +39,10 @@ export const listByDay = query({
     return solutions;
   },
 });
+
+export const getById = query({
+  args: { id: v.id("solutions") },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
+  },
+});

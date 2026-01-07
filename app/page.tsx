@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import Puzzle from "./Puzzle";
+import Puzzle from "../components/Puzzle";
 
 export default function Home() {
   return (

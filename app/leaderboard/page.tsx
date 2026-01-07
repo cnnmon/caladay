@@ -109,21 +109,9 @@ export default function LeaderboardPage() {
       })
     : [];
 
-  const handlePreview = (
-    grid: string,
-    timeElapsed?: number,
-    username?: string
-  ) => {
+  const handlePreview = (solutionId: string) => {
     if (!canPreview) return;
-    const params = new URLSearchParams();
-    params.set("preview", grid);
-    if (timeElapsed !== undefined) {
-      params.set("time", String(timeElapsed));
-    }
-    if (username) {
-      params.set("user", username);
-    }
-    router.push(`/?${params.toString()}`);
+    router.push(`/?solution=${solutionId}`);
   };
 
   return (
@@ -198,12 +186,7 @@ export default function LeaderboardPage() {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.02 }}
                         onClick={() =>
-                          isClickable &&
-                          handlePreview(
-                            solution.grid,
-                            solution.timeElapsed,
-                            solution.username
-                          )
+                          isClickable && handlePreview(solution._id)
                         }
                         className={`flex items-center justify-between px-4 py-3 ${
                           isMine ? "bg-amber-50" : ""
