@@ -1258,7 +1258,7 @@ export default function Puzzle() {
     >
       {hasMounted && (
         <motion.div
-          className="absolute top-0 left-0 p-2 flex gap-2 items-start bg-[#f2ede7] w-full justify-between"
+          className="absolute top-0 left-0 p-2 flex gap-2 items-start w-full justify-between"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
