@@ -8,7 +8,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "../convex/_generated/api";
 import LeaderboardModal, {
   addSolutionId,
+  addSubmittedGrid,
   getSavedUsername,
+  isGridAlreadySubmitted,
   ModalMode,
 } from "./LeaderboardModal";
 import { flipShape, normalizeShape, rotateShape, SHAPES } from "./shapes";
@@ -403,6 +405,7 @@ export default function Puzzle() {
   const [hasMounted, setHasMounted] = useState(false);
   const [showLeaderboardModal, setShowLeaderboardModal] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
+  const [showDuplicateModal, setShowDuplicateModal] = useState(false);
   const [modalMode, setModalMode] = useState<ModalMode>("submit");
   const [pendingSolution, setPendingSolution] =
     useState<SavedPuzzleState | null>(null);
@@ -658,6 +661,12 @@ export default function Puzzle() {
       clearProgress();
       clearInProgress(); // Clear in-progress when solved
 
+      // Check if this solution was already submitted
+      if (isGridAlreadySubmitted(state.grid)) {
+        setShowDuplicateModal(true);
+        return;
+      }
+
       // Check if user has a saved username - auto-submit if so
       const savedUsername = getSavedUsername();
       if (savedUsername) {
@@ -670,6 +679,7 @@ export default function Puzzle() {
           solvedAt: state.solvedAt,
         }).then((solutionId) => {
           addSolutionId(solutionId);
+          addSubmittedGrid(state.grid);
         });
       } else {
         // Show modal to ask for name
@@ -1344,7 +1354,7 @@ export default function Puzzle() {
             </Link>
             <button
               onClick={() => setShowHelpModal(true)}
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-stone-300 hover:bg-stone-400 text-stone-600 text-lg font-bold transition-colors"
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-stone-300 hover:bg-stone-400 text-stone-600 text-lg font-bold transition-colors cursor-pointer"
               title="Help & Hotkeys"
             >
               ?
@@ -1358,7 +1368,7 @@ export default function Puzzle() {
                   setModalMode("edit");
                   setShowLeaderboardModal(true);
                 }}
-                className="px-2 py-1 rounded-md bg-stone-700 text-white hover:bg-stone-600 font-mono tracking-wider"
+                className="px-2 py-1 rounded-md bg-stone-700 text-white hover:bg-stone-600 font-mono tracking-wider cursor-pointer"
                 title="Click to change name"
               >
                 {currentUsername}
@@ -1377,7 +1387,7 @@ export default function Puzzle() {
                 {isPlaying && (
                   <motion.button
                     onClick={() => setIsPlaying(false)}
-                    className="px-3 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200"
+                    className="px-3 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200 cursor-pointer"
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
@@ -1591,7 +1601,7 @@ export default function Puzzle() {
                 {!isSolved && (
                   <motion.button
                     onClick={() => setIsPlaying(true)}
-                    className="relative z-10 px-6 py-3 rounded-full bg-stone-800 text-white font-medium"
+                    className="relative z-10 px-6 py-3 rounded-full bg-stone-800 text-white font-medium cursor-pointer"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     initial={{ scale: 0.9 }}
@@ -1744,6 +1754,7 @@ export default function Puzzle() {
                   startedAt: pendingSolution.startedAt,
                   solvedAt: pendingSolution.solvedAt,
                 });
+                addSubmittedGrid(pendingSolution.grid);
                 return id;
               }
             : undefined
@@ -1822,6 +1833,48 @@ export default function Puzzle() {
         )}
       </AnimatePresence>
 
+      {/* Duplicate Solution Modal */}
+      <AnimatePresence>
+        {showDuplicateModal && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="absolute inset-0 bg-black/50"
+              onClick={() => setShowDuplicateModal(false)}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            />
+            <motion.div
+              className="relative bg-white rounded-lg p-6 max-w-sm w-full text-center"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            >
+              <p className="text-4xl mb-3">🎉</p>
+              <h2 className="text-xl font-bold text-stone-800 mb-2">
+                You solved it again!
+              </h2>
+              <p className="text-stone-600 mb-4">
+                This solution is the same as one you&apos;ve already submitted,
+                so it won&apos;t appear on the leaderboard again.
+              </p>
+              <button
+                onClick={() => setShowDuplicateModal(false)}
+                className="w-full px-4 py-2 rounded-lg bg-stone-800 hover:bg-stone-900 text-white transition-colors"
+              >
+                OK
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -1843,7 +1896,7 @@ export default function Puzzle() {
           {(placedShapes.length > 0 || isSolved || elapsedTime > 0) && (
             <motion.button
               onClick={resetToday}
-              className="px-2 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200"
+              className="px-2 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200 cursor-pointer"
             >
               {isSolved ? "Try again" : "Reset"}
             </motion.button>
@@ -1851,7 +1904,7 @@ export default function Puzzle() {
           {isPlaying && (
             <motion.button
               onClick={() => setIsPlaying(false)}
-              className="px-3 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200"
+              className="px-3 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200 cursor-pointer"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}

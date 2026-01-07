@@ -53,6 +53,25 @@ export function getSolutionIds(): string[] {
   return existing ? JSON.parse(existing) : [];
 }
 
+const GRIDS_KEY = "CALADAY_SUBMITTED_GRIDS";
+
+export function addSubmittedGrid(grid: string): void {
+  if (typeof window === "undefined") return;
+  const existing = localStorage.getItem(GRIDS_KEY);
+  const grids: string[] = existing ? JSON.parse(existing) : [];
+  if (!grids.includes(grid)) {
+    grids.push(grid);
+    localStorage.setItem(GRIDS_KEY, JSON.stringify(grids));
+  }
+}
+
+export function isGridAlreadySubmitted(grid: string): boolean {
+  if (typeof window === "undefined") return false;
+  const existing = localStorage.getItem(GRIDS_KEY);
+  const grids: string[] = existing ? JSON.parse(existing) : [];
+  return grids.includes(grid);
+}
+
 export default function LeaderboardModal({
   isOpen,
   onClose,
