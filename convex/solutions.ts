@@ -39,4 +39,3 @@ export const listByDay = query({
     return solutions;
   },
 });
-
