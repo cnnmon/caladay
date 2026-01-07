@@ -1319,10 +1319,6 @@ export default function Puzzle() {
   const { month, dayNum, dayWord } = getTargetsForDate(displayDate);
   const isViewingHistory = viewingDate !== null || viewingImported;
 
-  // Use imported shapes when previewing, otherwise use placed shapes
-  const displayShapes = viewingImported ? importedShapes : placedShapes;
-  const displayRotations = viewingImported ? importedRotations : shapeRotations;
-
   return (
     <motion.div
       className="flex flex-col items-center gap-4 p-4 select-none max-h-dvh overflow-hidden"
