@@ -30,7 +30,7 @@ export interface SavedPuzzleState {
   grid: string; // String representation of the grid (7x8, 56 chars)
   day: string; // Date key (YYYY-MM-DD)
   startedAt?: string; // ISO timestamp when timer started
-  solvedAt?: string; // ISO timestamp when solved (duration = solvedAt - startedAt)
+  timeElapsed?: number; // Elapsed time in ms, frozen when solved or page closed
 }
 
 // History of all solves keyed by date string (YYYY-MM-DD)

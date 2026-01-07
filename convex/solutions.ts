@@ -7,7 +7,7 @@ export const create = mutation({
     grid: v.string(),
     day: v.string(),
     startedAt: v.optional(v.string()),
-    solvedAt: v.optional(v.string()),
+    timeElapsed: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const id = await ctx.db.insert("solutions", {
@@ -15,7 +15,7 @@ export const create = mutation({
       grid: args.grid,
       day: args.day,
       startedAt: args.startedAt,
-      solvedAt: args.solvedAt,
+      timeElapsed: args.timeElapsed,
     });
     return id;
   },

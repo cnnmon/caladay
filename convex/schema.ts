@@ -7,7 +7,7 @@ export default defineSchema({
     grid: v.string(), // 56-character grid representation
     day: v.string(), // Date key (YYYY-MM-DD)
     startedAt: v.optional(v.string()), // ISO timestamp
-    solvedAt: v.optional(v.string()), // ISO timestamp
+    timeElapsed: v.optional(v.number()), // Elapsed time in ms
   }).index("by_day", ["day"]),
 });
 

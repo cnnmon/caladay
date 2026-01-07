@@ -381,10 +381,8 @@ function formatTime(seconds: number): string {
 
 // Get solve time in seconds from a saved state
 function getSolveTime(state: SavedPuzzleState): number {
-  if (state.startedAt && state.solvedAt) {
-    const start = new Date(state.startedAt).getTime();
-    const end = new Date(state.solvedAt).getTime();
-    return Math.floor((end - start) / 1000);
+  if (state.timeElapsed !== undefined) {
+    return Math.floor(state.timeElapsed / 1000);
   }
   return 0;
 }
@@ -400,6 +398,8 @@ export default function Puzzle() {
   const [importedRotations, setImportedRotations] = useState<
     Record<string, ShapeMatrix>
   >({});
+  const [importedTime, setImportedTime] = useState<number | null>(null); // time in ms for previewed solution
+  const [importedUsername, setImportedUsername] = useState<string | null>(null); // username for previewed solution
   const [history, setHistory] = useState<SolveHistory>({});
   const [isSolved, setIsSolved] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
@@ -422,12 +422,16 @@ export default function Puzzle() {
   // Handle preview param from URL (leaderboard click)
   useEffect(() => {
     const previewGrid = searchParams.get("preview");
+    const previewTime = searchParams.get("time");
+    const previewUser = searchParams.get("user");
     if (previewGrid) {
       const parsed = stringToPlacedShapes(previewGrid);
       if (parsed) {
         setViewingImported(true);
         setImportedShapes(parsed.shapes);
         setImportedRotations(parsed.rotations);
+        setImportedTime(previewTime ? parseInt(previewTime, 10) : null);
+        setImportedUsername(previewUser);
       }
       // Clear the URL param without full navigation
       router.replace("/", { scroll: false });
@@ -647,13 +651,12 @@ export default function Puzzle() {
       setIsSolved(true);
       setFinalTime(elapsedTime);
       // Save to history keyed by day
-      const solvedAt = new Date().toISOString();
       const dayKey = getDateKey(currentDate);
       const state: SavedPuzzleState = {
         grid: gridToString(placedShapes, shapeRotations, grid),
         day: dayKey,
-        startedAt: startedAt ?? solvedAt,
-        solvedAt,
+        startedAt: startedAt ?? new Date().toISOString(),
+        timeElapsed: elapsedTime * 1000, // Convert seconds to ms
       };
       const newHistory = { ...history, [dayKey]: state };
       setHistory(newHistory);
@@ -676,7 +679,7 @@ export default function Puzzle() {
           grid: state.grid,
           day: state.day,
           startedAt: state.startedAt,
-          solvedAt: state.solvedAt,
+          timeElapsed: state.timeElapsed,
         }).then((solutionId) => {
           addSolutionId(solutionId);
           addSubmittedGrid(state.grid);
@@ -750,6 +753,8 @@ export default function Puzzle() {
     setViewingImported(false);
     setImportedShapes([]);
     setImportedRotations({});
+    setImportedTime(null);
+    setImportedUsername(null);
     setGrid(markTargets(buildGrid(), currentDate));
     setPlacedShapes([]);
     setShapeRotations(Object.fromEntries(SHAPES.map((s) => [s.id, s.cells])));
@@ -784,14 +789,6 @@ export default function Puzzle() {
     clearInProgress();
   };
 
-  // Get sorted list of solve IDs (sorted by solvedAt timestamp, most recent first)
-  const solveIds = Object.entries(history)
-    .sort((a, b) => {
-      const aTime = a[1].solvedAt || a[0];
-      const bTime = b[1].solvedAt || b[0];
-      return bTime.localeCompare(aTime);
-    })
-    .map(([id]) => id);
 
   // Check if a shape is placed on the grid
   const isShapePlaced = useCallback(
@@ -1380,7 +1377,7 @@ export default function Puzzle() {
                     {isSolved ? "Try again" : "Reset"}
                   </motion.button>
                 )}
-                {isPlaying && (
+                {isPlaying && !isSolved && (
                   <motion.button
                     onClick={() => setIsPlaying(false)}
                     className="px-3 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200 cursor-pointer"
@@ -1391,7 +1388,7 @@ export default function Puzzle() {
                     Pause
                   </motion.button>
                 )}
-                {!isPlaying && (
+                {!isPlaying && !isSolved && (
                   <motion.button
                     onClick={() => setIsPlaying(true)}
                     className="px-3 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200"
@@ -1417,7 +1414,7 @@ export default function Puzzle() {
       >
         <h1 className="text-xl font-light tracking-wide text-stone-700">
           {month} {dayNum}, {dayWord}
-          {!viewingImported && (
+          {!viewingImported ? (
             <>
               {" · "}
               {viewingDate
@@ -1430,15 +1427,22 @@ export default function Puzzle() {
                     isSolved && finalTime !== null ? finalTime : elapsedTime
                   )}
             </>
-          )}
+          ) : importedTime !== null ? (
+            <>
+              {" · "}
+              {formatTime(Math.floor(importedTime / 1000))}
+            </>
+          ) : null}
           {viewingImported ? (
             <motion.div
-              key="solved"
+              key="preview"
               className="flex flex-col items-center gap-1"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              <span className="text-lg font-medium text-blue-600">Preview</span>
+              <span className="text-lg font-medium text-blue-600">
+                {importedUsername ? `${importedUsername}'s solution` : "Preview"}
+              </span>
             </motion.div>
           ) : isSolved || isViewingHistory ? (
             <motion.div
@@ -1748,7 +1752,7 @@ export default function Puzzle() {
                   grid: pendingSolution.grid,
                   day: pendingSolution.day,
                   startedAt: pendingSolution.startedAt,
-                  solvedAt: pendingSolution.solvedAt,
+                  timeElapsed: pendingSolution.timeElapsed,
                 });
                 addSubmittedGrid(pendingSolution.grid);
                 return id;
@@ -1897,7 +1901,7 @@ export default function Puzzle() {
               {isSolved ? "Try again" : "Reset"}
             </motion.button>
           )}
-          {isPlaying && (
+          {isPlaying && !isSolved && (
             <motion.button
               onClick={() => setIsPlaying(false)}
               className="px-3 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200 cursor-pointer"

@@ -17,11 +17,11 @@ function getDateKey(date: Date = new Date()): string {
   return `${year}-${month}-${day}`;
 }
 
-function formatTime(startedAt?: string, solvedAt?: string): string {
-  if (!startedAt || !solvedAt) return "—";
-  const start = new Date(startedAt).getTime();
-  const end = new Date(solvedAt).getTime();
-  const seconds = Math.floor((end - start) / 1000);
+function formatTime(timeElapsed?: number): string {
+  if (timeElapsed === undefined) {
+    return "—";
+  }
+  const seconds = Math.floor(timeElapsed / 1000);
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
   return `${mins}:${secs.toString().padStart(2, "0")}`;
@@ -103,21 +103,27 @@ export default function LeaderboardPage() {
   const currentDaySolutions = selectedDay && groupedByDay?.[selectedDay];
   const sortedSolutions = currentDaySolutions
     ? [...currentDaySolutions].sort((a, b) => {
-        const timeA =
-          a.startedAt && a.solvedAt
-            ? new Date(a.solvedAt).getTime() - new Date(a.startedAt).getTime()
-            : Infinity;
-        const timeB =
-          b.startedAt && b.solvedAt
-            ? new Date(b.solvedAt).getTime() - new Date(b.startedAt).getTime()
-            : Infinity;
+        const timeA = a.timeElapsed ?? Infinity;
+        const timeB = b.timeElapsed ?? Infinity;
         return timeA - timeB;
       })
     : [];
 
-  const handlePreview = (grid: string) => {
+  const handlePreview = (
+    grid: string,
+    timeElapsed?: number,
+    username?: string
+  ) => {
     if (!canPreview) return;
-    router.push(`/?preview=${encodeURIComponent(grid)}`);
+    const params = new URLSearchParams();
+    params.set("preview", grid);
+    if (timeElapsed !== undefined) {
+      params.set("time", String(timeElapsed));
+    }
+    if (username) {
+      params.set("user", username);
+    }
+    router.push(`/?${params.toString()}`);
   };
 
   return (
@@ -192,7 +198,12 @@ export default function LeaderboardPage() {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.02 }}
                         onClick={() =>
-                          isClickable && handlePreview(solution.grid)
+                          isClickable &&
+                          handlePreview(
+                            solution.grid,
+                            solution.timeElapsed,
+                            solution.username
+                          )
                         }
                         className={`flex items-center justify-between px-4 py-3 ${
                           isMine ? "bg-amber-50" : ""
@@ -238,7 +249,7 @@ export default function LeaderboardPage() {
                         </div>
                         <div className="flex items-center gap-2">
                           <span className="text-stone-500 font-mono">
-                            {formatTime(solution.startedAt, solution.solvedAt)}
+                            {formatTime(solution.timeElapsed)}
                           </span>
                           {isClickable && (
                             <span className="text-stone-300 text-sm">→</span>
