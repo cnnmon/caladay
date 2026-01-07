@@ -402,6 +402,7 @@ export default function Puzzle() {
   const [isSolved, setIsSolved] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
   const [showLeaderboardModal, setShowLeaderboardModal] = useState(false);
+  const [showHelpModal, setShowHelpModal] = useState(false);
   const [modalMode, setModalMode] = useState<ModalMode>("submit");
   const [pendingSolution, setPendingSolution] =
     useState<SavedPuzzleState | null>(null);
@@ -1341,13 +1342,13 @@ export default function Puzzle() {
             >
               ← Go to leaderboard
             </Link>
-            <p className="text-stone-700 hidden sm:block">
-              <b>Hotkeys:</b>
-              <br />R = rotate
-              <br />F = flip
-              <br />
-              Backspace/Delete/X = remove
-            </p>
+            <button
+              onClick={() => setShowHelpModal(true)}
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-stone-300 hover:bg-stone-400 text-stone-600 text-lg font-bold transition-colors"
+              title="Help & Hotkeys"
+            >
+              ?
+            </button>
           </div>
           <div className="flex items-start gap-2">
             {/* Username display */}
@@ -1748,6 +1749,78 @@ export default function Puzzle() {
             : undefined
         }
       />
+
+      {/* Help Modal */}
+      <AnimatePresence>
+        {showHelpModal && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="absolute inset-0 bg-black/50"
+              onClick={() => setShowHelpModal(false)}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            />
+            <motion.div
+              className="relative bg-white rounded-lg p-6 max-w-md w-full"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            >
+              <h2 className="text-xl font-bold text-stone-800 mb-4">
+                How to Play
+              </h2>
+              <div className="text-stone-600 space-y-3 mb-4">
+                <p>
+                  Fill the calendar grid using all 8 shapes without covering
+                  today&apos;s date (month, day, and day of the week).
+                </p>
+                <p>
+                  Drag shapes from the palette onto the grid. Tap a shape to
+                  select it, then rotate or flip using the buttons.
+                </p>
+              </div>
+              <h3 className="font-bold text-stone-800 mb-2">
+                Keyboard Shortcuts
+              </h3>
+              <div className="text-stone-600 space-y-1 mb-4 font-mono text-sm">
+                <p>
+                  <span className="inline-block w-24 text-stone-500">R</span>
+                  Rotate
+                </p>
+                <p>
+                  <span className="inline-block w-24 text-stone-500">F</span>
+                  Flip
+                </p>
+                <p>
+                  <span className="inline-block w-24 text-stone-500">
+                    Backspace
+                  </span>
+                  Remove
+                </p>
+                <p>
+                  <span className="inline-block w-24 text-stone-500">
+                    Delete / X
+                  </span>
+                  Remove
+                </p>
+              </div>
+              <button
+                onClick={() => setShowHelpModal(false)}
+                className="w-full px-4 py-2 rounded-lg bg-stone-800 hover:bg-stone-900 text-white transition-colors"
+              >
+                Got it
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <motion.div
         initial={{ opacity: 0 }}
