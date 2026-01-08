@@ -4,15 +4,37 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
 const USERNAME_KEY = "CALADAY_USERNAME";
-const SOLUTIONS_KEY = "CALADAY_SOLUTIONS";
+const SUBMISSIONS_KEY = "CALADAY_SUBMISSIONS"; // { id: string, grid: string }[]
 
 export type ModalMode = "submit" | "edit";
 
 interface LeaderboardModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit?: (username: string) => Promise<string>; // Returns solution ID (only for submit mode)
+  onSubmit?: (
+    username: string
+  ) => Promise<{ solutionId: string; grid: string }>;
   mode: ModalMode;
+}
+
+interface Submission {
+  id: string;
+  grid: string;
+}
+
+function getSubmissions(): Submission[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const data = localStorage.getItem(SUBMISSIONS_KEY);
+    return data ? JSON.parse(data) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveSubmissions(submissions: Submission[]): void {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(SUBMISSIONS_KEY, JSON.stringify(submissions));
 }
 
 async function loadBannedWords(): Promise<Set<string>> {
@@ -39,40 +61,23 @@ export function saveUsername(username: string): void {
   localStorage.setItem(USERNAME_KEY, username.toUpperCase());
 }
 
-export function addSolutionId(solutionId: string): void {
-  if (typeof window === "undefined") return;
-  const existing = localStorage.getItem(SOLUTIONS_KEY);
-  const ids: string[] = existing ? JSON.parse(existing) : [];
-  ids.push(solutionId);
-  localStorage.setItem(SOLUTIONS_KEY, JSON.stringify(ids));
-}
-
-export function getSolutionIds(): string[] {
-  if (typeof window === "undefined") return [];
-  const existing = localStorage.getItem(SOLUTIONS_KEY);
-  return existing ? JSON.parse(existing) : [];
-}
-
-const GRIDS_KEY = "CALADAY_SUBMITTED_GRIDS";
-
-export function addSubmittedGrid(grid: string): void {
-  if (typeof window === "undefined") return;
-  const existing = localStorage.getItem(GRIDS_KEY);
-  const grids: string[] = existing ? JSON.parse(existing) : [];
-  if (!grids.includes(grid)) {
-    grids.push(grid);
-    localStorage.setItem(GRIDS_KEY, JSON.stringify(grids));
+export function addSubmission(solutionId: string, grid: string): void {
+  const submissions = getSubmissions();
+  if (!submissions.some((s) => s.grid === grid)) {
+    submissions.push({ id: solutionId, grid });
+    saveSubmissions(submissions);
   }
 }
 
-export function isGridAlreadySubmitted(grid: string): boolean {
-  if (typeof window === "undefined") return false;
-  const existing = localStorage.getItem(GRIDS_KEY);
-  const grids: string[] = existing ? JSON.parse(existing) : [];
-  return grids.includes(grid);
+export function getSolutionIds(): string[] {
+  return getSubmissions().map((s) => s.id);
 }
 
-export default function LeaderboardModal({
+export function isGridAlreadySubmitted(grid: string): boolean {
+  return getSubmissions().some((s) => s.grid === grid);
+}
+
+export default function SolveModal({
   isOpen,
   onClose,
   onSubmit,
@@ -127,9 +132,9 @@ export default function LeaderboardModal({
 
     setIsSubmitting(true);
     try {
-      const solutionId = await onSubmit(username);
+      const { solutionId, grid } = await onSubmit(username);
       saveUsername(username);
-      addSolutionId(solutionId);
+      addSubmission(solutionId, grid);
       onClose();
     } catch {
       setError("Failed to submit. Please try again.");

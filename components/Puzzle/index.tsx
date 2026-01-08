@@ -2,7 +2,6 @@
 
 import { useMutation, useQuery } from "convex/react";
 import { AnimatePresence, motion } from "framer-motion";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "../../convex/_generated/api";
@@ -19,17 +18,15 @@ import {
   ShapeMatrix,
   SolveHistory,
 } from "../../lib/types";
-import LeaderboardModal, {
-  addSolutionId,
-  addSubmittedGrid,
+import SolveModal, {
+  addSubmission,
   getSavedUsername,
   isGridAlreadySubmitted,
   ModalMode,
-} from "../LeaderboardModal";
+} from "../SolveModal";
 
 const STORAGE_KEY = "caesar-v2";
 const PROGRESS_KEY = "caesar-progress-v2";
-const IN_PROGRESS_KEY = "CALADAY_IN_PROGRESS";
 const OLD_STORAGE_KEY = "caesar-puzzle-history";
 const OLD_PROGRESS_KEY = "caesar-puzzle-progress";
 const SHAPES_VERSION = "v2"; // Increment when shapes change to clear cached rotations
@@ -108,41 +105,6 @@ function saveProgress(state: ProgressState): void {
 function clearProgress(): void {
   if (typeof window === "undefined") return;
   localStorage.removeItem(PROGRESS_KEY);
-}
-
-// In-progress grid state (for showing/sharing current progress)
-interface InProgressState {
-  dateKey: string;
-  grid: string; // 56-char grid string
-}
-
-function loadInProgress(): InProgressState | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const data = localStorage.getItem(IN_PROGRESS_KEY);
-    if (!data) return null;
-    const parsed = JSON.parse(data);
-    // Invalidate if it's not for today
-    const todayKey = getDateKey();
-    if (parsed.dateKey !== todayKey) {
-      localStorage.removeItem(IN_PROGRESS_KEY);
-      return null;
-    }
-    return parsed;
-  } catch {
-    return null;
-  }
-}
-
-function saveInProgress(dateKey: string, gridStr: string): void {
-  if (typeof window === "undefined") return;
-  const state: InProgressState = { dateKey, grid: gridStr };
-  localStorage.setItem(IN_PROGRESS_KEY, JSON.stringify(state));
-}
-
-function clearInProgress(): void {
-  if (typeof window === "undefined") return;
-  localStorage.removeItem(IN_PROGRESS_KEY);
 }
 
 // Convert placed shapes to a 56-character grid string
@@ -413,7 +375,7 @@ export default function Puzzle() {
   const [history, setHistory] = useState<SolveHistory>({});
   const [isSolved, setIsSolved] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
-  const [showLeaderboardModal, setShowLeaderboardModal] = useState(false);
+  const [showSolveModal, setShowSolveModal] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
   const [showDuplicateModal, setShowDuplicateModal] = useState(false);
   const [modalMode, setModalMode] = useState<ModalMode>("submit");
@@ -447,6 +409,10 @@ export default function Puzzle() {
         setViewingImported(true);
         setImportedShapes(parsed.shapes);
         setImportedRotations(parsed.rotations);
+        // Update grid to show the correct day's targets
+        const solutionDate = new Date(previewSolution.day + "T12:00:00");
+        setGrid(markTargets(buildGrid(), solutionDate));
+        setViewingDate(previewSolution.day);
       }
     }
   }, [previewSolution]);
@@ -485,8 +451,8 @@ export default function Puzzle() {
     const todayState = loadedHistory[todayKey];
 
     // Check if there's in-progress state - takes priority over solved
-    const inProgress = loadInProgress();
-    if (inProgress && inProgress.dateKey === todayKey) {
+    const progress = loadProgress();
+    if (progress && progress.dateKey === todayKey) {
       // Have in-progress state for today, don't load solved state
       setHasMounted(true);
       return;
@@ -645,7 +611,6 @@ export default function Puzzle() {
         setIsSolved(false);
         setViewingDate(null);
         clearProgress();
-        clearInProgress(); // Clear in-progress when day changes
       }
     };
 
@@ -675,7 +640,6 @@ export default function Puzzle() {
       setHistory(newHistory);
       saveHistory(newHistory);
       clearProgress();
-      clearInProgress(); // Clear in-progress when solved
 
       // Check if this solution was already submitted
       if (isGridAlreadySubmitted(state.grid)) {
@@ -694,14 +658,13 @@ export default function Puzzle() {
           startedAt: state.startedAt,
           timeElapsed: state.timeElapsed,
         }).then((solutionId) => {
-          addSolutionId(solutionId);
-          addSubmittedGrid(state.grid);
+          addSubmission(solutionId, state.grid);
         });
       } else {
         // Show modal to ask for name
         setPendingSolution(state);
         setModalMode("submit");
-        setShowLeaderboardModal(true);
+        setShowSolveModal(true);
       }
     }
   }, [
@@ -715,29 +678,6 @@ export default function Puzzle() {
     elapsedTime,
     startedAt,
     grid,
-  ]);
-
-  // Save in-progress grid when shapes change
-  useEffect(() => {
-    if (!hasLoadedProgress) return; // Wait for initial load
-    if (viewingDate) return; // Don't save when viewing history
-    if (isSolved) return; // Don't save when solved
-    if (placedShapes.length === 0) {
-      clearInProgress(); // Clear if no shapes placed
-      return;
-    }
-
-    const dayKey = getDateKey(currentDate);
-    const gridStr = gridToString(placedShapes, shapeRotations, grid);
-    saveInProgress(dayKey, gridStr);
-  }, [
-    placedShapes,
-    shapeRotations,
-    grid,
-    viewingDate,
-    isSolved,
-    currentDate,
-    hasLoadedProgress,
   ]);
 
   // View a previous solve
@@ -790,15 +730,17 @@ export default function Puzzle() {
 
   // Reset today's puzzle (resets timer too)
   const resetToday = () => {
+    // If already solved, then reset elapsed time
+    if (isSolved) {
+      setElapsedTime(0);
+    }
     setPlacedShapes([]);
     setShapeRotations(Object.fromEntries(SHAPES.map((s) => [s.id, s.cells])));
     setIsSolved(false);
     setFinalTime(null);
     setSelectedShapeId(null);
     setStartedAt(null);
-    setElapsedTime(0); // Reset timer
     clearProgress();
-    clearInProgress();
   };
 
   // Check if a shape is placed on the grid
@@ -1296,7 +1238,7 @@ export default function Puzzle() {
 
   return (
     <motion.div
-      className="flex flex-col items-center gap-4 p-4 select-none max-h-dvh overflow-hidden"
+      className="flex flex-col items-center gap-4 p-4 h-full select-none max-h-dvh overflow-hidden"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
@@ -1309,160 +1251,206 @@ export default function Puzzle() {
       onPointerUp={handlePointerUp}
       onPointerCancel={() => setDragState(null)}
     >
-      {hasMounted && (
-        <motion.div
-          className="absolute top-0 left-0 p-2 flex gap-2 items-start w-full justify-between"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          <div className="flex flex-col gap-2 px-2 p-1">
-            <Link
-              href="/leaderboard"
-              className="px-3 py-1 rounded-full bg-stone-300 hover:bg-stone-400 text-stone-600 transition-colors w-fit"
+      <motion.div
+        className="absolute top-0 left-0 p-2 flex gap-2 items-start w-full justify-between"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
+        <div className="flex gap-2 px-2 p-1">
+          <button
+            onClick={() => router.push("/leaderboard")}
+            className="icon-button"
+          >
+            <svg
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
             >
-              ← Leaderboard
-            </Link>
+              <path
+                d="M14 6h8v8h-2v-4h-2V8h-4V6zm2 6v-2h2v2h-2zm-2 2v-2h2v2h-2zm-2 0h2v2h-2v-2zm-2-2h2v2h-2v-2zm-2 0v-2h2v2H8zm-2 2v-2h2v2H6zm-2 2v-2h2v2H4zm0 0v2H2v-2h2z"
+                fill="currentColor"
+              />
+            </svg>
+          </button>
+          <button
+            onClick={() => setShowHelpModal(true)}
+            className="icon-button"
+            title="Help & Hotkeys"
+          >
+            <svg
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M3 3h2v18H3V3zm16 0H5v2h14v14H5v2h16V3h-2zm-8 6h2V7h-2v2zm2 8h-2v-6h2v6z"
+                fill="currentColor"
+              />
+            </svg>
+          </button>
+        </div>
+        <div className="flex items-start gap-2">
+          {/* Username display */}
+          {currentUsername && (
             <button
-              onClick={() => setShowHelpModal(true)}
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-stone-300 hover:bg-stone-400 text-stone-600 text-lg font-bold transition-colors"
-              title="Help & Hotkeys"
+              onClick={() => {
+                setModalMode("edit");
+                setShowSolveModal(true);
+              }}
+              className="px-2 py-1 rounded-md bg-stone-800 text-white hover:bg-stone-700 font-mono tracking-wider"
+              title="Click to change name"
             >
-              ?
+              {currentUsername}
             </button>
-          </div>
-          <div className="flex items-start gap-2">
-            {/* Username display */}
-            {currentUsername && (
-              <button
-                onClick={() => {
-                  setModalMode("edit");
-                  setShowLeaderboardModal(true);
-                }}
-                className="px-2 py-1 rounded-md bg-stone-700 text-white hover:bg-stone-600 font-mono tracking-wider"
-                title="Click to change name"
-              >
-                {currentUsername}
-              </button>
-            )}
-            {!isViewingHistory && (
-              <div className="flex gap-2 sm:hidden">
-                {(placedShapes.length > 0 || isSolved || elapsedTime > 0) && (
-                  <motion.button
-                    onClick={resetToday}
-                    className="px-2 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200"
+          )}
+          {!isViewingHistory && (
+            <div className="flex gap-2 sm:hidden">
+              {(placedShapes.length > 0 || isSolved || elapsedTime > 0) && (
+                <motion.button onClick={resetToday} className="icon-button">
+                  <svg
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
                   >
-                    {isSolved ? "Try again" : "Reset"}
-                  </motion.button>
-                )}
-                {isPlaying && !isSolved && (
+                    <path
+                      d="M16 2h-2v2h2v2H4v2H2v5h2V8h12v2h-2v2h2v-2h2V8h2V6h-2V4h-2V2zM6 20h2v2h2v-2H8v-2h12v-2h2v-5h-2v5H8v-2h2v-2H8v2H6v2H4v2h2v2z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </motion.button>
+              )}
+              {!isSolved &&
+                (isPlaying ? (
                   <motion.button
                     onClick={() => setIsPlaying(false)}
-                    className="px-3 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200"
+                    className="icon-button"
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                   >
-                    Pause
+                    <svg
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M10 4H5v16h5V4zm9 0h-5v16h5V4z"
+                        fill="currentColor"
+                      />
+                    </svg>
                   </motion.button>
-                )}
-                {!isPlaying && !isSolved && (
+                ) : (
                   <motion.button
                     onClick={() => setIsPlaying(true)}
-                    className="px-3 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200"
+                    className="icon-button"
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                   >
-                    Resume
+                    <svg
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                    >
+                      {" "}
+                      <path
+                        d="M10 20H8V4h2v2h2v3h2v2h2v2h-2v2h-2v3h-2v2z"
+                        fill="currentColor"
+                      />{" "}
+                    </svg>
                   </motion.button>
-                )}
-              </div>
-            )}
-          </div>
-        </motion.div>
-      )}
-
-      {/* Header */}
-      <motion.div
-        className="flex flex-col items-center gap-2"
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.1 }}
-      >
-        <h1 className="text-xl font-light tracking-wide text-stone-700">
-          {month} {dayNum}, {dayWord}
-          {!viewingImported ? (
-            <>
-              {" · "}
-              {viewingDate
-                ? formatTime(
-                    history[viewingDate]
-                      ? getSolveTime(history[viewingDate])
-                      : 0
-                  )
-                : formatTime(
-                    isSolved && finalTime !== null ? finalTime : elapsedTime
-                  )}
-            </>
-          ) : previewSolution?.timeElapsed !== undefined ? (
-            <>
-              {" · "}
-              {formatTime(Math.floor(previewSolution.timeElapsed / 1000))}
-            </>
-          ) : null}
-          {viewingImported ? (
-            <motion.div
-              key="preview"
-              className="flex flex-col items-center gap-1"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              <span className="text-lg font-medium text-blue-600">
-                {previewSolution?.username
-                  ? `${previewSolution.username}'s solution`
-                  : "Preview"}
-              </span>
-            </motion.div>
-          ) : isSolved || isViewingHistory ? (
-            <motion.div
-              key="solved"
-              className="flex flex-col items-center gap-1"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              <span className="text-lg font-medium text-green-600">
-                {isViewingHistory ? "✓ Solved" : "🎉 Congratulations!"}
-              </span>
-            </motion.div>
-          ) : null}
-        </h1>
+                ))}
+            </div>
+          )}
+        </div>
       </motion.div>
 
-      {/* Grid */}
-      <motion.div
-        className="border-4 border-[#2B2B23] bg-[#2B2B23] rounded-lg"
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.4, delay: 0.2 }}
+      <div
+        className={`flex flex-col gap-4 items-center justify-center h-full ${
+          isPlaying ? "justify-end md:justify-center" : ""
+        }`}
       >
-        <div
-          ref={gridRef}
-          className="relative rounded"
-          style={{
-            width: 7 * cellSize,
-            height: 8 * cellSize,
-            touchAction: "none",
-          }}
+        {/* Header */}
+        <motion.div
+          className="flex flex-col items-center gap-2"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
         >
-          {grid.map((row, rowIdx) =>
-            row.map((cell, colIdx) => {
-              const cellInfo = getCellInfo(rowIdx, colIdx);
-              const isShaking = cellInfo && invalidShake === cellInfo.shapeId;
-              return (
-                <motion.div
-                  key={`${rowIdx}-${colIdx}`}
-                  className={`absolute flex items-center justify-center font-medium pointer-events-none
+          <h1 className="text-xl font-light tracking-wide text-stone-700">
+            {month} {dayNum}, {dayWord}
+            {!viewingImported ? (
+              <>
+                {" · "}
+                {viewingDate
+                  ? formatTime(
+                      history[viewingDate]
+                        ? getSolveTime(history[viewingDate])
+                        : 0
+                    )
+                  : formatTime(
+                      isSolved && finalTime !== null ? finalTime : elapsedTime
+                    )}
+              </>
+            ) : previewSolution?.timeElapsed !== undefined ? (
+              <>
+                {" · "}
+                {formatTime(Math.floor(previewSolution.timeElapsed / 1000))}
+              </>
+            ) : null}
+            {viewingImported ? (
+              <motion.div
+                key="preview"
+                className="flex flex-col items-center gap-1"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                <span className="text-lg font-medium text-blue-600">
+                  {previewSolution?.username
+                    ? `${previewSolution.username}'s solution`
+                    : "Preview"}
+                </span>
+              </motion.div>
+            ) : isSolved || isViewingHistory ? (
+              <motion.div
+                key="solved"
+                className="flex flex-col items-center gap-1"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                <span className="text-lg font-medium text-green-600">
+                  {isViewingHistory ? "✓ Solved" : "🎉 Congratulations!"}
+                </span>
+              </motion.div>
+            ) : null}
+          </h1>
+        </motion.div>
+
+        {/* Grid */}
+        <motion.div
+          className="border-4 border-[#2B2B23] bg-[#2B2B23] rounded-lg"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+        >
+          <div
+            ref={gridRef}
+            className="relative rounded"
+            style={{
+              width: 7 * cellSize,
+              height: 8 * cellSize,
+              touchAction: "none",
+            }}
+          >
+            {grid.map((row, rowIdx) =>
+              row.map((cell, colIdx) => {
+                const cellInfo = getCellInfo(rowIdx, colIdx);
+                const isShaking = cellInfo && invalidShake === cellInfo.shapeId;
+                return (
+                  <motion.div
+                    key={`${rowIdx}-${colIdx}`}
+                    className={`absolute flex items-center justify-center font-medium pointer-events-none
                   ${
                     cell.isBlocked
                       ? "bg-background"
@@ -1472,428 +1460,443 @@ export default function Puzzle() {
                   }
                   ${cell.isTarget ? "text-foreground" : "text-background"}
                 `}
-                  style={{
-                    width: cellSize,
-                    height: cellSize,
-                    top: rowIdx * cellSize,
-                    left: colIdx * cellSize,
-                  }}
-                  animate={{
-                    backgroundColor: isShaking
-                      ? "#ef4444"
-                      : cellInfo?.color ||
-                        (cell.isBlocked
-                          ? "#2B2B23"
-                          : cell.isTarget
-                            ? "#f2ede7"
-                            : "white"),
-                    color: cellInfo
-                      ? "#ffffff"
-                      : cell.isTarget
-                        ? "#27272a"
-                        : "#71717a",
-                    x: isShaking ? [0, -4, 4, -4, 4, 0] : 0,
-                  }}
-                  transition={{
-                    backgroundColor: { duration: 0.2 },
-                    x: { duration: 0.3 },
-                  }}
-                >
-                  <span>{cell.label}</span>
-                </motion.div>
-              );
-            })
-          )}
-
-          {/* Hover preview when dragging */}
-          <AnimatePresence>
-            {hoverPreview &&
-              hoverPreview.cells.map(([r, c], i) => {
-                const row = hoverPreview.gridRow + r;
-                const col = hoverPreview.gridCol + c;
-                if (row < 0 || row >= 8 || col < 0 || col >= 7) return null;
-                return (
-                  <motion.div
-                    key={`preview-${i}`}
-                    className="absolute pointer-events-none rounded-sm"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 0.5 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.1 }}
                     style={{
-                      width: cellSize - 2,
-                      height: cellSize - 2,
-                      top: row * cellSize + 1,
-                      left: col * cellSize + 1,
-                      backgroundColor: hoverPreview.isValid
-                        ? hoverPreview.color
-                        : "rgba(239, 68, 68, 0.5)",
-                      border: hoverPreview.isValid
-                        ? "2px solid rgba(255,255,255,0.8)"
-                        : "2px solid rgba(239, 68, 68, 0.8)",
+                      width: cellSize,
+                      height: cellSize,
+                      top: rowIdx * cellSize,
+                      left: colIdx * cellSize,
+                    }}
+                    animate={{
+                      backgroundColor: isShaking
+                        ? "#ef4444"
+                        : cellInfo?.color ||
+                          (cell.isBlocked
+                            ? "#2B2B23"
+                            : cell.isTarget
+                              ? "#f2ede7"
+                              : "white"),
+                      color: cellInfo
+                        ? "#ffffff"
+                        : cell.isTarget
+                          ? "#27272a"
+                          : "#71717a",
+                      x: isShaking ? [0, -4, 4, -4, 4, 0] : 0,
+                    }}
+                    transition={{
+                      backgroundColor: { duration: 0.2 },
+                      x: { duration: 0.3 },
+                    }}
+                  >
+                    <span>{cell.label}</span>
+                  </motion.div>
+                );
+              })
+            )}
+
+            {/* Hover preview when dragging */}
+            <AnimatePresence>
+              {hoverPreview &&
+                hoverPreview.cells.map(([r, c], i) => {
+                  const row = hoverPreview.gridRow + r;
+                  const col = hoverPreview.gridCol + c;
+                  if (row < 0 || row >= 8 || col < 0 || col >= 7) return null;
+                  return (
+                    <motion.div
+                      key={`preview-${i}`}
+                      className="absolute pointer-events-none rounded-sm"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 0.5 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.1 }}
+                      style={{
+                        width: cellSize - 2,
+                        height: cellSize - 2,
+                        top: row * cellSize + 1,
+                        left: col * cellSize + 1,
+                        backgroundColor: hoverPreview.isValid
+                          ? hoverPreview.color
+                          : "rgba(239, 68, 68, 0.5)",
+                        border: hoverPreview.isValid
+                          ? "2px solid rgba(255,255,255,0.8)"
+                          : "2px solid rgba(239, 68, 68, 0.8)",
+                      }}
+                    />
+                  );
+                })}
+            </AnimatePresence>
+
+            {/* Placed shapes - individual cell hitboxes for accurate clicking */}
+            {!isViewingHistory &&
+              isPlaying &&
+              !isSolved &&
+              placedShapes.flatMap((placed) => {
+                const cells = shapeRotations[placed.id];
+                return cells.map(([r, c], i) => (
+                  <div
+                    key={`${placed.id}-${i}`}
+                    className="absolute cursor-grab z-10"
+                    style={{
+                      width: cellSize,
+                      height: cellSize,
+                      top: (placed.gridRow + r) * cellSize,
+                      left: (placed.gridCol + c) * cellSize,
+                      touchAction: "none",
+                    }}
+                    onClick={() => setSelectedShapeId(placed.id)}
+                    onPointerDown={(e) => {
+                      setSelectedShapeId(placed.id);
+                      handlePointerDown(placed.id, e, true, { row: r, col: c });
                     }}
                   />
-                );
+                ));
               })}
-          </AnimatePresence>
 
-          {/* Placed shapes - individual cell hitboxes for accurate clicking */}
-          {!isViewingHistory &&
-            isPlaying &&
-            !isSolved &&
-            placedShapes.flatMap((placed) => {
-              const cells = shapeRotations[placed.id];
-              return cells.map(([r, c], i) => (
-                <div
-                  key={`${placed.id}-${i}`}
-                  className="absolute cursor-grab z-10"
+            {/* Blur overlay when paused or not started */}
+            <AnimatePresence>
+              {!isSolved && !isViewingHistory && !isPlaying && (
+                <motion.div
+                  className="absolute inset-0 flex items-center justify-center z-10"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
                   style={{
-                    width: cellSize,
-                    height: cellSize,
-                    top: (placed.gridRow + r) * cellSize,
-                    left: (placed.gridCol + c) * cellSize,
-                    touchAction: "none",
+                    backdropFilter: "blur(8px)",
+                    WebkitBackdropFilter: "blur(8px)",
                   }}
-                  onClick={() => setSelectedShapeId(placed.id)}
-                  onPointerDown={(e) => {
-                    setSelectedShapeId(placed.id);
-                    handlePointerDown(placed.id, e, true, { row: r, col: c });
-                  }}
-                />
-              ));
-            })}
+                >
+                  <div className="absolute inset-0 bg-white/60 rounded-lg" />
+                  {!isSolved && (
+                    <motion.button
+                      onClick={() => setIsPlaying(true)}
+                      className="relative z-[1] px-6 py-3 rounded-full bg-stone-800 text-white"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      initial={{ scale: 0.9 }}
+                      animate={{ scale: 1 }}
+                    >
+                      {elapsedTime > 0 ? "Resume" : "Start"}
+                    </motion.button>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </motion.div>
 
-          {/* Blur overlay when paused or not started */}
-          <AnimatePresence>
-            {!isSolved && !isViewingHistory && !isPlaying && (
+        {/* Shape palette - horizontal scrollable drawer with controls */}
+        {!isViewingHistory && isPlaying && !isSolved && (
+          <motion.div
+            className="w-full max-w-lg flex items-center gap-2"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            transition={{ duration: 0.4, delay: 0.3 }}
+          >
+            {/* Scrollable shapes on mobile, two rows on desktop */}
+            <div
+              className="flex-1 overflow-x-auto md:overflow-x-visible pb-4"
+              style={{ touchAction: "pan-x" }}
+            >
+              <div className="flex gap-3 px-2 min-w-max md:min-w-0 md:flex-wrap md:gap-2 md:justify-center">
+                {SHAPES.map((shape) => {
+                  const cells = shapeRotations[shape.id];
+                  const isDraggingThis = dragState?.shapeId === shape.id;
+                  const isSelected = selectedShapeId === shape.id;
+                  const isPlaced = isShapePlaced(shape.id);
+
+                  return (
+                    <motion.div
+                      key={shape.id}
+                      ref={(el) => {
+                        shapeRefs.current[shape.id] = el;
+                      }}
+                      className={`flex items-center justify-center p-1.5 rounded-md cursor-pointer transition-all ${
+                        isSelected ? "bg-stone-300/60" : "hover:bg-stone-300/40"
+                      }`}
+                      animate={{
+                        opacity: isDraggingThis ? 0.3 : 1,
+                      }}
+                      transition={{ duration: 0.15 }}
+                      onClick={() => setSelectedShapeId(shape.id)}
+                      onPointerDown={(e) => {
+                        setSelectedShapeId(shape.id);
+                        // Only start drag if not already placed
+                        if (!isPlaced) {
+                          handlePointerDown(shape.id, e, false);
+                        }
+                      }}
+                    >
+                      {renderShape(
+                        shape.id,
+                        cells,
+                        shape.color,
+                        () => {}, // Handler is on parent
+                        {
+                          opacity: isPlaced && !isSelected ? 0.35 : 1,
+                          // If placed, make grayscale if not selected
+                          filter: isPlaced ? "grayscale(1)" : "none",
+                        },
+                        PALETTE_CELL_SIZE
+                      )}
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Rotate/Flip controls */}
+            <div className="flex flex-col gap-1 shrink-0 pr-2">
+              <button
+                onClick={() =>
+                  selectedShapeId &&
+                  canRotateSelected &&
+                  handleRotate(selectedShapeId)
+                }
+                disabled={!canRotateSelected}
+                className={`w-8 h-8 flex items-center justify-center rounded text-sm transition-colors bg-stone-300 hover:bg-stone-400 active:bg-stone-400 text-stone-700 disabled:opacity-30 disabled:cursor-not-allowed`}
+                title="Rotate selected shape (R)"
+              >
+                ↻
+              </button>
+              <button
+                onClick={() =>
+                  selectedShapeId &&
+                  canFlipSelected &&
+                  handleFlip(selectedShapeId)
+                }
+                disabled={!canFlipSelected}
+                className={`w-8 h-8 flex items-center justify-center rounded text-sm transition-colors bg-stone-300 hover:bg-stone-400 active:bg-stone-400 text-stone-700 disabled:opacity-30 disabled:cursor-not-allowed`}
+                title="Flip selected shape (F)"
+              >
+                ⇆
+              </button>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Dragging preview - only show after movement threshold */}
+        <AnimatePresence>
+          {dragState && dragState.hasMoved && (
+            <motion.div
+              className="fixed pointer-events-none z-50"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 0.8, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.1 }}
+              style={{
+                left: dragState.currentX - dragState.offsetX,
+                top: dragState.currentY - dragState.offsetY,
+              }}
+            >
+              {renderShape(
+                dragState.shapeId,
+                shapeRotations[dragState.shapeId],
+                hoverPreview && !hoverPreview.isValid
+                  ? "#ef4444"
+                  : SHAPES.find((s) => s.id === dragState.shapeId)!.color,
+                () => {}
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Leaderboard submission modal */}
+        <SolveModal
+          isOpen={showSolveModal}
+          onClose={() => {
+            setShowSolveModal(false);
+            // Refresh username after modal closes
+            const saved = getSavedUsername();
+            setCurrentUsername(saved);
+          }}
+          mode={modalMode}
+          onSubmit={
+            modalMode === "submit"
+              ? async (username: string) => {
+                  if (!pendingSolution) throw new Error("No pending solution");
+                  const solutionId = await createSolution({
+                    username,
+                    grid: pendingSolution.grid,
+                    day: pendingSolution.day,
+                    startedAt: pendingSolution.startedAt,
+                    timeElapsed: pendingSolution.timeElapsed,
+                  });
+                  return { solutionId, grid: pendingSolution.grid };
+                }
+              : undefined
+          }
+        />
+
+        {/* Help Modal */}
+        <AnimatePresence>
+          {showHelpModal && (
+            <motion.div
+              className="fixed inset-0 z-50 flex items-center justify-center p-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
               <motion.div
-                className="absolute inset-0 flex items-center justify-center z-10"
+                className="absolute inset-0 bg-black/50"
+                onClick={() => setShowHelpModal(false)}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                style={{
-                  backdropFilter: "blur(8px)",
-                  WebkitBackdropFilter: "blur(8px)",
-                }}
+              />
+              <motion.div
+                className="relative bg-white rounded-lg p-6 max-w-md w-full"
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                transition={{ type: "spring", damping: 25, stiffness: 300 }}
               >
-                <div className="absolute inset-0 bg-white/60 rounded-lg" />
-                {!isSolved && (
-                  <motion.button
-                    onClick={() => setIsPlaying(true)}
-                    className="relative z-10 px-6 py-3 rounded-full bg-stone-800 text-white font-medium"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    initial={{ scale: 0.9 }}
-                    animate={{ scale: 1 }}
-                  >
-                    {elapsedTime > 0 ? "Resume" : "Start"}
-                  </motion.button>
-                )}
+                <h2 className="text-xl font-bold text-stone-800 mb-4">
+                  How to Play
+                </h2>
+                <div className="text-stone-600 space-y-3 mb-4">
+                  <p>
+                    Fill the calendar grid using all 8 shapes without covering
+                    today&apos;s date (month, day, and day of the week).
+                  </p>
+                  <p>
+                    Drag shapes from the palette onto the grid. Tap a shape to
+                    select it, then rotate or flip using the buttons.
+                  </p>
+                </div>
+                <h3 className="font-bold text-stone-800 mb-2">
+                  Keyboard Shortcuts
+                </h3>
+                <div className="text-stone-600 space-y-1 mb-4 font-mono text-sm">
+                  <p>
+                    <span className="inline-block w-24 text-stone-500">R</span>
+                    Rotate
+                  </p>
+                  <p>
+                    <span className="inline-block w-24 text-stone-500">F</span>
+                    Flip
+                  </p>
+                  <p>
+                    <span className="inline-block w-24 text-stone-500">
+                      Backspace
+                    </span>
+                    Remove
+                  </p>
+                  <p>
+                    <span className="inline-block w-24 text-stone-500">
+                      Delete / X
+                    </span>
+                    Remove
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowHelpModal(false)}
+                  className="w-full px-4 py-2 rounded-lg bg-stone-800 hover:bg-stone-900 text-white transition-colors"
+                >
+                  Got it
+                </button>
               </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-      {/* Shape palette - horizontal scrollable drawer with controls */}
-      {!isViewingHistory && isPlaying && !isSolved && (
+        {/* Duplicate Solution Modal */}
+        <AnimatePresence>
+          {showDuplicateModal && (
+            <motion.div
+              className="fixed inset-0 z-50 flex items-center justify-center p-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <motion.div
+                className="absolute inset-0 bg-black/50"
+                onClick={() => setShowDuplicateModal(false)}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              />
+              <motion.div
+                className="relative bg-white rounded-lg p-6 max-w-sm w-full text-center"
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              >
+                <p className="text-4xl mb-3">🎉</p>
+                <h2 className="text-xl font-bold text-stone-800 mb-2">
+                  You solved it again!
+                </h2>
+                <p className="text-stone-600 mb-4">
+                  This solution is the same as one you&apos;ve already
+                  submitted, so it won&apos;t appear on the leaderboard again.
+                </p>
+                <button
+                  onClick={() => setShowDuplicateModal(false)}
+                  className="w-full px-4 py-2 rounded-lg bg-stone-800 hover:bg-stone-900 text-white transition-colors"
+                >
+                  OK
+                </button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <motion.div
-          className="w-full max-w-lg flex items-center gap-2"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 10 }}
-          transition={{ duration: 0.4, delay: 0.3 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="flex flex-col gap-2 items-center"
         >
-          {/* Scrollable shapes on mobile, two rows on desktop */}
-          <div
-            className="flex-1 overflow-x-auto md:overflow-x-visible pb-4"
-            style={{ touchAction: "pan-x" }}
-          >
-            <div className="flex gap-3 px-2 min-w-max md:min-w-0 md:flex-wrap md:gap-2 md:justify-center">
-              {SHAPES.map((shape) => {
-                const cells = shapeRotations[shape.id];
-                const isDraggingThis = dragState?.shapeId === shape.id;
-                const isSelected = selectedShapeId === shape.id;
-                const isPlaced = isShapePlaced(shape.id);
-
-                return (
-                  <motion.div
-                    key={shape.id}
-                    ref={(el) => {
-                      shapeRefs.current[shape.id] = el;
-                    }}
-                    className={`flex items-center justify-center p-1.5 rounded-md cursor-pointer transition-all ${
-                      isSelected ? "bg-stone-300/60" : "hover:bg-stone-300/40"
-                    }`}
-                    animate={{
-                      opacity: isDraggingThis ? 0.3 : 1,
-                    }}
-                    transition={{ duration: 0.15 }}
-                    onClick={() => setSelectedShapeId(shape.id)}
-                    onPointerDown={(e) => {
-                      setSelectedShapeId(shape.id);
-                      // Only start drag if not already placed
-                      if (!isPlaced) {
-                        handlePointerDown(shape.id, e, false);
-                      }
-                    }}
-                  >
-                    {renderShape(
-                      shape.id,
-                      cells,
-                      shape.color,
-                      () => {}, // Handler is on parent
-                      {
-                        opacity: isPlaced && !isSelected ? 0.35 : 1,
-                        // If placed, make grayscale if not selected
-                        filter: isPlaced ? "grayscale(1)" : "none",
-                      },
-                      PALETTE_CELL_SIZE
-                    )}
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Rotate/Flip controls */}
-          <div className="flex flex-col gap-1 shrink-0 pr-2">
-            <button
-              onClick={() =>
-                selectedShapeId &&
-                canRotateSelected &&
-                handleRotate(selectedShapeId)
-              }
-              disabled={!canRotateSelected}
-              className={`w-8 h-8 flex items-center justify-center rounded text-sm transition-colors bg-stone-300 hover:bg-stone-400 active:bg-stone-400 text-stone-700 disabled:opacity-30 disabled:cursor-not-allowed`}
-              title="Rotate selected shape (R)"
-            >
-              ↻
-            </button>
-            <button
-              onClick={() =>
-                selectedShapeId &&
-                canFlipSelected &&
-                handleFlip(selectedShapeId)
-              }
-              disabled={!canFlipSelected}
-              className={`w-8 h-8 flex items-center justify-center rounded text-sm transition-colors bg-stone-300 hover:bg-stone-400 active:bg-stone-400 text-stone-700 disabled:opacity-30 disabled:cursor-not-allowed`}
-              title="Flip selected shape (F)"
-            >
-              ⇆
-            </button>
+          <p className="text-stone-400 text-center">
+            {isViewingHistory
+              ? "Viewing previous solve"
+              : isSolved
+                ? "Play again tomorrow!"
+                : isPlaying
+                  ? `Use all shapes without touching the current day`
+                  : elapsedTime > 0
+                    ? "Press Resume to continue"
+                    : "Press Start to begin"}
+          </p>
+          <div className="gap-2 items-center sm:flex hidden">
+            {(placedShapes.length > 0 || isSolved) && (
+              <motion.button onClick={resetToday} className="icon-button">
+                <svg
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M16 2h-2v2h2v2H4v2H2v5h2V8h12v2h-2v2h2v-2h2V8h2V6h-2V4h-2V2zM6 20h2v2h2v-2H8v-2h12v-2h2v-5h-2v5H8v-2h2v-2H8v2H6v2H4v2h2v2z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </motion.button>
+            )}
+            {isPlaying && !isSolved && (
+              <motion.button
+                onClick={() => setIsPlaying(false)}
+                className="icon-button"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+              >
+                <svg
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M10 4H5v16h5V4zm9 0h-5v16h5V4z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </motion.button>
+            )}
           </div>
         </motion.div>
-      )}
-
-      {/* Dragging preview - only show after movement threshold */}
-      <AnimatePresence>
-        {dragState && dragState.hasMoved && (
-          <motion.div
-            className="fixed pointer-events-none z-50"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 0.8, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.1 }}
-            style={{
-              left: dragState.currentX - dragState.offsetX,
-              top: dragState.currentY - dragState.offsetY,
-            }}
-          >
-            {renderShape(
-              dragState.shapeId,
-              shapeRotations[dragState.shapeId],
-              hoverPreview && !hoverPreview.isValid
-                ? "#ef4444"
-                : SHAPES.find((s) => s.id === dragState.shapeId)!.color,
-              () => {}
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Leaderboard submission modal */}
-      <LeaderboardModal
-        isOpen={showLeaderboardModal}
-        onClose={() => {
-          setShowLeaderboardModal(false);
-          // Refresh username after modal closes
-          const saved = getSavedUsername();
-          setCurrentUsername(saved);
-        }}
-        mode={modalMode}
-        onSubmit={
-          modalMode === "submit"
-            ? async (username: string) => {
-                if (!pendingSolution) throw new Error("No pending solution");
-                const id = await createSolution({
-                  username,
-                  grid: pendingSolution.grid,
-                  day: pendingSolution.day,
-                  startedAt: pendingSolution.startedAt,
-                  timeElapsed: pendingSolution.timeElapsed,
-                });
-                addSubmittedGrid(pendingSolution.grid);
-                return id;
-              }
-            : undefined
-        }
-      />
-
-      {/* Help Modal */}
-      <AnimatePresence>
-        {showHelpModal && (
-          <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div
-              className="absolute inset-0 bg-black/50"
-              onClick={() => setShowHelpModal(false)}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            />
-            <motion.div
-              className="relative bg-white rounded-lg p-6 max-w-md w-full"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            >
-              <h2 className="text-xl font-bold text-stone-800 mb-4">
-                How to Play
-              </h2>
-              <div className="text-stone-600 space-y-3 mb-4">
-                <p>
-                  Fill the calendar grid using all 8 shapes without covering
-                  today&apos;s date (month, day, and day of the week).
-                </p>
-                <p>
-                  Drag shapes from the palette onto the grid. Tap a shape to
-                  select it, then rotate or flip using the buttons.
-                </p>
-              </div>
-              <h3 className="font-bold text-stone-800 mb-2">
-                Keyboard Shortcuts
-              </h3>
-              <div className="text-stone-600 space-y-1 mb-4 font-mono text-sm">
-                <p>
-                  <span className="inline-block w-24 text-stone-500">R</span>
-                  Rotate
-                </p>
-                <p>
-                  <span className="inline-block w-24 text-stone-500">F</span>
-                  Flip
-                </p>
-                <p>
-                  <span className="inline-block w-24 text-stone-500">
-                    Backspace
-                  </span>
-                  Remove
-                </p>
-                <p>
-                  <span className="inline-block w-24 text-stone-500">
-                    Delete / X
-                  </span>
-                  Remove
-                </p>
-              </div>
-              <button
-                onClick={() => setShowHelpModal(false)}
-                className="w-full px-4 py-2 rounded-lg bg-stone-800 hover:bg-stone-900 text-white transition-colors"
-              >
-                Got it
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Duplicate Solution Modal */}
-      <AnimatePresence>
-        {showDuplicateModal && (
-          <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div
-              className="absolute inset-0 bg-black/50"
-              onClick={() => setShowDuplicateModal(false)}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            />
-            <motion.div
-              className="relative bg-white rounded-lg p-6 max-w-sm w-full text-center"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            >
-              <p className="text-4xl mb-3">🎉</p>
-              <h2 className="text-xl font-bold text-stone-800 mb-2">
-                You solved it again!
-              </h2>
-              <p className="text-stone-600 mb-4">
-                This solution is the same as one you&apos;ve already submitted,
-                so it won&apos;t appear on the leaderboard again.
-              </p>
-              <button
-                onClick={() => setShowDuplicateModal(false)}
-                className="w-full px-4 py-2 rounded-lg bg-stone-800 hover:bg-stone-900 text-white transition-colors"
-              >
-                OK
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
-        className="flex flex-col gap-2 items-center"
-      >
-        <p className="text-stone-400 text-center">
-          {isViewingHistory
-            ? "Viewing previous solve"
-            : isSolved
-              ? "Play again tomorrow!"
-              : isPlaying
-                ? `Use all shapes (${placedShapes.length}/${SHAPES.length}) without touching the current day`
-                : elapsedTime > 0
-                  ? "Press Resume to continue"
-                  : "Press Start to begin"}
-        </p>
-        <div className="gap-2 items-center sm:flex hidden">
-          {(placedShapes.length > 0 || isSolved || elapsedTime > 0) && (
-            <motion.button
-              onClick={resetToday}
-              className="px-2 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200"
-            >
-              {isSolved ? "Try again" : "Reset"}
-            </motion.button>
-          )}
-          {isPlaying && !isSolved && (
-            <motion.button
-              onClick={() => setIsPlaying(false)}
-              className="px-3 py-1 rounded-md bg-stone-300 hover:bg-stone-400 text-stone-500 hover:text-stone-200"
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-            >
-              Pause
-            </motion.button>
-          )}
-        </div>
-      </motion.div>
+      </div>
     </motion.div>
   );
 }

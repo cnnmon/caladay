@@ -7,8 +7,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { api } from "../../convex/_generated/api";
 
-const STORAGE_KEY = "caesar-v2";
-const SOLUTIONS_KEY = "CALADAY_SOLUTIONS";
+const SUBMISSIONS_KEY = "CALADAY_SUBMISSIONS";
 
 function getDateKey(date: Date = new Date()): string {
   const year = date.getFullYear();
@@ -39,24 +38,12 @@ function formatDate(day: string): string {
 function getMySolutionIds(): Set<string> {
   if (typeof window === "undefined") return new Set();
   try {
-    const data = localStorage.getItem(SOLUTIONS_KEY);
+    const data = localStorage.getItem(SUBMISSIONS_KEY);
     if (!data) return new Set();
-    return new Set(JSON.parse(data));
+    const submissions = JSON.parse(data) as { id: string; grid: string }[];
+    return new Set(submissions.map((s) => s.id));
   } catch {
     return new Set();
-  }
-}
-
-function hasSolvedToday(): boolean {
-  if (typeof window === "undefined") return false;
-  try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    if (!data) return false;
-    const history = JSON.parse(data);
-    const todayKey = getDateKey();
-    return !!history[todayKey];
-  } catch {
-    return false;
   }
 }
 
@@ -65,12 +52,10 @@ export default function LeaderboardPage() {
   const solutions = useQuery(api.solutions.list);
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [mySolutionIds, setMySolutionIds] = useState<Set<string>>(new Set());
-  const [canPreview, setCanPreview] = useState(false);
 
   // Load local storage data on mount
   useEffect(() => {
     setMySolutionIds(getMySolutionIds());
-    setCanPreview(hasSolvedToday());
   }, []);
 
   // Group solutions by day
@@ -109,8 +94,10 @@ export default function LeaderboardPage() {
       })
     : [];
 
+  const isViewingPastDay = selectedDay !== null && selectedDay < getDateKey();
+
   const handlePreview = (solutionId: string) => {
-    if (!canPreview) return;
+    if (!isViewingPastDay) return;
     router.push(`/?solution=${solutionId}`);
   };
 
@@ -177,7 +164,7 @@ export default function LeaderboardPage() {
                 <div className="divide-y divide-stone-100">
                   {sortedSolutions.map((solution, index) => {
                     const isMine = mySolutionIds.has(solution._id);
-                    const isClickable = canPreview;
+                    const isClickable = isViewingPastDay;
 
                     return (
                       <motion.div
@@ -198,7 +185,7 @@ export default function LeaderboardPage() {
                         title={
                           isClickable
                             ? "Click to preview solution"
-                            : "Solve today's puzzle to preview solutions"
+                            : "Solutions for today can only be viewed tomorrow"
                         }
                       >
                         <div className="flex items-center gap-3">
@@ -245,9 +232,9 @@ export default function LeaderboardPage() {
               )}
             </motion.div>
 
-            {!canPreview && (
+            {!isViewingPastDay && (
               <p className="text-center text-stone-400 text-sm mt-4">
-                Solve today&apos;s puzzle to preview other solutions
+                Today&apos;s solutions can be viewed tomorrow
               </p>
             )}
           </>

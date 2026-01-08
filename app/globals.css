@@ -49,3 +49,7 @@ button {
 .animate-shake {
   animation: shake 0.3s ease-in-out;
 }
+
+.icon-button {
+  @apply w-8 h-8 p-1.5 flex items-center justify-center rounded-full bg-stone-300 hover:bg-stone-400 text-stone-600 text-lg font-bold transition-colors;
+}
