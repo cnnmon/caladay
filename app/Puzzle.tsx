@@ -424,6 +424,7 @@ export default function Puzzle() {
     const previewGrid = searchParams.get("preview");
     const previewTime = searchParams.get("time");
     const previewUser = searchParams.get("user");
+    const previewDay = searchParams.get("day");
     if (previewGrid) {
       const parsed = stringToPlacedShapes(previewGrid);
       if (parsed) {
@@ -432,6 +433,11 @@ export default function Puzzle() {
         setImportedRotations(parsed.rotations);
         setImportedTime(previewTime ? parseInt(previewTime, 10) : null);
         setImportedUsername(previewUser);
+        // Set the grid to the day the solution was for
+        if (previewDay) {
+          const previewDate = new Date(previewDay + "T12:00:00");
+          setGrid(markTargets(buildGrid(), previewDate));
+        }
       }
       // Clear the URL param without full navigation
       router.replace("/", { scroll: false });
@@ -785,6 +791,7 @@ export default function Puzzle() {
     setImportedTime(null);
     setImportedUsername(null);
     // Reset puzzle state
+    setGrid(markTargets(buildGrid(), currentDate)); // Reset grid to today
     setPlacedShapes([]);
     setShapeRotations(Object.fromEntries(SHAPES.map((s) => [s.id, s.cells])));
     setIsSolved(false);

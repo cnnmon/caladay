@@ -112,7 +112,8 @@ export default function LeaderboardPage() {
   const handlePreview = (
     grid: string,
     timeElapsed?: number,
-    username?: string
+    username?: string,
+    day?: string
   ) => {
     if (!canPreview) return;
     const params = new URLSearchParams();
@@ -122,6 +123,9 @@ export default function LeaderboardPage() {
     }
     if (username) {
       params.set("user", username);
+    }
+    if (day) {
+      params.set("day", day);
     }
     router.push(`/?${params.toString()}`);
   };
@@ -202,7 +206,8 @@ export default function LeaderboardPage() {
                           handlePreview(
                             solution.grid,
                             solution.timeElapsed,
-                            solution.username
+                            solution.username,
+                            solution.day
                           )
                         }
                         className={`flex items-center justify-between px-4 py-3 ${
