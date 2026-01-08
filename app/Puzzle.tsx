@@ -778,6 +778,13 @@ export default function Puzzle() {
 
   // Reset today's puzzle (resets timer too)
   const resetToday = () => {
+    // Clear any preview state
+    setViewingImported(false);
+    setImportedShapes([]);
+    setImportedRotations({});
+    setImportedTime(null);
+    setImportedUsername(null);
+    // Reset puzzle state
     setPlacedShapes([]);
     setShapeRotations(Object.fromEntries(SHAPES.map((s) => [s.id, s.cells])));
     setIsSolved(false);
