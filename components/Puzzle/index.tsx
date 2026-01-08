@@ -1368,7 +1368,9 @@ export default function Puzzle() {
 
       <div
         className={`flex flex-col gap-4 items-center justify-center h-full ${
-          isPlaying ? "justify-end md:justify-center" : ""
+          isPlaying
+            ? "justify-end [@media(min-height:700px)]:justify-center"
+            : ""
         }`}
       >
         {/* Header */}
