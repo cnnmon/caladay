@@ -25,7 +25,6 @@ import SolveModal, {
   ModalMode,
 } from "../SolveModal";
 
-const STORAGE_KEY = "caesar-v2";
 const PROGRESS_KEY = "caesar-progress-v2";
 const OLD_STORAGE_KEY = "caesar-puzzle-history";
 const OLD_PROGRESS_KEY = "caesar-puzzle-progress";
@@ -37,30 +36,6 @@ function getDateKey(date: Date = new Date()): string {
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
-}
-
-function clearOldKeys(): void {
-  if (typeof window === "undefined") return;
-  localStorage.removeItem(OLD_STORAGE_KEY);
-  localStorage.removeItem(OLD_PROGRESS_KEY);
-}
-
-function loadHistory(): SolveHistory {
-  if (typeof window === "undefined") return {};
-  try {
-    // Clear old keys on first load
-    clearOldKeys();
-    const data = localStorage.getItem(STORAGE_KEY);
-    if (!data) return {};
-    return JSON.parse(data);
-  } catch {
-    return {};
-  }
-}
-
-function saveHistory(history: SolveHistory): void {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
 }
 
 interface ProgressState {
@@ -337,7 +312,7 @@ function markTargets(
 }
 
 const MAX_CELL_SIZE = 48;
-const PALETTE_CELL_SIZE = 18;
+const PALETTE_CELL_SIZE = 15;
 
 // Format seconds as MM:SS
 function formatTime(seconds: number): string {
@@ -437,6 +412,7 @@ export default function Puzzle() {
   const [selectedShapeId, setSelectedShapeId] = useState<string | null>(null);
   const [invalidShake, setInvalidShake] = useState<string | null>(null);
   const [hasLoadedProgress, setHasLoadedProgress] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const gridRef = useRef<HTMLDivElement>(null);
   const shapeRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
@@ -444,11 +420,8 @@ export default function Puzzle() {
 
   // Load history after mount to avoid hydration mismatch
   useEffect(() => {
-    const loadedHistory = loadHistory();
-    setHistory(loadedHistory);
-
     const todayKey = getDateKey(currentDate);
-    const todayState = loadedHistory[todayKey];
+    const todayState = history[todayKey];
 
     // Check if there's in-progress state - takes priority over solved
     const progress = loadProgress();
@@ -759,6 +732,20 @@ export default function Puzzle() {
       });
     }
   }, [selectedShapeId]);
+
+  // Close drawer when dragging starts (on mobile)
+  useEffect(() => {
+    if (dragState?.hasMoved) {
+      setIsDrawerOpen(false);
+    }
+  }, [dragState?.hasMoved]);
+
+  // Open drawer when game starts on mobile
+  useEffect(() => {
+    if (isPlaying && !isSolved && !viewingDate && !viewingImported) {
+      setIsDrawerOpen(true);
+    }
+  }, [isPlaying, isSolved, viewingDate, viewingImported]);
 
   // Get cell info based on placed shapes (or imported shapes when previewing)
   const getCellInfo = useCallback(
@@ -1204,7 +1191,7 @@ export default function Puzzle() {
     return (
       <div
         key={shapeId}
-        className="relative cursor-grab active:cursor-grabbing"
+        className={`relative cursor-grab active:cursor-grabbing`}
         style={{
           width: maxCol * size,
           height: maxRow * size,
@@ -1366,13 +1353,7 @@ export default function Puzzle() {
         </div>
       </motion.div>
 
-      <div
-        className={`flex flex-col gap-4 items-center justify-center h-full ${
-          isPlaying
-            ? "justify-end [@media(min-height:700px)]:justify-center"
-            : ""
-        }`}
-      >
+      <div className={`flex flex-col gap-4 items-center justify-center h-full`}>
         {/* Header */}
         <motion.div
           className="flex flex-col items-center gap-2"
@@ -1586,21 +1567,31 @@ export default function Puzzle() {
           </div>
         </motion.div>
 
-        {/* Shape palette - horizontal scrollable drawer with controls */}
+        {/* Shape palette - drawer on mobile, always visible on desktop */}
         {!isViewingHistory && isPlaying && !isSolved && (
-          <motion.div
-            className="w-full max-w-lg flex items-center gap-2"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            transition={{ duration: 0.4, delay: 0.3 }}
-          >
-            {/* Scrollable shapes on mobile, two rows on desktop */}
-            <div
-              className="flex-1 overflow-x-auto md:overflow-x-visible pb-4"
-              style={{ touchAction: "pan-x" }}
+          <>
+            {/* Mobile drawer toggle button */}
+            <motion.button
+              onClick={() => setIsDrawerOpen(!isDrawerOpen)}
+              className="sm:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-30 px-4 py-2 rounded-full bg-stone-800 text-white shadow-lg"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.3 }}
             >
-              <div className="flex gap-3 px-2 min-w-max md:min-w-0 md:flex-wrap md:gap-2 md:justify-center">
+              Open palette (
+              {`${SHAPES.length - placedShapes.length}/${SHAPES.length}`})
+            </motion.button>
+
+            {/* Desktop: always visible */}
+            <motion.div
+              className="hidden sm:flex w-full items-center gap-2"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.4, delay: 0.3 }}
+            >
+              {/* Scrollable shapes on mobile, two rows on desktop */}
+              <div className="flex gap-3 px-2 flex-wrap gap-2 justify-center">
                 {SHAPES.map((shape) => {
                   const cells = shapeRotations[shape.id];
                   const isDraggingThis = dragState?.shapeId === shape.id;
@@ -1645,36 +1636,158 @@ export default function Puzzle() {
                   );
                 })}
               </div>
-            </div>
 
-            {/* Rotate/Flip controls */}
-            <div className="flex flex-col gap-1 shrink-0 pr-2">
-              <button
-                onClick={() =>
-                  selectedShapeId &&
-                  canRotateSelected &&
-                  handleRotate(selectedShapeId)
-                }
-                disabled={!canRotateSelected}
-                className={`w-8 h-8 flex items-center justify-center rounded text-sm transition-colors bg-stone-300 hover:bg-stone-400 active:bg-stone-400 text-stone-700 disabled:opacity-30 disabled:cursor-not-allowed`}
-                title="Rotate selected shape (R)"
-              >
-                ↻
-              </button>
-              <button
-                onClick={() =>
-                  selectedShapeId &&
-                  canFlipSelected &&
-                  handleFlip(selectedShapeId)
-                }
-                disabled={!canFlipSelected}
-                className={`w-8 h-8 flex items-center justify-center rounded text-sm transition-colors bg-stone-300 hover:bg-stone-400 active:bg-stone-400 text-stone-700 disabled:opacity-30 disabled:cursor-not-allowed`}
-                title="Flip selected shape (F)"
-              >
-                ⇆
-              </button>
-            </div>
-          </motion.div>
+              {/* Rotate/Flip controls */}
+              <div className="flex flex-col gap-1 shrink-0 pr-2">
+                <button
+                  onClick={() =>
+                    selectedShapeId &&
+                    canRotateSelected &&
+                    handleRotate(selectedShapeId)
+                  }
+                  disabled={!canRotateSelected}
+                  className={`w-8 h-8 flex items-center justify-center rounded text-sm transition-colors bg-stone-300 hover:bg-stone-400 active:bg-stone-400 text-stone-700 disabled:opacity-30 disabled:cursor-not-allowed`}
+                  title="Rotate selected shape (R)"
+                >
+                  ↻
+                </button>
+                <button
+                  onClick={() =>
+                    selectedShapeId &&
+                    canFlipSelected &&
+                    handleFlip(selectedShapeId)
+                  }
+                  disabled={!canFlipSelected}
+                  className={`w-8 h-8 flex items-center justify-center rounded text-sm transition-colors bg-stone-300 hover:bg-stone-400 active:bg-stone-400 text-stone-700 disabled:opacity-30 disabled:cursor-not-allowed`}
+                  title="Flip selected shape (F)"
+                >
+                  ⇆
+                </button>
+              </div>
+            </motion.div>
+
+            {/* Mobile: drawer that slides up from bottom */}
+            <AnimatePresence>
+              {isDrawerOpen && (
+                <motion.div
+                  className="sm:hidden fixed inset-x-0 bottom-0 z-40 bg-white border-3 border-black border-b-0 rounded-t-2xl"
+                  initial={{ y: "100%" }}
+                  animate={{ y: 0 }}
+                  exit={{ y: "100%" }}
+                  transition={{ type: "spring", damping: 30, stiffness: 300 }}
+                >
+                  <div className="p-4 flex flex-col gap-4 max-h-[50vh] overflow-y-auto">
+                    <p className="text-stone-400 text-sm text-center italic">
+                      Click a shape to select it and then rotate or flip it.
+                      Then, drag it to the grid to place it.
+                    </p>
+                    <div className="flex gap-4">
+                      {/* Shapes grid */}
+                      <div className="grid grid-cols-4 gap-3 justify-items-center">
+                        {SHAPES.map((shape) => {
+                          const cells = shapeRotations[shape.id];
+                          const isDraggingThis =
+                            dragState?.shapeId === shape.id;
+                          const isSelected = selectedShapeId === shape.id;
+                          const isPlaced = isShapePlaced(shape.id);
+
+                          return (
+                            <motion.div
+                              key={shape.id}
+                              ref={(el) => {
+                                shapeRefs.current[shape.id] = el;
+                              }}
+                              className={`flex items-center justify-center p-2 rounded-md cursor-pointer transition-all ${
+                                isSelected
+                                  ? "bg-stone-300/60"
+                                  : "hover:bg-stone-300/40"
+                              }`}
+                              animate={{
+                                opacity: isDraggingThis ? 0.3 : 1,
+                              }}
+                              transition={{ duration: 0.15 }}
+                              onClick={() => setSelectedShapeId(shape.id)}
+                              onPointerDown={(e) => {
+                                setSelectedShapeId(shape.id);
+                                // Only start drag if not already placed
+                                if (!isPlaced) {
+                                  handlePointerDown(shape.id, e, false);
+                                }
+                              }}
+                            >
+                              {renderShape(
+                                shape.id,
+                                cells,
+                                shape.color,
+                                () => {}, // Handler is on parent
+                                {
+                                  opacity: isPlaced && !isSelected ? 0.35 : 1,
+                                  filter: isPlaced ? "grayscale(1)" : "none",
+                                },
+                                PALETTE_CELL_SIZE
+                              )}
+                            </motion.div>
+                          );
+                        })}
+                      </div>
+
+                      {/* Rotate/Flip controls */}
+                      <div className="flex flex-col gap-2 items-center justify-center pb-2">
+                        <button
+                          onClick={() =>
+                            selectedShapeId &&
+                            canRotateSelected &&
+                            handleRotate(selectedShapeId)
+                          }
+                          disabled={!canRotateSelected}
+                          className={`icon-button`}
+                          title="Rotate selected shape (R)"
+                        >
+                          <svg
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              d="M16 2h-2v2h2v2H4v2H2v5h2V8h12v2h-2v2h2v-2h2V8h2V6h-2V4h-2V2zM6 20h2v2h2v-2H8v-2h12v-2h2v-5h-2v5H8v-2h2v-2H8v2H6v2H4v2h2v2z"
+                              fill="currentColor"
+                            />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() =>
+                            selectedShapeId &&
+                            canFlipSelected &&
+                            handleFlip(selectedShapeId)
+                          }
+                          disabled={!canFlipSelected}
+                          className={`icon-button`}
+                          title="Flip selected shape (F)"
+                        >
+                          <svg
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              d="M10 4H5v16h5V4zm9 0h-5v16h5V4z"
+                              fill="currentColor"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setIsDrawerOpen(!isDrawerOpen)}
+                      className="bg-stone-300 hover:bg-stone-400 active:bg-stone-400 text-stone-700 px-3 py-1 rounded-md"
+                    >
+                      Close palette
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </>
         )}
 
         {/* Dragging preview - only show after movement threshold */}
