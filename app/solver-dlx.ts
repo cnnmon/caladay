@@ -1,12 +1,12 @@
 /**
  * Dancing Links (DLX) solver for the calendar puzzle.
- * 
+ *
  * This implements Donald Knuth's Algorithm X using the Dancing Links technique
  * for solving exact cover problems efficiently.
  */
 
-import { SHAPES, flipShape, normalizeShape, rotateShape } from "./shapes";
-import { ShapeMatrix } from "./types";
+import { SHAPES, flipShape, normalizeShape, rotateShape } from "../lib/shapes";
+import { ShapeMatrix } from "../lib/types";
 
 const BOARD_HEIGHT = 8;
 const BOARD_WIDTH = 7;
@@ -157,7 +157,11 @@ class DLX {
     let minSize = Infinity;
     let minColumn: ColumnNode | null = null;
 
-    for (let col = this.header.right as ColumnNode; col !== this.header; col = col.right as ColumnNode) {
+    for (
+      let col = this.header.right as ColumnNode;
+      col !== this.header;
+      col = col.right as ColumnNode
+    ) {
       if (col.size < minSize) {
         minSize = col.size;
         minColumn = col;
@@ -294,7 +298,7 @@ function getValidPlacements(
 
 /**
  * Count solutions using Dancing Links algorithm.
- * 
+ *
  * @param blockedPositions - Array of [row, col] positions that must stay uncovered
  * @param oneSolution - If true, stop after finding one solution
  * @returns The number of valid solutions
@@ -355,13 +359,19 @@ export function countSolutionsDLX(
   }
 
   // Pre-compute all orientations
-  const shapeOrientations = SHAPES.map((shape) => getAllOrientations(shape.cells));
+  const shapeOrientations = SHAPES.map((shape) =>
+    getAllOrientations(shape.cells)
+  );
 
   // Add rows for each valid placement of each shape
   let rowId = 0;
   for (let shapeIdx = 0; shapeIdx < SHAPES.length; shapeIdx++) {
     for (const orientation of shapeOrientations[shapeIdx]) {
-      const placements = getValidPlacements(shapeIdx, orientation, blockedCells);
+      const placements = getValidPlacements(
+        shapeIdx,
+        orientation,
+        blockedCells
+      );
 
       for (const placement of placements) {
         // This row covers: the cells it occupies + the "shape used" constraint
@@ -427,6 +437,8 @@ export function countSolutionsForDateDLX(
 /**
  * Check if a puzzle has at least one solution using DLX.
  */
-export function hasSolutionDLX(blockedPositions: Array<[number, number]>): boolean {
+export function hasSolutionDLX(
+  blockedPositions: Array<[number, number]>
+): boolean {
   return countSolutionsDLX(blockedPositions, true) > 0;
 }

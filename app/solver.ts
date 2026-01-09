@@ -1,5 +1,5 @@
-import { SHAPES, flipShape, normalizeShape, rotateShape } from "./shapes";
-import { ShapeMatrix } from "./types";
+import { SHAPES, flipShape, normalizeShape, rotateShape } from "../lib/shapes";
+import { ShapeMatrix } from "../lib/types";
 
 const BOARD_HEIGHT = 8;
 const BOARD_WIDTH = 7;
@@ -152,7 +152,7 @@ function dfs(
     const orientations = shapeOrientations[shapeIdx];
     for (let oi = 0; oi < orientations.length; oi++) {
       const orientation = orientations[oi];
-      
+
       // Try placing so that any cell of the shape covers the empty cell
       for (let ci = 0; ci < orientation.length; ci++) {
         const placeRow = row - orientation[ci][0];
@@ -160,7 +160,13 @@ function dfs(
 
         if (canPlace(board, orientation, placeRow, placeCol)) {
           placeShape(board, orientation, placeRow, placeCol);
-          solutionCount += dfs(board, shapeOrientations, available, remainingCount - 1, oneSolution);
+          solutionCount += dfs(
+            board,
+            shapeOrientations,
+            available,
+            remainingCount - 1,
+            oneSolution
+          );
           removeShape(board, orientation, placeRow, placeCol);
 
           if (oneSolution && solutionCount > 0) {
@@ -179,7 +185,7 @@ function dfs(
 
 /**
  * Count the number of possible solutions for a given puzzle configuration.
- * 
+ *
  * @param blockedPositions - Array of [row, col] positions that must stay uncovered (targets)
  * @param oneSolution - If true, stop after finding one solution (faster)
  * @returns The number of valid solutions
@@ -203,7 +209,7 @@ export function countSolutions(
 
 /**
  * Count solutions for a specific date.
- * 
+ *
  * @param date - The date to solve for
  * @param oneSolution - If true, stop after finding one solution
  * @returns The number of valid solutions
@@ -253,7 +259,9 @@ export function countSolutionsForDate(
 /**
  * Check if a puzzle has at least one solution.
  */
-export function hasSolution(blockedPositions: Array<[number, number]>): boolean {
+export function hasSolution(
+  blockedPositions: Array<[number, number]>
+): boolean {
   return countSolutions(blockedPositions, true) > 0;
 }
 
