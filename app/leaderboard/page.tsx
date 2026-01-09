@@ -51,12 +51,7 @@ export default function LeaderboardPage() {
   const router = useRouter();
   const solutions = useQuery(api.solutions.list);
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
-  const [mySolutionIds, setMySolutionIds] = useState<Set<string>>(new Set());
-
-  // Load local storage data on mount
-  useEffect(() => {
-    setMySolutionIds(getMySolutionIds());
-  }, []);
+  const [mySolutionIds] = useState<Set<string>>(() => getMySolutionIds());
 
   // Group solutions by day
   const groupedByDay = solutions?.reduce(
