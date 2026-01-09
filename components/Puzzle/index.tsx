@@ -1353,7 +1353,9 @@ export default function Puzzle() {
         </div>
       </motion.div>
 
-      <div className={`flex flex-col gap-4 items-center justify-center h-full`}>
+      <div
+        className={`flex flex-col gap-4 items-center justify-center h-full}
+      >
         {/* Header */}
         <motion.div
           className="flex flex-col items-center gap-2"
