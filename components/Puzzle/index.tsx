@@ -1775,8 +1775,9 @@ export default function Puzzle() {
                     today&apos;s date (month, day, and day of the week).
                   </p>
                   <p>
-                    Drag shapes from the palette onto the grid. Tap a shape to
-                    select it, then rotate or flip using the buttons.
+                    Drag shapes onto the grid. Tap a shape to select it, then
+                    rotate or flip using the buttons. Drag a shape off the grid
+                    to remove it.
                   </p>
                 </div>
                 <h3 className="font-bold text-stone-800 mb-2">
