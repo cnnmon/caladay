@@ -1249,7 +1249,12 @@ export default function Puzzle() {
       >
         <div className="flex gap-2 px-2 p-1">
           <button
-            onClick={() => router.push("/leaderboard")}
+            onClick={() => {
+              const url = viewingDate
+                ? `/leaderboard?day=${viewingDate}`
+                : "/leaderboard";
+              router.push(url);
+            }}
             className="icon-button"
           >
             ← Leaderboard

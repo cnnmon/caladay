@@ -3,7 +3,7 @@
 import { useQuery } from "convex/react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { api } from "../../convex/_generated/api";
 
@@ -49,9 +49,25 @@ function getMySolutionIds(): Set<string> {
 
 export default function LeaderboardPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const solutions = useQuery(api.solutions.list);
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [mySolutionIds] = useState<Set<string>>(() => getMySolutionIds());
+  const [urlDayParam, setUrlDayParam] = useState<string | null>(null);
+  const [urlParamChecked, setUrlParamChecked] = useState(false);
+
+  // Read URL param once on mount
+  useEffect(() => {
+    if (!urlParamChecked) {
+      const dayParam = searchParams.get("day");
+      if (dayParam) {
+        setUrlDayParam(dayParam);
+        // Clear the URL param without full navigation
+        router.replace("/leaderboard", { scroll: false });
+      }
+      setUrlParamChecked(true);
+    }
+  }, [searchParams, router, urlParamChecked]);
 
   // Group solutions by day
   const groupedByDay = solutions?.reduce(
@@ -68,17 +84,22 @@ export default function LeaderboardPage() {
     ? Object.keys(groupedByDay).sort((a, b) => b.localeCompare(a))
     : [];
 
-  // Default to today if available, otherwise first day
+  // Set initial day once sortedDays is available
   useEffect(() => {
     if (sortedDays.length > 0 && selectedDay === null) {
-      const today = getDateKey();
-      if (sortedDays.includes(today)) {
-        setSelectedDay(today);
+      // Prefer URL param day if valid, otherwise today or most recent
+      if (urlDayParam && sortedDays.includes(urlDayParam)) {
+        setSelectedDay(urlDayParam);
       } else {
-        setSelectedDay(sortedDays[0]);
+        const today = getDateKey();
+        if (sortedDays.includes(today)) {
+          setSelectedDay(today);
+        } else {
+          setSelectedDay(sortedDays[0]);
+        }
       }
     }
-  }, [sortedDays, selectedDay]);
+  }, [sortedDays, selectedDay, urlDayParam]);
 
   const currentDaySolutions = selectedDay && groupedByDay?.[selectedDay];
   const sortedSolutions = currentDaySolutions
