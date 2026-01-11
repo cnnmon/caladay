@@ -1775,7 +1775,7 @@ export default function Puzzle() {
                 </h2>
                 <div className="text-stone-600 space-y-3 mb-4">
                   <p>
-                    Fill the calendar grid using all 8 shapes without covering
+                    Fill the calendar grid using all 10 shapes without covering
                     today&apos;s date (month, day, and day of the week).
                   </p>
                   <p>
