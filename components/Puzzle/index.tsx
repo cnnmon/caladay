@@ -1248,32 +1248,14 @@ export default function Puzzle() {
             onClick={() => router.push("/leaderboard")}
             className="icon-button"
           >
-            <svg
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-            >
-              <path
-                d="M14 6h8v8h-2v-4h-2V8h-4V6zm2 6v-2h2v2h-2zm-2 2v-2h2v2h-2zm-2 0h2v2h-2v-2zm-2-2h2v2h-2v-2zm-2 0v-2h2v2H8zm-2 2v-2h2v2H6zm-2 2v-2h2v2H4zm0 0v2H2v-2h2z"
-                fill="currentColor"
-              />
-            </svg>
+            ← Leaderboard
           </button>
           <button
             onClick={() => setShowHelpModal(true)}
             className="icon-button"
             title="Help & Hotkeys"
           >
-            <svg
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-            >
-              <path
-                d="M3 3h2v18H3V3zm16 0H5v2h14v14H5v2h16V3h-2zm-8 6h2V7h-2v2zm2 8h-2v-6h2v6z"
-                fill="currentColor"
-              />
-            </svg>
+            Help
           </button>
         </div>
         <div className="flex items-start gap-2">
@@ -1289,65 +1271,6 @@ export default function Puzzle() {
             >
               {currentUsername}
             </button>
-          )}
-          {!isViewingHistory && (
-            <div className="flex gap-2 sm:hidden">
-              {(placedShapes.length > 0 || isSolved || elapsedTime > 0) && (
-                <motion.button onClick={resetToday} className="icon-button">
-                  <svg
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      d="M16 2h-2v2h2v2H4v2H2v5h2V8h12v2h-2v2h2v-2h2V8h2V6h-2V4h-2V2zM6 20h2v2h2v-2H8v-2h12v-2h2v-5h-2v5H8v-2h2v-2H8v2H6v2H4v2h2v2z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                </motion.button>
-              )}
-              {!isSolved &&
-                (isPlaying ? (
-                  <motion.button
-                    onClick={() => setIsPlaying(false)}
-                    className="icon-button"
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                  >
-                    <svg
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        d="M10 4H5v16h5V4zm9 0h-5v16h5V4z"
-                        fill="currentColor"
-                      />
-                    </svg>
-                  </motion.button>
-                ) : (
-                  <motion.button
-                    onClick={() => setIsPlaying(true)}
-                    className="icon-button"
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                  >
-                    <svg
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                    >
-                      {" "}
-                      <path
-                        d="M10 20H8V4h2v2h2v3h2v2h2v2h-2v2h-2v3h-2v2z"
-                        fill="currentColor"
-                      />{" "}
-                    </svg>
-                  </motion.button>
-                ))}
-            </div>
           )}
         </div>
       </motion.div>
@@ -1645,7 +1568,7 @@ export default function Puzzle() {
                     handleRotate(selectedShapeId)
                   }
                   disabled={!canRotateSelected}
-                  className={`w-8 h-8 flex items-center justify-center rounded text-sm transition-colors bg-stone-300 hover:bg-stone-400 active:bg-stone-400 text-stone-700 disabled:opacity-30 disabled:cursor-not-allowed`}
+                  className={`w-8 h-8 text-xl flex items-center justify-center rounded text-sm transition-colors bg-stone-300 hover:bg-stone-400 active:bg-stone-400 text-stone-700 disabled:opacity-30 disabled:cursor-not-allowed`}
                   title="Rotate selected shape (R)"
                 >
                   ↻
@@ -1657,7 +1580,7 @@ export default function Puzzle() {
                     handleFlip(selectedShapeId)
                   }
                   disabled={!canFlipSelected}
-                  className={`w-8 h-8 flex items-center justify-center rounded text-sm transition-colors bg-stone-300 hover:bg-stone-400 active:bg-stone-400 text-stone-700 disabled:opacity-30 disabled:cursor-not-allowed`}
+                  className={`w-8 h-8 text-xl flex items-center justify-center rounded text-sm transition-colors bg-stone-300 hover:bg-stone-400 active:bg-stone-400 text-stone-700 disabled:opacity-30 disabled:cursor-not-allowed`}
                   title="Flip selected shape (F)"
                 >
                   ⇆
@@ -1676,10 +1599,6 @@ export default function Puzzle() {
                   transition={{ type: "spring", damping: 30, stiffness: 300 }}
                 >
                   <div className="p-4 flex flex-col gap-4 max-h-[50vh] overflow-y-auto">
-                    <p className="text-stone-400 text-sm text-center italic">
-                      Click a shape to select it and then rotate or flip it.
-                      Then, drag it to the grid to place it.
-                    </p>
                     <div className="flex gap-4">
                       {/* Shapes grid */}
                       <div className="grid grid-cols-4 gap-3 justify-items-center">
@@ -1731,7 +1650,7 @@ export default function Puzzle() {
                       </div>
 
                       {/* Rotate/Flip controls */}
-                      <div className="flex flex-col gap-2 items-center justify-center pb-2">
+                      <div className="flex flex-col gap-2 items-center justify-center">
                         <button
                           onClick={() =>
                             selectedShapeId &&
@@ -1739,19 +1658,10 @@ export default function Puzzle() {
                             handleRotate(selectedShapeId)
                           }
                           disabled={!canRotateSelected}
-                          className={`icon-button`}
+                          className="w-8 h-8 text-xl flex items-center justify-center rounded text-sm transition-colors bg-stone-300 hover:bg-stone-400 active:bg-stone-400 text-stone-700 disabled:opacity-30 disabled:cursor-not-allowed!"
                           title="Rotate selected shape (R)"
                         >
-                          <svg
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              d="M16 2h-2v2h2v2H4v2H2v5h2V8h12v2h-2v2h2v-2h2V8h2V6h-2V4h-2V2zM6 20h2v2h2v-2H8v-2h12v-2h2v-5h-2v5H8v-2h2v-2H8v2H6v2H4v2h2v2z"
-                              fill="currentColor"
-                            />
-                          </svg>
+                          ↻
                         </button>
                         <button
                           onClick={() =>
@@ -1760,19 +1670,10 @@ export default function Puzzle() {
                             handleFlip(selectedShapeId)
                           }
                           disabled={!canFlipSelected}
-                          className={`icon-button`}
+                          className="w-8 h-8 text-xl flex items-center justify-center rounded text-sm transition-colors bg-stone-300 hover:bg-stone-400 active:bg-stone-400 text-stone-700 disabled:opacity-30 disabled:cursor-not-allowed!"
                           title="Flip selected shape (F)"
                         >
-                          <svg
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              d="M10 4H5v16h5V4zm9 0h-5v16h5V4z"
-                              fill="currentColor"
-                            />
-                          </svg>
+                          ⇆
                         </button>
                       </div>
                     </div>
@@ -1780,7 +1681,7 @@ export default function Puzzle() {
                       onClick={() => setIsDrawerOpen(!isDrawerOpen)}
                       className="bg-stone-300 hover:bg-stone-400 active:bg-stone-400 text-stone-700 px-3 py-1 rounded-md"
                     >
-                      Close palette
+                      Hide
                     </button>
                   </div>
                 </motion.div>
@@ -1973,19 +1874,10 @@ export default function Puzzle() {
                     ? "Press Resume to continue"
                     : "Press Start to begin"}
           </p>
-          <div className="gap-2 items-center sm:flex hidden">
+          <div className="gap-2 items-center flex">
             {(placedShapes.length > 0 || isSolved) && (
               <motion.button onClick={resetToday} className="icon-button">
-                <svg
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    d="M16 2h-2v2h2v2H4v2H2v5h2V8h12v2h-2v2h2v-2h2V8h2V6h-2V4h-2V2zM6 20h2v2h2v-2H8v-2h12v-2h2v-5h-2v5H8v-2h2v-2H8v2H6v2H4v2h2v2z"
-                    fill="currentColor"
-                  />
-                </svg>
+                Reset
               </motion.button>
             )}
             {isPlaying && !isSolved && (
@@ -1996,16 +1888,7 @@ export default function Puzzle() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
               >
-                <svg
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    d="M10 4H5v16h5V4zm9 0h-5v16h5V4z"
-                    fill="currentColor"
-                  />
-                </svg>
+                Pause
               </motion.button>
             )}
           </div>
