@@ -583,6 +583,10 @@ export default function Puzzle() {
         );
         setIsSolved(false);
         setViewingDate(null);
+        setElapsedTime(0);
+        setFinalTime(null);
+        setStartedAt(null);
+        setIsPlaying(false);
         clearProgress();
       }
     };
