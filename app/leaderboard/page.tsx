@@ -111,9 +111,11 @@ export default function LeaderboardPage() {
     : [];
 
   const isViewingPastDay = selectedDay !== null && selectedDay < getDateKey();
+  const isViewingToday = selectedDay === getDateKey();
 
-  const handlePreview = (solutionId: string) => {
-    if (!isViewingPastDay) return;
+  const handlePreview = (solutionId: string, isMine: boolean) => {
+    // Allow preview for past days, or your own solutions today
+    if (!isViewingPastDay && !(isViewingToday && isMine)) return;
     router.push(`/?solution=${solutionId}`);
   };
 
@@ -180,7 +182,8 @@ export default function LeaderboardPage() {
                 <div className="divide-y divide-stone-100">
                   {sortedSolutions.map((solution, index) => {
                     const isMine = mySolutionIds.has(solution._id);
-                    const isClickable = isViewingPastDay;
+                    // Can click past day solutions, or your own solutions today
+                    const isClickable = isViewingPastDay || (isViewingToday && isMine);
 
                     return (
                       <motion.div
@@ -189,7 +192,7 @@ export default function LeaderboardPage() {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.02 }}
                         onClick={() =>
-                          isClickable && handlePreview(solution._id)
+                          isClickable && handlePreview(solution._id, isMine)
                         }
                         className={`flex items-center justify-between px-4 py-3 ${
                           isMine ? "bg-amber-50" : ""
@@ -201,7 +204,7 @@ export default function LeaderboardPage() {
                         title={
                           isClickable
                             ? "Click to preview solution"
-                            : "Solutions for today can only be viewed tomorrow"
+                            : "Other players' solutions can be viewed tomorrow"
                         }
                       >
                         <div className="flex items-center gap-3">
@@ -248,9 +251,9 @@ export default function LeaderboardPage() {
               )}
             </motion.div>
 
-            {!isViewingPastDay && (
+            {isViewingToday && (
               <p className="text-center text-stone-400 text-sm mt-4">
-                Today&apos;s solutions can be viewed tomorrow
+                Other players&apos; solutions can be viewed tomorrow
               </p>
             )}
           </>
