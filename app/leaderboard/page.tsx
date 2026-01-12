@@ -4,7 +4,7 @@ import { useQuery } from "convex/react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { api } from "../../convex/_generated/api";
 
 const SUBMISSIONS_KEY = "CALADAY_SUBMISSIONS";
@@ -47,7 +47,7 @@ function getMySolutionIds(): Set<string> {
   }
 }
 
-export default function LeaderboardPage() {
+function LeaderboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const solutions = useQuery(api.solutions.list);
@@ -183,7 +183,8 @@ export default function LeaderboardPage() {
                   {sortedSolutions.map((solution, index) => {
                     const isMine = mySolutionIds.has(solution._id);
                     // Can click past day solutions, or your own solutions today
-                    const isClickable = isViewingPastDay || (isViewingToday && isMine);
+                    const isClickable =
+                      isViewingPastDay || (isViewingToday && isMine);
 
                     return (
                       <motion.div
@@ -260,5 +261,19 @@ export default function LeaderboardPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function LeaderboardPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#f2ede7] px-6 py-4">
+          <div className="text-center text-stone-400 py-8">Loading...</div>
+        </div>
+      }
+    >
+      <LeaderboardContent />
+    </Suspense>
   );
 }
