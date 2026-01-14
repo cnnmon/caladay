@@ -47,6 +47,21 @@ function getMySolutionIds(): Set<string> {
   }
 }
 
+// Difficulty colors from shapes.ts
+const DIFFICULTY_COLORS = {
+  hard: "#A33366",     // Red
+  medium: "#E7920A",   // Yellow
+  easy: "#849E16",     // Green
+  easiest: "#0F688E",  // Blue
+};
+
+function getDifficultyColor(solutions: number): string {
+  if (solutions >= 3500) return DIFFICULTY_COLORS.easiest;
+  if (solutions >= 2000) return DIFFICULTY_COLORS.easy;
+  if (solutions >= 1250) return DIFFICULTY_COLORS.medium;
+  return DIFFICULTY_COLORS.hard;
+}
+
 export default function LeaderboardPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -55,6 +70,23 @@ export default function LeaderboardPage() {
   const [mySolutionIds] = useState<Set<string>>(() => getMySolutionIds());
   const [urlDayParam, setUrlDayParam] = useState<string | null>(null);
   const [urlParamChecked, setUrlParamChecked] = useState(false);
+  const [solutionsCache, setSolutionsCache] = useState<Map<string, number> | null>(null);
+
+  // Load solutions cache for difficulty colors
+  useEffect(() => {
+    fetch("/solutions-cache.csv")
+      .then(response => response.text())
+      .then(text => {
+        const cache = new Map<string, number>();
+        const lines = text.trim().split("\n");
+        for (let i = 1; i < lines.length; i++) {
+          const [date, solutions] = lines[i].split(",");
+          cache.set(date, parseInt(solutions, 10));
+        }
+        setSolutionsCache(cache);
+      })
+      .catch(err => console.error("Failed to load solutions cache:", err));
+  }, []);
 
   // Group solutions by day
   const groupedByDay = solutions?.reduce(
@@ -151,15 +183,26 @@ export default function LeaderboardPage() {
               {sortedDays.map((day) => {
                 const isToday = day === getDateKey();
                 const isActive = day === selectedDay;
+                const isPastOrToday = day <= getDateKey();
+                const solutionCount = solutionsCache?.get(day);
+                const difficultyColor = isPastOrToday && solutionCount ? getDifficultyColor(solutionCount) : null;
+                
                 return (
                   <button
                     key={day}
                     onClick={() => setSelectedDay(day)}
                     className={`px-3 py-1.5 rounded-lg whitespace-nowrap transition-colors ${
                       isActive
-                        ? "bg-stone-700 text-white"
-                        : "bg-stone-200 hover:bg-stone-300 text-stone-600"
+                        ? "text-white"
+                        : difficultyColor
+                          ? "text-white hover:opacity-80"
+                          : "bg-stone-200 hover:bg-stone-300 text-stone-600"
                     }`}
+                    style={{
+                      backgroundColor: isActive 
+                        ? "#44403c" // stone-700
+                        : difficultyColor || undefined,
+                    }}
                   >
                     {isToday ? "Today" : formatDate(day)}
                   </button>

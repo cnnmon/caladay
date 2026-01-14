@@ -2,14 +2,13 @@
 
 import { useEffect, useState } from "react";
 
-// Reference points for fill and color interpolation
-// Format: [solutions, fillPercent, r, g, b]
-const REFERENCE_POINTS: [number, number, number, number, number][] = [
-  [600, 95, 239, 68, 68],    // Red, mostly filled
-  [1250, 67, 234, 179, 8],   // Yellow, 2/3 filled
-  [3000, 33, 34, 197, 94],   // Green, 1/3 filled
-  [5000, 5, 59, 130, 246],   // Blue, mostly empty
-];
+// Difficulty colors from shapes.ts
+const DIFFICULTY_COLORS = {
+  hard: "#A33366",     // Red
+  medium: "#E7920A",   // Yellow
+  easy: "#849E16",     // Green
+  easiest: "#0F688E",  // Blue
+};
 
 // Cache for solutions data (loaded once, shared across all instances)
 let solutionsCache: Map<string, number> | null = null;
@@ -44,45 +43,42 @@ function getDateKey(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
-function interpolate(solutions: number): { fillPercent: number; color: string } {
-  // Clamp solutions to our range
-  const clampedSolutions = Math.max(600, Math.min(5000, solutions));
+// Reference points for fill interpolation: [solutions, fillPercent]
+const FILL_POINTS: [number, number][] = [
+  [600, 95],
+  [1250, 67],
+  [3000, 33],
+  [5000, 5],
+];
 
-  // Find the two reference points to interpolate between
-  let lowerIdx = 0;
-  for (let i = 0; i < REFERENCE_POINTS.length - 1; i++) {
-    if (clampedSolutions >= REFERENCE_POINTS[i][0] && clampedSolutions <= REFERENCE_POINTS[i + 1][0]) {
-      lowerIdx = i;
-      break;
+function getFillPercent(solutions: number): number {
+  const clamped = Math.max(600, Math.min(5000, solutions));
+  
+  // Find the two points to interpolate between
+  for (let i = 0; i < FILL_POINTS.length - 1; i++) {
+    if (clamped >= FILL_POINTS[i][0] && clamped <= FILL_POINTS[i + 1][0]) {
+      const [x1, y1] = FILL_POINTS[i];
+      const [x2, y2] = FILL_POINTS[i + 1];
+      const t = (clamped - x1) / (x2 - x1);
+      return y1 + t * (y2 - y1);
     }
   }
-
-  const lower = REFERENCE_POINTS[lowerIdx];
-  const upper = REFERENCE_POINTS[Math.min(lowerIdx + 1, REFERENCE_POINTS.length - 1)];
-
-  // Calculate interpolation factor (0 to 1)
-  const range = upper[0] - lower[0];
-  const t = range > 0 ? (clampedSolutions - lower[0]) / range : 0;
-
-  // Interpolate fill percentage
-  const fillPercent = lower[1] + t * (upper[1] - lower[1]);
-
-  // Interpolate color (RGB)
-  const r = Math.round(lower[2] + t * (upper[2] - lower[2]));
-  const g = Math.round(lower[3] + t * (upper[3] - lower[3]));
-  const b = Math.round(lower[4] + t * (upper[4] - lower[4]));
-
-  return {
-    fillPercent,
-    color: `rgb(${r}, ${g}, ${b})`,
-  };
+  return FILL_POINTS[FILL_POINTS.length - 1][1];
 }
 
-function getDifficultyLabel(solutions: number): string {
-  if (solutions >= 3500) return "Easiest";
-  if (solutions >= 2000) return "Easy";
-  if (solutions >= 1250) return "Medium";
-  return "Hard";
+function getDifficultyStyle(solutions: number): { fillPercent: number; color: string; label: string } {
+  const fillPercent = getFillPercent(solutions);
+  
+  if (solutions >= 3500) {
+    return { fillPercent, color: DIFFICULTY_COLORS.easiest, label: "Easiest" };
+  }
+  if (solutions >= 2000) {
+    return { fillPercent, color: DIFFICULTY_COLORS.easy, label: "Easy" };
+  }
+  if (solutions >= 1250) {
+    return { fillPercent, color: DIFFICULTY_COLORS.medium, label: "Medium" };
+  }
+  return { fillPercent, color: DIFFICULTY_COLORS.hard, label: "Hard" };
 }
 
 interface DifficultyBarProps {
@@ -135,8 +131,7 @@ export default function DifficultyBar({ date = new Date(), className = "" }: Dif
     return null;
   }
 
-  const { fillPercent, color } = interpolate(solutions);
-  const label = getDifficultyLabel(solutions);
+  const { fillPercent, color, label } = getDifficultyStyle(solutions);
 
   return (
     <div

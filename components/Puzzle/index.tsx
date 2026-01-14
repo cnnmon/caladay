@@ -451,6 +451,7 @@ export default function Puzzle() {
   const [elapsedTime, setElapsedTime] = useState(0);
   const [finalTime, setFinalTime] = useState<number | null>(null);
   const [startedAt, setStartedAt] = useState<string | null>(null);
+  const [hintPenaltyKey, setHintPenaltyKey] = useState<number | null>(null);
 
   // Track when timer starts
   useEffect(() => {
@@ -1296,7 +1297,7 @@ export default function Puzzle() {
           <h1 className="text-xl font-light tracking-wide text-stone-700">
             {month} {dayNum}, {dayWord}
             {!viewingImported ? (
-              <>
+              <span className="relative inline-block">
                 {" · "}
                 {viewingDate
                   ? formatTime(
@@ -1307,7 +1308,22 @@ export default function Puzzle() {
                   : formatTime(
                       isSolved && finalTime !== null ? finalTime : elapsedTime
                     )}
-              </>
+                <AnimatePresence>
+                  {hintPenaltyKey && (
+                    <motion.span
+                      key={hintPenaltyKey}
+                      className="absolute left-full ml-1 text-red-500 font-medium pointer-events-none"
+                      initial={{ opacity: 1, y: 0 }}
+                      animate={{ opacity: 0, y: -20 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.8, ease: "easeOut" }}
+                      onAnimationComplete={() => setHintPenaltyKey(null)}
+                    >
+                      +1
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </span>
             ) : previewSolution?.timeElapsed !== undefined ? (
               <>
                 {" · "}
@@ -1893,15 +1909,29 @@ export default function Puzzle() {
               </motion.button>
             )}
             {isPlaying && !isSolved && (
-              <motion.button
-                onClick={() => setIsPlaying(false)}
-                className="icon-button"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-              >
-                Pause
-              </motion.button>
+              <>
+                <motion.button
+                  onClick={() => {
+                    setElapsedTime((t) => t + 1);
+                    setHintPenaltyKey(Date.now());
+                  }}
+                  className="icon-button"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                >
+                  Hint
+                </motion.button>
+                <motion.button
+                  onClick={() => setIsPlaying(false)}
+                  className="icon-button"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                >
+                  Pause
+                </motion.button>
+              </>
             )}
           </div>
         </motion.div>
