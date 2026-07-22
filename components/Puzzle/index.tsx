@@ -645,9 +645,15 @@ export default function Puzzle() {
           day: state.day,
           startedAt: state.startedAt,
           timeElapsed: state.timeElapsed,
-        }).then((solutionId) => {
-          addSubmission(solutionId, state.grid);
-        });
+        })
+          .then((solutionId) => {
+            addSubmission(solutionId, state.grid);
+          })
+          .catch((err) => {
+            // Offline or rejected by server-side validation; the solve is
+            // still saved locally, just not on the leaderboard.
+            console.warn("Leaderboard submission failed:", err);
+          });
       } else {
         // Show modal to ask for name
         setPendingSolution(state);
@@ -1241,7 +1247,7 @@ export default function Puzzle() {
       onPointerCancel={() => setDragState(null)}
     >
       <motion.div
-        className="absolute top-0 left-0 p-2 flex gap-2 items-start w-full justify-between"
+        className="absolute top-0 left-0 p-2 pt-[max(0.5rem,env(safe-area-inset-top))] flex gap-2 items-start w-full justify-between"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}

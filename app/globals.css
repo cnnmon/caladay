@@ -23,6 +23,15 @@ body {
   -webkit-overflow-scrolling: none;
 }
 
+/* Keep in-flow content out of the notch / home indicator (iOS).
+   No-ops in regular browsers where the insets are 0. */
+body {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
 button {
   cursor: pointer !important;
 }

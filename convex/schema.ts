@@ -8,6 +8,11 @@ export default defineSchema({
     day: v.string(), // Date key (YYYY-MM-DD)
     startedAt: v.optional(v.string()), // ISO timestamp
     timeElapsed: v.optional(v.number()), // Elapsed time in ms
+    hidden: v.optional(v.boolean()), // Hidden after being reported (UGC moderation)
   }).index("by_day", ["day"]),
-});
 
+  // User reports of inappropriate leaderboard entries (App Store Guideline 1.2)
+  reports: defineTable({
+    solutionId: v.id("solutions"),
+  }).index("by_solution", ["solutionId"]),
+});

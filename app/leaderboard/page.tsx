@@ -1,13 +1,15 @@
 "use client";
 
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { api } from "../../convex/_generated/api";
+import { Id } from "../../convex/_generated/dataModel";
 
 const SUBMISSIONS_KEY = "CALADAY_SUBMISSIONS";
+const REPORTED_KEY = "CALADAY_REPORTED";
 
 function getDateKey(date: Date = new Date()): string {
   const year = date.getFullYear();
@@ -47,14 +49,64 @@ function getMySolutionIds(): Set<string> {
   }
 }
 
+function getReportedIds(): Set<string> {
+  if (typeof window === "undefined") return new Set();
+  try {
+    const data = localStorage.getItem(REPORTED_KEY);
+    return data ? new Set(JSON.parse(data) as string[]) : new Set();
+  } catch {
+    return new Set();
+  }
+}
+
 function LeaderboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const solutions = useQuery(api.solutions.list);
+  const reportSolution = useMutation(api.solutions.report);
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [mySolutionIds] = useState<Set<string>>(() => getMySolutionIds());
   const [urlDayParam, setUrlDayParam] = useState<string | null>(null);
   const [urlParamChecked, setUrlParamChecked] = useState(false);
+  const [reportedIds, setReportedIds] = useState<Set<string>>(() =>
+    getReportedIds()
+  );
+  const [confirmingReportId, setConfirmingReportId] = useState<string | null>(
+    null
+  );
+  const [loadTimedOut, setLoadTimedOut] = useState(false);
+
+  // If the leaderboard can't load (offline / bad network), say so
+  // instead of spinning forever.
+  useEffect(() => {
+    if (solutions !== undefined) {
+      setLoadTimedOut(false);
+      return;
+    }
+    const timer = setTimeout(() => setLoadTimedOut(true), 8000);
+    return () => clearTimeout(timer);
+  }, [solutions]);
+
+  const handleReport = (solutionId: Id<"solutions">) => {
+    if (reportedIds.has(solutionId)) return;
+    if (confirmingReportId !== solutionId) {
+      // First tap: ask for confirmation
+      setConfirmingReportId(solutionId);
+      return;
+    }
+    reportSolution({ solutionId }).catch(() => {
+      // Ignore network failures; the local "reported" state still applies
+    });
+    const next = new Set(reportedIds);
+    next.add(solutionId);
+    setReportedIds(next);
+    try {
+      localStorage.setItem(REPORTED_KEY, JSON.stringify([...next]));
+    } catch {
+      // localStorage unavailable; non-fatal
+    }
+    setConfirmingReportId(null);
+  };
 
   // Group solutions by day
   const groupedByDay = solutions?.reduce(
@@ -139,7 +191,16 @@ function LeaderboardContent() {
       {/* Narrower content */}
       <div className="max-w-2xl mx-auto">
         {!solutions ? (
-          <div className="text-center text-stone-400 py-8">Loading...</div>
+          loadTimedOut ? (
+            <div className="text-center text-stone-400 py-8">
+              Can&apos;t reach the leaderboard right now.
+              <br />
+              Check your connection — your solves are still saved on this
+              device.
+            </div>
+          ) : (
+            <div className="text-center text-stone-400 py-8">Loading...</div>
+          )
         ) : solutions.length === 0 ? (
           <div className="text-center text-stone-400 py-8">
             No solutions yet. Be the first to solve and submit!
@@ -244,6 +305,32 @@ function LeaderboardContent() {
                           {isClickable && (
                             <span className="text-stone-300 text-sm">→</span>
                           )}
+                          {!isMine &&
+                            (reportedIds.has(solution._id) ? (
+                              <span
+                                className="text-stone-300 text-sm px-1"
+                                title="Reported"
+                              >
+                                ✓
+                              </span>
+                            ) : (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleReport(solution._id);
+                                }}
+                                className={`text-sm px-1 transition-colors ${
+                                  confirmingReportId === solution._id
+                                    ? "text-red-500"
+                                    : "text-stone-300 hover:text-red-400"
+                                }`}
+                                title="Report inappropriate name"
+                              >
+                                {confirmingReportId === solution._id
+                                  ? "report?"
+                                  : "⚑"}
+                              </button>
+                            ))}
                         </div>
                       </motion.div>
                     );

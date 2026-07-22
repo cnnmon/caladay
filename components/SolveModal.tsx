@@ -1,7 +1,9 @@
 "use client";
 
+import { ConvexError } from "convex/values";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { isUsernameBanned } from "../convex/moderation";
 
 const USERNAME_KEY = "CALADAY_USERNAME";
 const SUBMISSIONS_KEY = "CALADAY_SUBMISSIONS"; // { id: string, grid: string }[]
@@ -37,20 +39,6 @@ function saveSubmissions(submissions: Submission[]): void {
   localStorage.setItem(SUBMISSIONS_KEY, JSON.stringify(submissions));
 }
 
-async function loadBannedWords(): Promise<Set<string>> {
-  try {
-    const res = await fetch("/moderation.txt");
-    const text = await res.text();
-    const words = text
-      .trim()
-      .split(/\s+/)
-      .map((w) => w.toUpperCase());
-    return new Set(words);
-  } catch {
-    return new Set();
-  }
-}
-
 export function getSavedUsername(): string | null {
   if (typeof window === "undefined") return null;
   return localStorage.getItem(USERNAME_KEY);
@@ -84,13 +72,8 @@ export default function SolveModal({
   mode,
 }: LeaderboardModalProps) {
   const [username, setUsername] = useState("");
-  const [bannedWords, setBannedWords] = useState<Set<string>>(new Set());
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  useEffect(() => {
-    loadBannedWords().then(setBannedWords);
-  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -103,7 +86,7 @@ export default function SolveModal({
   const handleUsernameChange = (value: string) => {
     const upper = value.toUpperCase().slice(0, 3);
     setUsername(upper);
-    if (bannedWords.has(upper)) {
+    if (isUsernameBanned(upper)) {
       setError("That name is not allowed");
     } else {
       setError("");
@@ -115,7 +98,7 @@ export default function SolveModal({
       setError("Please enter a name");
       return;
     }
-    if (bannedWords.has(username)) {
+    if (isUsernameBanned(username)) {
       setError("That name is not allowed");
       return;
     }
@@ -136,8 +119,12 @@ export default function SolveModal({
       saveUsername(username);
       addSubmission(solutionId, grid);
       onClose();
-    } catch {
-      setError("Failed to submit. Please try again.");
+    } catch (err) {
+      setError(
+        err instanceof ConvexError && typeof err.data === "string"
+          ? err.data
+          : "Failed to submit. Please try again."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -207,7 +194,7 @@ export default function SolveModal({
               <button
                 onClick={handleSubmit}
                 disabled={
-                  isSubmitting || !username || bannedWords.has(username)
+                  isSubmitting || !username || isUsernameBanned(username)
                 }
                 className="flex-1 px-4 py-2 rounded-lg bg-stone-800 hover:bg-stone-900 text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
