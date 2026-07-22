@@ -79,10 +79,7 @@ function LeaderboardContent() {
   // If the leaderboard can't load (offline / bad network), say so
   // instead of spinning forever.
   useEffect(() => {
-    if (solutions !== undefined) {
-      setLoadTimedOut(false);
-      return;
-    }
+    if (solutions !== undefined) return;
     const timer = setTimeout(() => setLoadTimedOut(true), 8000);
     return () => clearTimeout(timer);
   }, [solutions]);
