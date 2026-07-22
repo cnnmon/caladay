@@ -4,6 +4,7 @@ import {
   validateUsername,
 } from "../convex/validation";
 import { isUsernameBanned } from "../convex/moderation";
+import { solveToEmojiGrid } from "../lib/share";
 
 // Real solutions pulled from the production Convex DB (solutions:list)
 const REAL_SOLUTIONS: Array<{ day: string; grid: string }> = [
@@ -118,6 +119,39 @@ describe("validateUsername", () => {
     expect(validateUsername("ABCD")).not.toBeNull();
     expect(validateUsername("A1")).not.toBeNull();
     expect(validateUsername("a b")).not.toBeNull();
+  });
+});
+
+describe("solveToEmojiGrid", () => {
+  it("renders 8 rows of 7 squares with targets left white", () => {
+    const mosaic = solveToEmojiGrid(REAL_SOLUTIONS[0].grid);
+    const rows = mosaic.split("\n");
+    expect(rows).toHaveLength(8);
+    for (const row of rows) {
+      expect([...row]).toHaveLength(7);
+    }
+    // 3 uncovered target cells → 3 white squares
+    expect(mosaic.match(/⬜/g)).toHaveLength(3);
+    // 6 blocked cells → 6 black squares
+    expect(mosaic.match(/⬛/g)).toHaveLength(6);
+  });
+
+  it("never gives touching shapes the same color", () => {
+    for (const { grid } of REAL_SOLUTIONS) {
+      const rows = solveToEmojiGrid(grid).split("\n").map((r) => [...r]);
+      for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 7; col++) {
+          const id = grid[row * 7 + col];
+          if (id === "#" || id === ".") continue;
+          for (const [r, c] of [[row + 1, col], [row, col + 1]]) {
+            if (r >= 8 || c >= 7) continue;
+            const otherId = grid[r * 7 + c];
+            if (otherId === "#" || otherId === "." || otherId === id) continue;
+            expect(rows[row][col]).not.toBe(rows[r][c]);
+          }
+        }
+      }
+    }
   });
 });
 

@@ -80,12 +80,18 @@ export const listByDay = query({
 export const getById = query({
   args: { id: v.id("solutions") },
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.id);
+    const solution = await ctx.db.get(args.id);
+    // Hidden (reported) entries are hidden everywhere, including previews
+    if (!solution || solution.hidden) return null;
+    return solution;
   },
 });
 
 // Report a leaderboard entry as inappropriate (App Store Guideline 1.2).
 // After REPORTS_TO_HIDE reports, the entry is hidden from all leaderboards.
+// Note: with no auth there is no way to dedupe reporters server-side; the
+// client dedupes locally. Abuse of this can only hide entries (fail-safe
+// direction for content moderation), never expose anything.
 export const report = mutation({
   args: { solutionId: v.id("solutions") },
   handler: async (ctx, args) => {

@@ -18,6 +18,9 @@ import {
   ShapeMatrix,
   SolveHistory,
 } from "../../lib/types";
+import { hapticInvalid, hapticPlace, hapticSolve, isNative } from "../../lib/native";
+import { isReminderEnabled, setReminderEnabled } from "../../lib/notifications";
+import { shareSolve } from "../../lib/share";
 import DifficultyBar from "../DifficultyBar";
 import SolveModal, {
   addSubmission,
@@ -360,6 +363,16 @@ export default function Puzzle() {
   const [pendingSolution, setPendingSolution] =
     useState<SavedPuzzleState | null>(null);
   const [currentUsername, setCurrentUsername] = useState<string | null>(null);
+  const [nativeUI, setNativeUI] = useState(false);
+  const [reminderOn, setReminderOn] = useState(false);
+  const [shareStatus, setShareStatus] = useState<string | null>(null);
+
+  // Native-only UI (reminder bell) is decided after mount to avoid
+  // hydration mismatches with the prerendered HTML.
+  useEffect(() => {
+    setNativeUI(isNative());
+    setReminderOn(isReminderEnabled());
+  }, []);
 
   const createSolution = useMutation(api.solutions.create);
 
@@ -410,11 +423,26 @@ export default function Puzzle() {
     startY: number;
     isFromGrid: boolean;
     hasMoved: boolean;
+    // Whether the shape was already selected when the press started
+    // (pieces select themselves eagerly on pointerdown, so this must be
+    // captured before that to make tap-again-to-rotate work)
+    wasSelected: boolean;
   } | null>(null);
   const DRAG_THRESHOLD = 5;
   const [selectedShapeId, setSelectedShapeId] = useState<string | null>(null);
   const [invalidShake, setInvalidShake] = useState<string | null>(null);
   const [hasLoadedProgress, setHasLoadedProgress] = useState(false);
+  // Grid cell currently targeted while dragging; only re-renders on cell change
+  const [dragCell, setDragCell] = useState<{ row: number; col: number } | null>(
+    null
+  );
+  // Drag ghost follows the pointer via direct DOM writes (no re-render per move)
+  const ghostRef = useRef<HTMLDivElement>(null);
+  const ghostPos = useRef({ x: 0, y: 0 });
+  // Long-press (flip) tracking
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const longPressFired = useRef(false);
+  const LONG_PRESS_MS = 450;
   const gridRef = useRef<HTMLDivElement>(null);
   const shapeRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const [isMobile, setIsMobile] = useState(false);
@@ -615,6 +643,7 @@ export default function Puzzle() {
 
     const solved = checkSolved();
     if (solved && !isSolved) {
+      hapticSolve();
       setIsSolved(true);
       setFinalTime(elapsedTime);
       // Save to history keyed by day
@@ -944,21 +973,19 @@ export default function Puzzle() {
 
   // Calculate hover preview when dragging (only after movement threshold)
   const hoverPreview = (() => {
-    if (!dragState || !dragState.hasMoved || !gridRef.current) return null;
-
-    const gridRect = gridRef.current.getBoundingClientRect();
-    const x =
-      dragState.currentX - gridRect.left - dragState.offsetX + cellSize / 2;
-    const y =
-      dragState.currentY - gridRect.top - dragState.offsetY + cellSize / 2;
-    const gridCol = Math.floor(x / cellSize);
-    const gridRow = Math.floor(y / cellSize);
+    if (!dragState || !dragState.hasMoved || !dragCell) return null;
 
     const cells = shapeRotations[dragState.shapeId];
     const shape = SHAPES.find((s) => s.id === dragState.shapeId)!;
-    const isValid = isValidPlacement(dragState.shapeId, gridRow, gridCol);
+    const isValid = isValidPlacement(dragState.shapeId, dragCell.row, dragCell.col);
 
-    return { gridRow, gridCol, cells, color: shape.color, isValid };
+    return {
+      gridRow: dragCell.row,
+      gridCol: dragCell.col,
+      cells,
+      color: shape.color,
+      isValid,
+    };
   })();
 
   // Compare if two shape matrices are identical
@@ -1105,6 +1132,16 @@ export default function Puzzle() {
         offsetY += cellOffset.row * cellSize;
       }
 
+      // Long-press (no movement) flips the shape
+      longPressFired.current = false;
+      if (longPressTimer.current) clearTimeout(longPressTimer.current);
+      longPressTimer.current = setTimeout(() => {
+        longPressFired.current = true;
+        setSelectedShapeId(shapeId);
+        handleFlip(shapeId);
+        hapticPlace();
+      }, LONG_PRESS_MS);
+
       // Don't remove from grid yet - wait until actual movement
       setDragState({
         shapeId,
@@ -1116,9 +1153,12 @@ export default function Puzzle() {
         startY: e.clientY,
         isFromGrid,
         hasMoved: false,
+        // selectedShapeId still holds the pre-press value here: the eager
+        // select in the piece's own onPointerDown hasn't re-rendered yet
+        wasSelected: selectedShapeId === shapeId,
       });
     },
-    [cellSize]
+    [cellSize, handleFlip, selectedShapeId]
   );
 
   const handlePointerMove = useCallback(
@@ -1130,6 +1170,12 @@ export default function Puzzle() {
       const dy = Math.abs(e.clientY - dragState.startY);
       const shouldStartDrag = dx > DRAG_THRESHOLD || dy > DRAG_THRESHOLD;
 
+      // Real movement cancels the long-press flip
+      if (shouldStartDrag && longPressTimer.current) {
+        clearTimeout(longPressTimer.current);
+        longPressTimer.current = null;
+      }
+
       // If this is the first real movement and shape is from grid, remove it now
       if (shouldStartDrag && !dragState.hasMoved && dragState.isFromGrid) {
         setPlacedShapes((prev) =>
@@ -1137,30 +1183,69 @@ export default function Puzzle() {
         );
       }
 
-      setDragState((prev) =>
-        prev
-          ? {
-              ...prev,
-              currentX: e.clientX,
-              currentY: e.clientY,
-              hasMoved: prev.hasMoved || shouldStartDrag,
-            }
-          : null
-      );
+      // Move the drag ghost with direct DOM writes; re-rendering the whole
+      // component on every pointer move makes dragging feel laggy.
+      ghostPos.current = {
+        x: e.clientX - dragState.offsetX,
+        y: e.clientY - dragState.offsetY,
+      };
+      if (ghostRef.current) {
+        ghostRef.current.style.transform = `translate3d(${ghostPos.current.x}px, ${ghostPos.current.y}px, 0)`;
+      }
+
+      // State only changes on the hasMoved transition (once per drag)...
+      if (!dragState.hasMoved && shouldStartDrag) {
+        setDragState((prev) =>
+          prev
+            ? {
+                ...prev,
+                currentX: e.clientX,
+                currentY: e.clientY,
+                hasMoved: true,
+              }
+            : null
+        );
+      }
+
+      // ...and when the targeted grid cell changes (drives the hover preview)
+      if ((dragState.hasMoved || shouldStartDrag) && gridRef.current) {
+        const gridRect = gridRef.current.getBoundingClientRect();
+        const x = e.clientX - gridRect.left - dragState.offsetX + cellSize / 2;
+        const y = e.clientY - gridRect.top - dragState.offsetY + cellSize / 2;
+        const gridCol = Math.floor(x / cellSize);
+        const gridRow = Math.floor(y / cellSize);
+        setDragCell((prev) =>
+          prev && prev.row === gridRow && prev.col === gridCol
+            ? prev
+            : { row: gridRow, col: gridCol }
+        );
+      }
     },
-    [dragState]
+    [dragState, cellSize]
   );
 
   const handlePointerUp = useCallback(
     (e: React.PointerEvent) => {
+      setDragCell(null);
+      if (longPressTimer.current) {
+        clearTimeout(longPressTimer.current);
+        longPressTimer.current = null;
+      }
       if (!dragState || !gridRef.current) {
         setDragState(null);
         return;
       }
 
-      // If no movement occurred, this was just a click to select
+      // No movement: long-press already flipped; otherwise a tap selects,
+      // and tapping a shape that was already selected rotates it
       if (!dragState.hasMoved) {
-        setSelectedShapeId(dragState.shapeId);
+        if (!longPressFired.current) {
+          if (dragState.wasSelected) {
+            handleRotate(dragState.shapeId);
+          } else {
+            setSelectedShapeId(dragState.shapeId);
+          }
+        }
         setDragState(null);
         return;
       }
@@ -1173,15 +1258,20 @@ export default function Puzzle() {
 
       const shape = SHAPES.find((s) => s.id === dragState.shapeId)!;
       if (isValidPlacement(dragState.shapeId, gridRow, gridCol)) {
+        hapticPlace();
         setPlacedShapes((prev) => [
           ...prev,
           { ...shape, cells: shapeRotations[shape.id], gridRow, gridCol },
         ]);
+      } else if (gridRow >= 0 && gridRow < 8 && gridCol >= 0 && gridCol < 7) {
+        // Attempted a placement on the board but it was invalid
+        // (dropping outside the board is just returning the piece)
+        hapticInvalid();
       }
 
       setDragState(null);
     },
-    [dragState, cellSize, isValidPlacement, shapeRotations]
+    [dragState, cellSize, isValidPlacement, shapeRotations, handleRotate]
   );
 
   // Render shape as positioned div
@@ -1244,7 +1334,14 @@ export default function Puzzle() {
       }}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
-      onPointerCancel={() => setDragState(null)}
+      onPointerCancel={() => {
+        if (longPressTimer.current) {
+          clearTimeout(longPressTimer.current);
+          longPressTimer.current = null;
+        }
+        setDragState(null);
+        setDragCell(null);
+      }}
     >
       <motion.div
         className="absolute top-0 left-0 p-2 pt-[max(0.5rem,env(safe-area-inset-top))] flex gap-2 items-start w-full justify-between"
@@ -1273,6 +1370,20 @@ export default function Puzzle() {
           </button>
         </div>
         <div className="flex items-start gap-2">
+          {/* Daily reminder toggle (native app only) */}
+          {nativeUI && (
+            <button
+              onClick={async () => {
+                setReminderOn(await setReminderEnabled(!reminderOn));
+              }}
+              className="icon-button"
+              title={
+                reminderOn ? "Daily reminder on" : "Enable daily reminder"
+              }
+            >
+              {reminderOn ? "🔔" : "🔕"}
+            </button>
+          )}
           {/* Username display */}
           {currentUsername && (
             <button
@@ -1334,13 +1445,36 @@ export default function Puzzle() {
             ) : isSolved || isViewingHistory ? (
               <motion.div
                 key="solved"
-                className="flex flex-col items-center gap-1"
+                className="flex items-center gap-3"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
               >
                 <span className="text-lg font-medium text-green-600">
                   {isViewingHistory ? "✓ Solved" : "🎉 Congratulations!"}
                 </span>
+                {(() => {
+                  const dayKey = viewingDate ?? getDateKey(currentDate);
+                  const state = history[dayKey];
+                  return state ? (
+                    <button
+                      onClick={async () => {
+                        const result = await shareSolve(
+                          state.grid,
+                          state.day,
+                          state.timeElapsed
+                        );
+                        if (result === "copied") {
+                          setShareStatus("copied!");
+                          setTimeout(() => setShareStatus(null), 2000);
+                        }
+                      }}
+                      className="icon-button"
+                      title="Share your solve"
+                    >
+                      {shareStatus ?? "Share"}
+                    </button>
+                  ) : null;
+                })()}
               </motion.div>
             ) : null}
           </h1>
@@ -1588,19 +1722,24 @@ export default function Puzzle() {
           </motion.div>
         )}
 
-        {/* Dragging preview - only show after movement threshold */}
+        {/* Dragging preview - only show after movement threshold.
+            Outer div is positioned via direct DOM writes in handlePointerMove;
+            the inner motion.div only animates opacity/scale. */}
         <AnimatePresence>
           {dragState && dragState.hasMoved && (
+            <div
+              ref={ghostRef}
+              className="fixed top-0 left-0 pointer-events-none z-50"
+              style={{
+                transform: `translate3d(${ghostPos.current.x}px, ${ghostPos.current.y}px, 0)`,
+                willChange: "transform",
+              }}
+            >
             <motion.div
-              className="fixed pointer-events-none z-50"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 0.8, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
               transition={{ duration: 0.1 }}
-              style={{
-                left: dragState.currentX - dragState.offsetX,
-                top: dragState.currentY - dragState.offsetY,
-              }}
             >
               {renderShape(
                 dragState.shapeId,
@@ -1611,6 +1750,7 @@ export default function Puzzle() {
                 () => {}
               )}
             </motion.div>
+            </div>
           )}
         </AnimatePresence>
 
@@ -1673,9 +1813,9 @@ export default function Puzzle() {
                     today&apos;s date (month, day, and day of the week).
                   </p>
                   <p>
-                    Drag shapes onto the grid. Tap a shape to select it, then
-                    rotate or flip using the buttons. Drag a shape off the grid
-                    to remove it.
+                    Drag shapes onto the grid. Tap a shape to select it, tap it
+                    again to rotate, and press &amp; hold to flip — or use the
+                    buttons. Drag a shape off the grid to remove it.
                   </p>
                 </div>
                 <h3 className="font-bold text-stone-800 mb-2">
