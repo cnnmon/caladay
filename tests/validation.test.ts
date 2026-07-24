@@ -1,9 +1,9 @@
 import {
+  isUsernameBanned,
   targetsForDay,
   validateSolution,
   validateUsername,
-} from "../convex/validation";
-import { isUsernameBanned } from "../convex/moderation";
+} from "../supabase/functions/_shared/puzzle";
 import { solveToEmojiGrid } from "../lib/share";
 
 // Real solutions pulled from the production Convex DB (solutions:list)

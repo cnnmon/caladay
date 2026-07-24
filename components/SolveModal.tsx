@@ -1,9 +1,8 @@
 "use client";
 
-import { ConvexError } from "convex/values";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { isUsernameBanned } from "../convex/moderation";
+import { isUsernameBanned } from "../supabase/functions/_shared/puzzle";
 
 const USERNAME_KEY = "CALADAY_USERNAME";
 const SUBMISSIONS_KEY = "CALADAY_SUBMISSIONS"; // { id: string, grid: string }[]
@@ -120,9 +119,10 @@ export default function SolveModal({
       addSubmission(solutionId, grid);
       onClose();
     } catch (err) {
+      // submitSolution throws Error with a user-facing message
       setError(
-        err instanceof ConvexError && typeof err.data === "string"
-          ? err.data
+        err instanceof Error && err.message
+          ? err.message
           : "Failed to submit. Please try again."
       );
     } finally {

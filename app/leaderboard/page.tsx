@@ -1,12 +1,10 @@
 "use client";
 
-import { useMutation, useQuery } from "convex/react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
-import { api } from "../../convex/_generated/api";
-import { Id } from "../../convex/_generated/dataModel";
+import { listSolutions, reportSolution, SolutionRow } from "../../lib/db";
 
 const SUBMISSIONS_KEY = "CALADAY_SUBMISSIONS";
 const REPORTED_KEY = "CALADAY_REPORTED";
@@ -62,8 +60,9 @@ function getReportedIds(): Set<string> {
 function LeaderboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const solutions = useQuery(api.solutions.list);
-  const reportSolution = useMutation(api.solutions.report);
+  const [solutions, setSolutions] = useState<SolutionRow[] | undefined>(
+    undefined
+  );
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [mySolutionIds] = useState<Set<string>>(() => getMySolutionIds());
   const [urlDayParam, setUrlDayParam] = useState<string | null>(null);
@@ -76,22 +75,31 @@ function LeaderboardContent() {
   );
   const [loadTimedOut, setLoadTimedOut] = useState(false);
 
-  // If the leaderboard can't load (offline / bad network), say so
-  // instead of spinning forever.
+  // Fetch the leaderboard on mount; flag failure so we don't spin forever.
   useEffect(() => {
-    if (solutions !== undefined) return;
+    let cancelled = false;
+    listSolutions()
+      .then((rows) => {
+        if (!cancelled) setSolutions(rows);
+      })
+      .catch(() => {
+        if (!cancelled) setLoadTimedOut(true);
+      });
     const timer = setTimeout(() => setLoadTimedOut(true), 8000);
-    return () => clearTimeout(timer);
-  }, [solutions]);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, []);
 
-  const handleReport = (solutionId: Id<"solutions">) => {
+  const handleReport = (solutionId: string) => {
     if (reportedIds.has(solutionId)) return;
     if (confirmingReportId !== solutionId) {
       // First tap: ask for confirmation
       setConfirmingReportId(solutionId);
       return;
     }
-    reportSolution({ solutionId }).catch(() => {
+    reportSolution(solutionId).catch(() => {
       // Ignore network failures; the local "reported" state still applies
     });
     const next = new Set(reportedIds);

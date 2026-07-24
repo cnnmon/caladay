@@ -41,7 +41,7 @@ export default function PrivacyPage() {
               If you choose to submit a solve to the leaderboard, we store: your
               chosen display name (up to 3 letters), your solution, the puzzle
               date, and your solve time. This is stored with our database
-              provider (Convex) and is <strong>publicly visible</strong> to
+              provider (Supabase) and is <strong>publicly visible</strong> to
               other players. Submissions are optional — you can always skip
               them and keep playing.
             </p>

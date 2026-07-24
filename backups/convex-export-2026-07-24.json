@@ -1,0 +1,4142 @@
+[
+ {
+  "_creationTime": 1784900708950.4976,
+  "_id": "j576k7gk9k3amqbcd53f8staa98b49ks",
+  "day": "2026-07-24",
+  "grid": "IIIILT#.ZLLLT#ZZSSTTTZSSOVVVZOOOPPVJO.PPPVJJJJUUU####U.U",
+  "startedAt": "2026-07-24T13:44:30.556Z",
+  "timeElapsed": 38000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1784749072752.9841,
+  "_id": "j5755kmx9s1amrqx8bd0g870nd8b0174",
+  "day": "2026-07-22",
+  "grid": "ZZJJJJ#.ZZZOJ#LLOOOPPLTOSSPPLTTTSSP.TVVVUUIIIIVU.####VUU",
+  "startedAt": "2026-07-22T19:37:13.758Z",
+  "timeElapsed": 38000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1784735633245.0137,
+  "_id": "j57bn3scwe7xcjb5gb97xgf44s8b1svp",
+  "day": "2026-07-22",
+  "grid": "UUPPOO#.UPPTO#UULPTOOLLLTTTZSSIIIIZ.SSJVZZJJJJVZ.####VVV",
+  "startedAt": "2026-07-22T15:45:07.126Z",
+  "timeElapsed": 228000.0,
+  "username": "ALU"
+ },
+ {
+  "_creationTime": 1784734945457.4817,
+  "_id": "j575v9rtkysen0amh0bfbtbte98b0xcf",
+  "day": "2026-07-22",
+  "grid": "IIIIOO#.PPPVO#LSPPVOOLSSJVVVLLSJJJJ.ZZZTUUZZTTTU.####TUU",
+  "startedAt": "2026-07-22T15:41:43.198Z",
+  "timeElapsed": 39000.0,
+  "username": "ALU"
+ },
+ {
+  "_creationTime": 1784732916604.1694,
+  "_id": "j5729ecsqvh3f08009nm61bre98b0k58",
+  "day": "2026-07-22",
+  "grid": "JJJJOO#.SSJVO#LLSSVOOLPPPVVVLPPIIII.ZZZTUUZZTTTU.####TUU",
+  "startedAt": "2026-07-22T15:08:03.667Z",
+  "timeElapsed": 32000.0,
+  "username": "ALU"
+ },
+ {
+  "_creationTime": 1784701160225.9985,
+  "_id": "j571p4rxb6xhbh3xqbvqjs4pzs8b1dqx",
+  "day": "2026-07-21",
+  "grid": "TTTSOO#.TZSSO#ITZZSOOILLZPPPILVZPP.ILVJJJJVVVJU.U####UUU",
+  "startedAt": "2026-07-22T06:17:04.483Z",
+  "timeElapsed": 119000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1784663919489.6936,
+  "_id": "j576rckqm5zhmv9kw6arcdn32s8aze26",
+  "day": "2026-07-21",
+  "grid": "VVVJIZ#.PVJIZ#PPVJIZZPPJJITZLLSOOT.LSSOTTTLSOOU.U####UUU",
+  "startedAt": "2026-07-21T19:58:03.394Z",
+  "timeElapsed": 32000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1784652466475.906,
+  "_id": "j57586vtyvz2eq8dhsm7hxjp198ay45p",
+  "day": "2026-07-21",
+  "grid": "OOJJJJ#.OJUUU#IOOUSUZILLSSZZITLSPZ.ITLPPZVTTTPP.V####VVV",
+  "startedAt": "2026-07-21T16:47:22.198Z",
+  "timeElapsed": 128000.0,
+  "username": "YAO"
+ },
+ {
+  "_creationTime": 1784652399145.9321,
+  "_id": "j579r4n71h6826003k21thrkw18aypvz",
+  "day": "2026-07-21",
+  "grid": "IIIIOO#.PPPZO#SPPZZOOSSTZJUUVSTZJU.VTTTJUUVVVJJ.L####LLL",
+  "startedAt": "2026-07-21T16:45:17.401Z",
+  "timeElapsed": 74000.0,
+  "username": "HAI"
+ },
+ {
+  "_creationTime": 1784652300955.8147,
+  "_id": "j573qmgjct8nmgf8h8c6h1fhkn8az56f",
+  "day": "2026-07-21",
+  "grid": "IIIIOO#.PPPZO#SPPZZOOSSTZJUUVSTZJU.VTTTJUUVVVJJ.L####LLL",
+  "startedAt": "2026-07-21T16:43:51.410Z",
+  "timeElapsed": 64000.0,
+  "username": "BDY"
+ },
+ {
+  "_creationTime": 1784652294375.9763,
+  "_id": "j5750ackm8rxfthaeqj2cwfzj98aya9g",
+  "day": "2026-07-21",
+  "grid": "OOJJJJ#.OJUUU#IOOUSUZILLSSZZITLSPZ.ITLPPZVTTTPP.V####VVV",
+  "startedAt": "2026-07-21T16:44:05.760Z",
+  "timeElapsed": 32000.0,
+  "username": "HPY"
+ },
+ {
+  "_creationTime": 1784553070443.1743,
+  "_id": "j5704r7fs1f49tjx7vp5vd15fd8axem0",
+  "day": "2026-07-20",
+  "grid": "UUOOPP#.ULOPP#UULOOPTZZLLTTTJZZZS.TJJJJSSVIIII.SV####VVV",
+  "startedAt": "2026-07-20T13:10:27.124Z",
+  "timeElapsed": 141000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1784504583803.719,
+  "_id": "j57cd1h3eayf4zw6jsqj8py1vs8av4vk",
+  "day": "2026-07-19",
+  "grid": "LLLTTT#.ILSTZ#JISSTZZJISUUUZJIVU.UZJJVOOPPVVV.OPP####OOP",
+  "startedAt": "2026-07-19T23:42:19.556Z",
+  "timeElapsed": 44000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1784381327822.179,
+  "_id": "j57bwk8keqdf5t0ma0900xttqh8ar9as",
+  "day": "2026-07-18",
+  "grid": "UUJIOO#.UJILO#UUJILOOTJJILLPTTT.VPPTZZZVPPZZVVVSS####SS.",
+  "startedAt": "2026-07-18T13:27:35.444Z",
+  "timeElapsed": 72000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1784326140745.6733,
+  "_id": "j57630xe2emyzq8nh2enrd4q7n8aq4hx",
+  "day": "2026-07-17",
+  "grid": "SSIIII#.SSZZZ#LLZZTTTLJJJJTVLJ.OOTVPPPOVVVPPOOUUU####U.U",
+  "startedAt": "2026-07-17T22:07:52.910Z",
+  "timeElapsed": 64000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1784226740592.2314,
+  "_id": "j57a67by34qcgg6b5bgmp173ms8am574",
+  "day": "2026-07-16",
+  "grid": "UUPPPL#.USPPL#UUSSLLOZZZSOOOT.ZZOJJTTTVVVJTIIIIVJ####.VJ",
+  "startedAt": "2026-07-16T18:29:50.283Z",
+  "timeElapsed": 147000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1784045387295.0952,
+  "_id": "j57bc1ds6rbrtcr9babbt3cezs8ah9vc",
+  "day": "2026-07-14",
+  "grid": "ZZJJJJ#.ZZZTJ#PPOOTTTPPPOTS.VVVOOSSVLIIIISVLLLU.U####UUU",
+  "startedAt": "2026-07-14T13:13:29.135Z",
+  "timeElapsed": 267000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1783963425302.6055,
+  "_id": "j574z86c2s6rq8qhtw3rx3qqt98afnfm",
+  "day": "2026-07-13",
+  "grid": "OOUUUZ#.OUSUZ#LOOSSZZLPPPS.ZLLPPVVVJIIIITVJJJJ.TV####TTT",
+  "startedAt": "2026-07-13T17:20:47.236Z",
+  "timeElapsed": 177000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1783939475708.6575,
+  "_id": "j5712bnrmkydzn50t700hp3agh8ae7vy",
+  "day": "2026-07-13",
+  "grid": "TTTPIZ#.TPPIZ#STPPIZZSSOOI.ZVSOLLJJVOOLUUJVVVL.UJ####UUJ",
+  "startedAt": "2026-07-13T10:43:37.060Z",
+  "timeElapsed": 39000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1783867134405.1423,
+  "_id": "j5750k72xetwahxv2w5x8p56rx8acxak",
+  "day": "2026-07-12",
+  "grid": "UUVVVO#.UVOOO#UUVOTTTIIII.TJPPZZZTJPPSSZZJPSS.LJJ####LLL",
+  "startedAt": "2026-07-12T14:38:19.687Z",
+  "timeElapsed": 34000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1783654374548.6392,
+  "_id": "j57bf3a7qwxckjdyrm4254b2698a9eze",
+  "day": "2026-07-09",
+  "grid": "UUIVVV#.UIVLS#UUIVLSSJ.ILLOSJPPOOOTJPPOTTTJJPZZZT####.ZZ",
+  "startedAt": "2026-07-10T03:32:18.935Z",
+  "timeElapsed": 35000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1783604668696.9668,
+  "_id": "j5742fv2c9tgksjm0txjbpkj5x8a6btb",
+  "day": "2026-07-09",
+  "grid": "UUVVVZ#.UVOOZ#UUVOPZZT.OOPPZTTTLPPJTSSLLLJSSIIIIJ####.JJ",
+  "startedAt": "2026-07-09T13:43:31.837Z",
+  "timeElapsed": 56000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1783580163977.0378,
+  "_id": "j574rps4nsfwf890vn762nd8n98a6sc8",
+  "day": "2026-07-08",
+  "grid": "UUTTTZ#.ULTZZ#UULTZJJ.SLLZIJPSSOOIJPPSOVIJPPOOVI.####VVV",
+  "startedAt": "2026-07-09T06:18:03.246Z",
+  "timeElapsed": 193000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1783492019288.8845,
+  "_id": "j57e083m3ykwey2c657p4npyxn8a568m",
+  "day": "2026-07-07",
+  "grid": "SSIIII#.SSPPP#LLLTPP.JZLTVVVJZTTTOVJZZOOOVJJZOU.U####UUU",
+  "startedAt": "2026-07-08T06:26:04.836Z",
+  "timeElapsed": 53000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1783012962908.3691,
+  "_id": "j574wtf7cd3msq4wynptf63ggs89rvpf",
+  "day": "2026-07-02",
+  "grid": "IIIISS#.UUSSP#Z.UOOPPZUUOVPPZZOOVJJLZVVVTJLLLTTTJ####.TJ",
+  "startedAt": "2026-07-02T17:22:06.489Z",
+  "timeElapsed": 31000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1782948837337.8945,
+  "_id": "j575d3dy1tnq3xct3vhssbd0e589pzsm",
+  "day": "2026-07-01",
+  "grid": "TTTSOO#.TSSOZ#.TSOOZZVVVLLLZVPPLJJZVPPPJUUIIIIJU.####JUU",
+  "startedAt": "2026-07-01T23:31:40.495Z",
+  "timeElapsed": 111000.0,
+  "username": "TIF"
+ },
+ {
+  "_creationTime": 1782941195737.2788,
+  "_id": "j57acs5y1c2kz005903s2v0h9h89p3r3",
+  "day": "2026-07-01",
+  "grid": "JJPLLL#.JPPSL#.JPPSSVIJZZZSVIZZOVVVIOOOTUUIOTTTU.####TUU",
+  "startedAt": "2026-07-01T20:50:29.911Z",
+  "timeElapsed": 510000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1782932408820.9595,
+  "_id": "j57dgcqhc22ygrjdgp8czfbhs589p74p",
+  "day": "2026-07-01",
+  "grid": "VVVUUU#.ZVUOU#.ZVPOOOZZPPISOZLPPISSJLLLITSJJJJIT.####TTT",
+  "startedAt": "2026-07-01T18:48:41.163Z",
+  "timeElapsed": 673000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1782838508986.3965,
+  "_id": "j579y633epda7kz796gd0sm2tx89ngye",
+  "day": "2026-06-30",
+  "grid": "JJVVV.#IJOOVZ#IJTOVZZIJTOOPZITTTPPZUUUSPPLU.USS.L####SLL",
+  "startedAt": "2026-06-30T16:50:58.555Z",
+  "timeElapsed": 249000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1782779620815.8958,
+  "_id": "j571ve8nactc74xb8dv3kaeyfd89mc0e",
+  "day": "2026-06-29",
+  "grid": "VIIII.#VLLLTS#VVVLTSSPPZTTTSPPZOOJJPZZOUUJ.ZOO.UJ####UUJ",
+  "startedAt": "2026-06-30T00:33:11.361Z",
+  "timeElapsed": 29000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1782621783256.5527,
+  "_id": "j57be1kp8csb9r1ajh9g455b6x89g31h",
+  "day": "2026-06-27",
+  "grid": "IJJJJ.#IJUUSS#IVUOOSSIVUUOLLTVVVOOLTTTZZ.LTZZZPPP####PP.",
+  "startedAt": "2026-06-28T04:40:20.683Z",
+  "timeElapsed": 303000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1782583755835.5479,
+  "_id": "j579p03thd3r8xnk0x69a744cx89ejc4",
+  "day": "2026-06-27",
+  "grid": "IPPOO.#IPPOTS#IPOOTSSIUUTTTSLLUVJJZLUUVJ.ZLVVVJZZ####JZ.",
+  "startedAt": "2026-06-27T18:08:53.147Z",
+  "timeElapsed": 22000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1782505541632.0178,
+  "_id": "j577e67ff37wvbffc4sb77hrc189cvzj",
+  "day": "2026-06-26",
+  "grid": "VVVOI.#VOOOIZ#VOPPIZZJPPPILZJSTTTLZJSST.LLJJSTUUU####U.U",
+  "startedAt": "2026-06-26T20:24:57.038Z",
+  "timeElapsed": 44000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1782400710068.798,
+  "_id": "j579t2ryvtt790g8xedhhdxz6x89as8n",
+  "day": "2026-06-25",
+  "grid": "PPZZZ.#PPSSZZ#PSSIIIIVVVJJJJVOOJTTTVOU.UTLOOUUUTL####.LL",
+  "startedAt": "2026-06-25T15:17:52.414Z",
+  "timeElapsed": 37000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1782284936016.2512,
+  "_id": "j57azbw48sfcjtv607p9jbwve989998s",
+  "day": "2026-06-24",
+  "grid": "PPPSS.#PPSSVZ#IIIIVZZJJVVVOZJLLOOOZJL.OTUUJLTTTU.####TUU",
+  "startedAt": "2026-06-24T07:08:29.797Z",
+  "timeElapsed": 26000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1782246207345.0833,
+  "_id": "j57c4pqbvzkwmdpkpz2w0acysh896cbk",
+  "day": "2026-06-23",
+  "grid": "VVVLL.#VPPLOO#VPPLOJJISPOOTJISSTTTJI.SZZTJIZZZU.U####UUU",
+  "startedAt": "2026-06-23T20:22:50.702Z",
+  "timeElapsed": 34000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1782226820503.0984,
+  "_id": "j5799jhjne1wekbss9c5af105x8963zq",
+  "day": "2026-06-23",
+  "grid": "IJJJJ.#IJLLSP#IZLSSPPIZLSOPPVZZTOOOV.ZTTTOVVVTU.U####UUU",
+  "startedAt": "2026-06-23T14:59:29.014Z",
+  "timeElapsed": 51000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1781921345802.1707,
+  "_id": "j5775pqtaq33n9arr43e9nezms890q74",
+  "day": "2026-06-19",
+  "grid": "PPVVV.#PPOOVZ#PSSOVZZSSLOOTZLLLJ.TZJJJJTTTIIIIUUU####U.U",
+  "startedAt": "2026-06-20T02:07:36.237Z",
+  "timeElapsed": 67000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1781789962631.8276,
+  "_id": "j5714z11rdh0kyrjkg3w5hnj5988xbpk",
+  "day": "2026-06-18",
+  "grid": "VVVTS.#VOOTSS#VOTTTSZOOJUUZZPPJ.UZIPPJUUZIPJJLLLI####.LI",
+  "startedAt": "2026-06-18T13:38:20.821Z",
+  "timeElapsed": 233000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1781753414702.8716,
+  "_id": "j573d9vgce8mnady9dh9ywq3wd88wctf",
+  "day": "2026-06-17",
+  "grid": "JJJJZ.#JPLSZZ#PPLSSZIPPLLSZIVU.UOOIVUUUOTIVVVOOT.####TTT",
+  "startedAt": "2026-06-18T03:29:46.154Z",
+  "timeElapsed": 28000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1781708420029.272,
+  "_id": "j575qqvjgzm8pbrqhs4sq3sb5s88t0qn",
+  "day": "2026-06-17",
+  "grid": "PPVVV.#PPLLVS#IPLTVSSIJLTTTSIJ.TZZZIJOZZUUJJOOOU.####OUU",
+  "startedAt": "2026-06-17T14:57:51.015Z",
+  "timeElapsed": 148000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1781640022760.2588,
+  "_id": "j57d7jn2cyfkfthw28adbv0mes88skh2",
+  "day": "2026-06-16",
+  "grid": "LLLZZ.#LZZZSS#TIIIISSTTTJJJJT.OVPPJOOOVPPPOVVVU.U####UUU",
+  "startedAt": "2026-06-16T19:59:48.292Z",
+  "timeElapsed": 34000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1781628068382.6892,
+  "_id": "j5745dqr32f19ermdfg0213gv988sqj4",
+  "day": "2026-06-16",
+  "grid": "VVVPP.#VOOPPP#VOTIIIIOOTTTZZL.TZZZJLSSJJJJLLSSU.U####UUU",
+  "startedAt": "2026-06-16T16:36:49.461Z",
+  "timeElapsed": 77000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1781490963768.8047,
+  "_id": "j574vzpm4p10smk62t5kd272mn88qaqw",
+  "day": "2026-06-14",
+  "grid": "VJJJJ.#VJIIII#VVVZZUUSZZZOU.SSOOOUULSOTTTPLLL.TPP####TPP",
+  "startedAt": "2026-06-15T02:35:27.280Z",
+  "timeElapsed": 36000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1781398962325.974,
+  "_id": "j57b3786c39qznstdekqtxrfws88njz2",
+  "day": "2026-06-13",
+  "grid": "PPPUU.#LPPUSS#LZZUUSSLLZZZ.IVVVOJJIVOOOTJIVOTTTJI####TJ.",
+  "startedAt": "2026-06-14T01:02:20.703Z",
+  "timeElapsed": 21000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1781299684362.8337,
+  "_id": "j57armmrybbenm9652jb0qb5nd88hqw8",
+  "day": "2026-06-12",
+  "grid": "ILVVV.#ILLLVZ#ISOOVZZISSO.TZPPSOOTZPPPJTTTJJJJUUU####U.U",
+  "startedAt": "2026-06-12T21:27:40.325Z",
+  "timeElapsed": 23000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1781268268666.1423,
+  "_id": "j571769dyw7zwzq9t83sjbs43h88hq4h",
+  "day": "2026-06-12",
+  "grid": "LLSTZ.#LSSTZZ#LSTTTZVIIII.ZVPPOOVVVPPOJJJJPOOJUUU####U.U",
+  "startedAt": "2026-06-12T12:43:54.448Z",
+  "timeElapsed": 29000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1781192051910.2288,
+  "_id": "j57eg2ps4rrr5ejv0w2bj34r2988ft9y",
+  "day": "2026-06-11",
+  "grid": "JJZZZ.#JZZOOS#JTTTOSSJLT.OOSVLTIIIIVLLPPUUVVVPPPU####.UU",
+  "startedAt": "2026-06-11T15:33:12.813Z",
+  "timeElapsed": 58000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1781134488726.688,
+  "_id": "j574gkhg11b0ygj8pft16jgjex88dzsy",
+  "day": "2026-06-10",
+  "grid": "JJUUZ.#JLLUZZ#JLUUSZIJL.SSZIVVVSOOIVPPPOTIVPPOOT.####TTT",
+  "startedAt": "2026-06-10T23:33:31.907Z",
+  "timeElapsed": 59000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1781098558269.2788,
+  "_id": "j57dna0008afvgg3jac4yqtyn188dvbk",
+  "day": "2026-06-10",
+  "grid": "JJJJI.#VVVJIZ#VLLLIZZVL.TISZPTTTSSZPPOTSUUPPOOOU.####OUU",
+  "startedAt": "2026-06-10T13:31:19.427Z",
+  "timeElapsed": 390000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1781013894082.775,
+  "_id": "j57dpjpbq55qzpgvn445wqfm6588bbb2",
+  "day": "2026-06-09",
+  "grid": "JJJJI.#VVVJIZ#VPPPIZZV.PPITZLLLOOTZLSSOTTTSSOOU.U####UUU",
+  "startedAt": "2026-06-09T14:03:55.218Z",
+  "timeElapsed": 58000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1780961859393.1008,
+  "_id": "j579mh7qbme4yke51mg19s5ty5888cqe",
+  "day": "2026-06-08",
+  "grid": "JJJJP.#JLLLPP#TTTLPPS.TOOZSSVTOZZSIVOOZUUIVVVZ.UI####UUI",
+  "startedAt": "2026-06-08T23:37:20.734Z",
+  "timeElapsed": 18000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1780947762249.0457,
+  "_id": "j57a0mfr138pjvv1jjhm2da3bn889yrg",
+  "day": "2026-06-08",
+  "grid": "VVVZZ.#VZZZLS#VTLLLSS.TIIIISTTTOOJJPPPOUUJPPOO.UJ####UUJ",
+  "startedAt": "2026-06-08T19:42:15.310Z",
+  "timeElapsed": 24000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1780854217973.4407,
+  "_id": "j576stq87zmejyrdwrqskr0aj1887c29",
+  "day": "2026-06-07",
+  "grid": "VVVPP.#JJVPPP#JIVSSZ.JISSOZZJIOOOTZLIOTTTZLLL.UTU####UUU",
+  "startedAt": "2026-06-07T17:42:54.272Z",
+  "timeElapsed": 43000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1780728759574.3599,
+  "_id": "j572sn9b9hfwgcqv96289grkex8846t2",
+  "day": "2026-06-05",
+  "grid": "JJJJS.#VPPJSS#VPPP.SIVVVTTTILUUUTZILUOUTZILLOOOZZ####O.Z",
+  "startedAt": "2026-06-06T06:51:01.263Z",
+  "timeElapsed": 137000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1780675334820.4187,
+  "_id": "j57azrkmpb278801pwk68xt819883jhh",
+  "day": "2026-06-05",
+  "grid": "IOZZZ.#IOOOZZ#ILLO.SSILJTSSVPLJTTTVPPJTVVVPPJJUUU####U.U",
+  "startedAt": "2026-06-05T16:01:09.539Z",
+  "timeElapsed": 65000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1780556107034.4758,
+  "_id": "j571p5vx6b4xfs1pjvcmsqkfe5881gsc",
+  "day": "2026-06-03",
+  "grid": "VVVLL.#VOOLTZ#VO.LTZZOOSTTTZPPSSJJZPPPSJUUIIIIJU.####JUU",
+  "startedAt": "2026-06-03T07:01:29.028Z",
+  "timeElapsed": 95000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1780351109650.489,
+  "_id": "j579pcyd9q7we4bjmdg309nqqn87typz",
+  "day": "2026-06-01",
+  "grid": "JJJJI.#UUPJIS#.UPPISSUUPPIZSVOLLLZZVOOOLTZVVVO.TZ####TTT",
+  "startedAt": "2026-06-01T21:57:32.823Z",
+  "timeElapsed": 55000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1780270560833.6646,
+  "_id": "j577y6xv31kc8saap6g4yfpfsh87rtpb",
+  "day": "2026-05-31",
+  "grid": "IZZZ.T#IUUZZT#IUSSTTTIUUSSLLJJJJOOLPPPJVOLPP..VOO####VVV",
+  "startedAt": "2026-05-31T22:20:45.009Z",
+  "timeElapsed": 142000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1780173863754.4436,
+  "_id": "j570y72azwx4mw8cwpt6ahz4vx87p9yc",
+  "day": "2026-05-30",
+  "grid": "IOOU.U#IVOUUU#IVOOPJJIVVVPPJTLLLPPJTTTLSSJT.ZZZSS####ZZ.",
+  "startedAt": "2026-05-30T20:43:37.378Z",
+  "timeElapsed": 46000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1780126139848.8245,
+  "_id": "j573vqxgx7xppgz4hsdhk7rc6d87qk1q",
+  "day": "2026-05-30",
+  "grid": "VVVU.U#JLVUUU#JLVIPPPJLLISPPJJOISSZOOOITSZO.TTTZZ####TZ.",
+  "startedAt": "2026-05-30T07:28:36.644Z",
+  "timeElapsed": 23000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1780082514985.16,
+  "_id": "j572qe4akzdhhab8x5pbm2ezb587m2bb",
+  "day": "2026-05-29",
+  "grid": "IJPP.T#IJPPPT#IJSSTTTIJJSSOVLLLOOOVZZLOVVV.ZZZUUU####U.U",
+  "startedAt": "2026-05-29T19:21:26.808Z",
+  "timeElapsed": 28000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1780064610036.8455,
+  "_id": "j570v5d41ss3qf0x37d0vq5zts87nx67",
+  "day": "2026-05-29",
+  "grid": "OVVV.Z#OOOVTZ#PPOVTZZPPPTTTZLLLIIIISSLJJJJ.SSJUUU####U.U",
+  "startedAt": "2026-05-29T14:23:04.870Z",
+  "timeElapsed": 24000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1779865340074.2495,
+  "_id": "j57c2z3s5qdw4qxhzke9eewcdn87hpj8",
+  "day": "2026-05-27",
+  "grid": "IIII.Z#JLLSTZ#JLSSTZZJLSTTTZJJOVUUUOOOVU.UOVVVPP.####PPP",
+  "startedAt": "2026-05-27T07:01:22.547Z",
+  "timeElapsed": 36000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1779828876790.0837,
+  "_id": "j57f3dgsxk4z45f4cewdkga9rx87fjx7",
+  "day": "2026-05-26",
+  "grid": "STTT.Z#SSTOOZ#LSTVOZZLLLVOOZJVVVPPPJJJJ.PPIIIIU.U####UUU",
+  "startedAt": "2026-05-26T20:54:16.073Z",
+  "timeElapsed": 20000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1779781378642.4592,
+  "_id": "j57dt0wmxta3z2hd6cr648gv9587fqb5",
+  "day": "2026-05-26",
+  "grid": "OZZZ.T#OOOZZT#SSOLTTTVSSLLLPVIIIIPPVVVJ.PPJJJJU.U####UUU",
+  "startedAt": "2026-05-26T07:40:59.298Z",
+  "timeElapsed": 117000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1779751835962.2246,
+  "_id": "j573y0p0ch0jn18r7c3989t1rn87c54c",
+  "day": "2026-05-25",
+  "grid": "PTTT.Z#PPTOOZ#PPTOZZSJJOOZSSJVUUUSIJVU.ULIJVVV.LI####LLI",
+  "startedAt": "2026-05-25T23:29:58.745Z",
+  "timeElapsed": 37000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1779643508044.8594,
+  "_id": "j571c3de3ssd01a039ck9bmjsn87bkq8",
+  "day": "2026-05-24",
+  "grid": "LLLU.U#OOLUUU#IOJJJJZIOOPPJZITPPPZZIT.SSZVTTT.SSV####VVV",
+  "startedAt": "2026-05-24T17:18:54.111Z",
+  "timeElapsed": 372000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1779606762222.1426,
+  "_id": "j571dr2ks32tw98tr35kkhwpq987agg5",
+  "day": "2026-05-24",
+  "grid": "LLLU.U#LSSUUU#SSJJJJIVVVPPJIVTPPPZIVT.OOZITTT.OZZ####OOZ",
+  "startedAt": "2026-05-24T07:12:19.183Z",
+  "timeElapsed": 22000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1779485226441.0793,
+  "_id": "j5772arjjmffz98csp19f2m61h877d9y",
+  "day": "2026-05-22",
+  "grid": "IIII.Z#JJJJTZ#JSOOTZZSSOTTTZSOOVVVL.PPVLLLPPPVUUU####U.U",
+  "startedAt": "2026-05-22T21:26:29.779Z",
+  "timeElapsed": 26000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1779396379879.662,
+  "_id": "j57cr7tnz65k8cxc2qe8wtb9918744d1",
+  "day": "2026-05-21",
+  "grid": "VVVU.U#LLVUUU#LZVJJJJLZTSOOJZZTSSO.ZTTTSOOIIIIPPP####.PP",
+  "startedAt": "2026-05-21T20:45:28.853Z",
+  "timeElapsed": 50000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1779315762784.1846,
+  "_id": "j57db1n77wjj5c96pp0bx2n6wx8722fx",
+  "day": "2026-05-20",
+  "grid": "PPSS.L#PPPSSL#JJZTOLLJZZTOOOJZTTT.OJZVVVUUIIIIVU.####VUU",
+  "startedAt": "2026-05-20T22:22:17.449Z",
+  "timeElapsed": 25000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1779303569487.0942,
+  "_id": "j574rthxvwtpdfskzne3amznjn872tgb",
+  "day": "2026-05-20",
+  "grid": "LZZZ.V#LLLZZV#ISSVVVTIJSSTTTIJPPP.TIJOPPUUJJOOOU.####OUU",
+  "startedAt": "2026-05-20T18:58:54.773Z",
+  "timeElapsed": 34000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1779224025169.8225,
+  "_id": "j57cfbvpy8mhgs63jh389nj8td870d7z",
+  "day": "2026-05-19",
+  "grid": "IVVV.Z#IPPVTZ#IPPVTZZIPSTTTZLSSU.UJLSOUUUJLLOOO.J####OJJ",
+  "startedAt": "2026-05-19T20:53:10.289Z",
+  "timeElapsed": 29000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1779190884392.4026,
+  "_id": "j5752azw68rdg3b91hnr9j39wx871pnr",
+  "day": "2026-05-19",
+  "grid": "LLLU.U#LOOUUU#JJOPPPZIJOOPPZIJTS.ZZIJTSSZVITTTS.V####VVV",
+  "startedAt": "2026-05-19T11:40:58.712Z",
+  "timeElapsed": 25000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1779135816347.5496,
+  "_id": "j578ta5tcp5syna51eh5bs6t3h86y4qg",
+  "day": "2026-05-18",
+  "grid": "VVVU.U#VOOUUU#VOLLLZZOOLZZZIPPP.SSIJPPSSTIJJJJ.TI####TTT",
+  "startedAt": "2026-05-18T20:22:49.793Z",
+  "timeElapsed": 46000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1779113248775.7273,
+  "_id": "j572rxfkhvrtxkfkpbm98jraes86y61y",
+  "day": "2026-05-18",
+  "grid": "OVVV.Z#OOOVTZ#LLOVTZZLPPTTTZLPP.SJIUPUSSJIUUUS.JI####JJI",
+  "startedAt": "2026-05-18T14:05:01.046Z",
+  "timeElapsed": 147000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1779051439614.6233,
+  "_id": "j57f05ha4amvgsncp22j4cged186wrfk",
+  "day": "2026-05-17",
+  "grid": "JJJJ.S#JTTTSS#LLTUSUZILTUUUZIL.OOZZIPPPOZVIPP.OOV####VVV",
+  "startedAt": "2026-05-17T20:56:42.840Z",
+  "timeElapsed": 36000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1779050266857.2212,
+  "_id": "j572j5hmh11358chdgh7b090rn86x9r9",
+  "day": "2026-05-17",
+  "grid": "LLSS.T#LSSTTT#LPPPUTUJZPPUUUJZ.VVVIJZZOOVIJJZ.OVI####OOI",
+  "startedAt": "2026-05-17T20:36:41.908Z",
+  "timeElapsed": 43000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1778975215015.5566,
+  "_id": "j57afwtvtcp72dd8gzb8vr2cvn86vm9q",
+  "day": "2026-05-16",
+  "grid": "VVVU.U#OOVUUU#IOVPPLLIOOPPPLI.JJJJLIZZZTJSZZTTTSS####TS.",
+  "startedAt": "2026-05-16T23:46:15.617Z",
+  "timeElapsed": 92000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1778948560779.1885,
+  "_id": "j5714srm3vxky702v4ws8cy7ks86vqcv",
+  "day": "2026-05-16",
+  "grid": "PPPU.U#PPOUUU#OOOJJJJOSSJTTTV.SSITZVLLLITZVVVLIZZ####IZ.",
+  "startedAt": "2026-05-16T16:21:21.194Z",
+  "timeElapsed": 79000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1778846315505.4954,
+  "_id": "j571dsp3prvpz45p5z53n40n9186r773",
+  "day": "2026-05-15",
+  "grid": "VVVU.U#VOOUUU#VOJIIIIOOJJJJL.STZLLLSSTZZPPSTTTZPP####Z.P",
+  "startedAt": "2026-05-15T11:57:57.544Z",
+  "timeElapsed": 37000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1778760314171.61,
+  "_id": "j571r33vb9h5ktqt7vx03grwz186phkq",
+  "day": "2026-05-14",
+  "grid": "IOOU.U#IZOUUU#IZOOVVVIZZTVS.LLZTVSSLJTTTPSLJJJJPP####.PP",
+  "startedAt": "2026-05-14T12:04:40.637Z",
+  "timeElapsed": 33000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1778675931562.6543,
+  "_id": "j5786bx26s7sy6ec0199p9dsv186n6d9",
+  "day": "2026-05-13",
+  "grid": "SVVV.Z#SSTVZZ#ISTVZLLITTTZ.LIOOPJJLIOPPJUUOOPPJU.####JUU",
+  "startedAt": "2026-05-13T12:37:13.165Z",
+  "timeElapsed": 97000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1778587147887.9995,
+  "_id": "j576pvg93bfzx3qz671zdapyqh86jb6v",
+  "day": "2026-05-12",
+  "grid": "PPOO.T#PPOTTT#POOUUTZLLSU.ZZLSSUUZJLSVVVZJIIIIV.J####VJJ",
+  "startedAt": "2026-05-12T11:58:41.112Z",
+  "timeElapsed": 79000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1778572226300.896,
+  "_id": "j57bxhn5j9f40v107nraac04z986kzcq",
+  "day": "2026-05-12",
+  "grid": "PPLL.S#PPPLSS#JJZLSOOIJZZ.OVIJTZOOVIJTZVVVITTTU.U####UUU",
+  "startedAt": "2026-05-12T07:50:02.912Z",
+  "timeElapsed": 235000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1778536347489.2803,
+  "_id": "j57d9am4p739tc3ev0q5bzrdkx86gmd4",
+  "day": "2026-05-11",
+  "grid": "VVVU.U#VTOUUU#VTOOOLITTT.OLIJJJJLLIJSSZZZISSZZ.PP####PPP",
+  "startedAt": "2026-05-11T21:47:29.850Z",
+  "timeElapsed": 297000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1778484267814.2847,
+  "_id": "j574yn56tv976cgz3f8vmf32n186ge51",
+  "day": "2026-05-11",
+  "grid": "VVVU.U#VPPUUU#VPPPLLLIJJ.OZLIJOOOZZIJOSSTZIJSS.TZ####TTT",
+  "startedAt": "2026-05-11T07:23:40.754Z",
+  "timeElapsed": 46000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1778453903764.4858,
+  "_id": "j572tcyx5mf5rrf1yygrtq0yfn86fp6a",
+  "day": "2026-05-10",
+  "grid": "IIII.Z#PPSOOZ#PPSSOZZJP.SOOZJLLLTTTJLUUUTVJJU.UTV####VVV",
+  "startedAt": "2026-05-10T22:58:02.674Z",
+  "timeElapsed": 21000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1778435197193.7961,
+  "_id": "j57c8p7y5adwdr529j34kmhpg586era2",
+  "day": "2026-05-10",
+  "grid": "IIII.O#UUUOOO#UZUOJPPZZ.SJPPZTSSJLPZTSJJLVTTT.LLV####VVV",
+  "startedAt": "2026-05-10T17:42:59.487Z",
+  "timeElapsed": 216000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1778361076149.116,
+  "_id": "j57es91hg3a9gwk2k6etaec5kd86cjj1",
+  "day": "2026-05-09",
+  "grid": "OZZZ.T#OOOZZT#UUOITTTU.LIVVVUULIPPVJLLIPPVJJJJPSS####SS.",
+  "startedAt": "2026-05-09T21:10:16.977Z",
+  "timeElapsed": 306000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1778360143181.9766,
+  "_id": "j57f6ad2zvxn8t50j24agjc3e186d960",
+  "day": "2026-05-09",
+  "grid": "UUSS.V#UOOSSV#UUOVVVTL.OOTTTLLLZZZTJIIIIZZJJJJPPP####PP.",
+  "startedAt": "2026-05-09T20:53:11.917Z",
+  "timeElapsed": 147000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1778283146387.3188,
+  "_id": "j57bh9201xy6gzqr9cbfeyez9d86b516",
+  "day": "2026-05-08",
+  "grid": "LLLU.U#LPPUUU#PPPSVVV.ZSSVJJZZSOVJIZOOOTJIZOTTTJI####T.I",
+  "startedAt": "2026-05-08T23:31:38.055Z",
+  "timeElapsed": 45000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1778242014358.5835,
+  "_id": "j57ba2p7jvwc8en7382f9xskfx86a25t",
+  "day": "2026-05-08",
+  "grid": "VVVP.Z#VIJPPZ#VIJPPZZ.IJOOSZTIJJOSSTTTLOOSTLLLUUU####U.U",
+  "startedAt": "2026-05-08T12:05:57.262Z",
+  "timeElapsed": 56000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1778220192603.4048,
+  "_id": "j571b4xxmn1rnyvfd61ggm3nm986ac17",
+  "day": "2026-05-07",
+  "grid": "IPPU.U#IPPUUU#IPOZZZ.ILOOOZZVLSSOJJVLLSSTJVVVTTTJ####.TJ",
+  "startedAt": "2026-05-07T07:06:43.381Z",
+  "timeElapsed": 37000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1778136310947.5203,
+  "_id": "j57a6y5wnfbddvcetaaz0w3a4x86954x",
+  "day": "2026-05-06",
+  "grid": "JJJJ.S#JTTTSS#LLTZS.OILTZOOOILZZOPPIUZUVPPIUUUVP.####VVV",
+  "startedAt": "2026-05-06T07:40:52.966Z",
+  "timeElapsed": 37000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1778080558399.4888,
+  "_id": "j57b52vbzvqr86amda1b5wcbcs86762k",
+  "day": "2026-05-06",
+  "grid": "PPPJ.S#PPOJSS#OOOJS.TOZJJTTTZZIIIITZLVVVUUZLLLVU.####VUU",
+  "startedAt": "2026-05-06T11:54:58.453Z",
+  "timeElapsed": 443000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1778041617261.2576,
+  "_id": "j57816r6271hqy103jthansccn867259",
+  "day": "2026-05-05",
+  "grid": "PPUU.T#PPUTTT#ZPUU.TOZZIJOOOLZIJOSSLZIJSSVLLIJJ.V####VVV",
+  "startedAt": "2026-05-06T04:26:25.451Z",
+  "timeElapsed": 31000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1778008928383.3818,
+  "_id": "j57cfghn199a0ad0vjnsjgzp5n8656jv",
+  "day": "2026-05-05",
+  "grid": "STTT.O#SSTOOO#JSTO.ZZJPPZZZVJPPLLLVJJPLVVVIIIIU.U####UUU",
+  "startedAt": "2026-05-05T19:19:50.481Z",
+  "timeElapsed": 137000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1777932250006.5579,
+  "_id": "j57a1pfm6zxrezb3bdc44vbzvx862nnf",
+  "day": "2026-05-04",
+  "grid": "IIII.T#ZOOTTT#ZZO.UTUJZOOUUUJZPPPLLJSSPPLVJJSS.LV####VVV",
+  "startedAt": "2026-05-04T22:03:22.736Z",
+  "timeElapsed": 47000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1777930362304.5017,
+  "_id": "j57eprmhrf6fag1ctxrnq0063n863957",
+  "day": "2026-05-04",
+  "grid": "VVVL.Z#VLLLTZ#VPP.TZZIPPTTTZIPSOOJJISSOUUJISOO.UJ####UUJ",
+  "startedAt": "2026-05-04T21:28:49.736Z",
+  "timeElapsed": 262000.0,
+  "username": "TIF"
+ },
+ {
+  "_creationTime": 1777860353428.435,
+  "_id": "j570mxszsfd2m7hbc72jt3hks9863hjs",
+  "day": "2026-05-03",
+  "grid": "JJZU.U#JZZUUU#JZ.IIIIJZTVVVOTTTVOOOPPTVOSSPPP.SSL####LLL",
+  "startedAt": "2026-05-04T02:04:06.262Z",
+  "timeElapsed": 107000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1777759755335.8594,
+  "_id": "j578gp7b8c259t5m9t0vtnge8d85zgwc",
+  "day": "2026-05-02",
+  "grid": "OZZZ.T#OOOZZT#I.OJTTTILLJJJJILVUUPPILVUPPPVVVUUSS####SS.",
+  "startedAt": "2026-05-02T22:08:14.271Z",
+  "timeElapsed": 121000.0,
+  "username": "ALU"
+ },
+ {
+  "_creationTime": 1777734861033.7278,
+  "_id": "j576engk2a6qp0xaytvzg3mgxs85ynmv",
+  "day": "2026-05-02",
+  "grid": "TZZZ.J#TTTZZJ#T.OUUJLOOOUJJLOSSUULLSSVVVPPIIIIVPP####VP.",
+  "startedAt": "2026-05-02T15:13:20.730Z",
+  "timeElapsed": 60000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1777731985968.5596,
+  "_id": "j57bcrvbj87d47c7ag5dx5fwzx85zx2f",
+  "day": "2026-05-02",
+  "grid": "VVVU.U#VZZUUU#V.ZZZOOLLPPPOJLTPPOOJLTIIIIJTTTSSJJ####SS.",
+  "startedAt": "2026-05-02T14:25:49.062Z",
+  "timeElapsed": 36000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1777663514697.8413,
+  "_id": "j574c90hzb04m553fyav7jwyad85whpg",
+  "day": "2026-05-01",
+  "grid": "OZZZ.T#OOOZZT#.SOVTTTSSPVLLLSPPVVVLJPPIIIIJJJJUUU####U.U",
+  "startedAt": "2026-05-01T19:23:30.557Z",
+  "timeElapsed": 103000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1777609717963.5063,
+  "_id": "j57f9n25vxc3jjb6bapgjyrby185wfta",
+  "day": "2026-05-01",
+  "grid": "VVVU.U#LLVUUU#.LVJPPPILZJPPTIZZJTTTIZOJJSTIZOOOSS####O.S",
+  "startedAt": "2026-05-01T04:27:32.671Z",
+  "timeElapsed": 552000.0,
+  "username": "ALU"
+ },
+ {
+  "_creationTime": 1777564653692.5566,
+  "_id": "j57d29q6eaa4kc3aqha4n46yx985v150",
+  "day": "2026-04-30",
+  "grid": "VVV.OO#VLLZTO#VLZZTOOILZTTTJISZJJJJISSPPUUI.SPPPU####.UU",
+  "startedAt": "2026-04-30T15:53:07.156Z",
+  "timeElapsed": 266000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1777554525496.7903,
+  "_id": "j570cwnarsx27n9x7yenj1n0ps85vd4e",
+  "day": "2026-04-30",
+  "grid": "ILS.OO#ILSSVO#ILLSVOOIZZZVVVZZPPPJJUUUPPTJU.UTTTJ####.TJ",
+  "startedAt": "2026-04-30T13:08:02.392Z",
+  "timeElapsed": 192000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1777475596654.1106,
+  "_id": "j574s2f5j143mjtrv87gx03a7585r51x",
+  "day": "2026-04-29",
+  "grid": "ILL.OO#ILPPVO#ILPPVOOISZPVVVSSZJJJJSZZJTUU.ZTTTU.####TUU",
+  "startedAt": "2026-04-29T15:11:49.038Z",
+  "timeElapsed": 87000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1777393451211.482,
+  "_id": "j573nb8tcab3dt88jkj528596x85pwzb",
+  "day": "2026-04-28",
+  "grid": "LLL.OO#LSSJJO#SSPJTOOVPPJTTTVPPJTZZVVVZZZ.IIIIU.U####UUU",
+  "startedAt": "2026-04-28T16:23:48.609Z",
+  "timeElapsed": 22000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1777389630199.5054,
+  "_id": "j571y0g8c0472qk6h7ye2spxsn85qhm1",
+  "day": "2026-04-28",
+  "grid": "VVV.OO#VTSJJO#VTSSJOOTTTSJPPLZZZJPPLLLZZP.IIIIU.U####UUU",
+  "startedAt": "2026-04-28T15:20:05.840Z",
+  "timeElapsed": 24000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1777386171773.0715,
+  "_id": "j5728v4pez5rw55mmqxp2agrzd85q1jp",
+  "day": "2026-04-28",
+  "grid": "TTT.PP#LTIPPP#LTIVVVZLLIVOOZSSIVOZZJSSOOZ.JJJJU.U####UUU",
+  "startedAt": "2026-04-28T14:21:55.730Z",
+  "timeElapsed": 55000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1777328581462.0923,
+  "_id": "j5723w7sgs1hn5xhamwkva1scs85nm2a",
+  "day": "2026-04-27",
+  "grid": "ZZZ.OO#ITZZVO#ITTTVOOITJJVVVISSJUUUSSLJU.ULLLJ.PP####PPP",
+  "startedAt": "2026-04-27T22:21:35.213Z",
+  "timeElapsed": 303000.0,
+  "username": "ALU"
+ },
+ {
+  "_creationTime": 1777301855225.0745,
+  "_id": "j5790zb8t82x8svthyp5gy1s3d85ntbr",
+  "day": "2026-04-27",
+  "grid": "VVV.ST#VOOSST#VOLSTTTOOLIIIIZZLLUUUJZZZU.UJJJJ.PP####PPP",
+  "startedAt": "2026-04-27T14:56:18.697Z",
+  "timeElapsed": 258000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1777160216087.5251,
+  "_id": "j574aqqv75zvswg90327embqmh85gers",
+  "day": "2026-04-25",
+  "grid": "VVV.ZT#JJVZZT#JIVZTTTJIOZLLLJIOOOPLUIU.OPPUUUSSPP####SS.",
+  "startedAt": "2026-04-25T23:34:40.155Z",
+  "timeElapsed": 133000.0,
+  "username": "TIF"
+ },
+ {
+  "_creationTime": 1777030482786.3818,
+  "_id": "j57538j64p88cm725dezk0gje985fcrf",
+  "day": "2026-04-24",
+  "grid": "TTT.OO#ITLJVO#ITLJVOOILLJVVVISJJPPPSS.ZZPPSZZZUUU####U.U",
+  "startedAt": "2026-04-24T11:34:01.517Z",
+  "timeElapsed": 41000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1776979031154.718,
+  "_id": "j579bj0gnncw4gaspm1y23azwx85cg59",
+  "day": "2026-04-23",
+  "grid": "JVU.UT#JVUUUT#JVVVTTTJJZZPPIZZZPPPIL.SSOOILLLSSOI####.OO",
+  "startedAt": "2026-04-23T21:16:34.731Z",
+  "timeElapsed": 36000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1776946639668.382,
+  "_id": "j57e7ch6yr6wkc8x1x9nxf72f185dc21",
+  "day": "2026-04-23",
+  "grid": "LLL.ZT#ISLZZT#ISSZTTTIJSZPPPIJJJJPPU.UOVVVUUUOOOV####.OV",
+  "startedAt": "2026-04-23T12:09:05.277Z",
+  "timeElapsed": 113000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1776862085140.098,
+  "_id": "j57bnbtcffpsybs7gewtxjy6cn85axhw",
+  "day": "2026-04-22",
+  "grid": "ILS.OO#ILSSVO#ILLSVOOIPPJVVVPPPJJJJ.ZZZTUUZZTTTU.####TUU",
+  "startedAt": "2026-04-22T12:47:28.481Z",
+  "timeElapsed": 36000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1776857093278.5928,
+  "_id": "j572yespd76njcpe7fq54883k985bv39",
+  "day": "2026-04-22",
+  "grid": "VVV.OO#VTUUUO#VTUJUOOTTTJJJJSSZZLLL.SSZZZLIIIIPP.####PPP",
+  "startedAt": "2026-04-22T11:22:16.620Z",
+  "timeElapsed": 156000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1776778167325.0117,
+  "_id": "j577s1mpnyc18as31f10f06bs5859b61",
+  "day": "2026-04-21",
+  "grid": "JJU.UT#JPUUUT#JPPSTTTJPPSSOOIIIISO.LZZZOOVLLLZZ.V####VVV",
+  "startedAt": "2026-04-21T13:28:06.062Z",
+  "timeElapsed": 81000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1776775952213.3025,
+  "_id": "j577erbsyhwc59y42sym47cjs9859exk",
+  "day": "2026-04-21",
+  "grid": "VVV.ZZ#VTZZZJ#VTJJJJSTTTLLSSPOOLIS.PPOLIUUPPOOI.U####IUU",
+  "startedAt": "2026-04-21T12:50:55.798Z",
+  "timeElapsed": 96000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1776711757454.4602,
+  "_id": "j5705wfecxa6ryjbskt3pmja0s857v0e",
+  "day": "2026-04-20",
+  "grid": "LLL.OO#LJJJJO#IIIIJOOVVVSZUUVTSSZ.UVTSZZUUTTTZ.PP####PPP",
+  "startedAt": "2026-04-20T19:01:02.823Z",
+  "timeElapsed": 94000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1776703950982.4714,
+  "_id": "j576hm3103hjeese0yh7vp0hr5856qq1",
+  "day": "2026-04-20",
+  "grid": "LLL.JV#LJJJJV#PPZVVVOPPZZOOOPSTZO.ISSTZUUISTTT.UI####UUI",
+  "startedAt": "2026-04-20T16:51:54.291Z",
+  "timeElapsed": 36000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1776629773670.8694,
+  "_id": "j575es7e2rgq436k0dpmhh4gm1854qpc",
+  "day": "2026-04-19",
+  "grid": "LLL.SS#LITSSZ#JITTTZZJITUUUZJIVU.UZJJVOOPPVVV.OPP####OOP",
+  "startedAt": "2026-04-19T20:14:51.717Z",
+  "timeElapsed": 226000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1776549075931.893,
+  "_id": "j5785hg91s7s1zetpj0bqt7yvn852ht8",
+  "day": "2026-04-18",
+  "grid": "LLU.UZ#ILUUUZ#ILVVVZZITVPPPZITV.PPOTTTJOOOJJJJOSS####SS.",
+  "startedAt": "2026-04-18T21:50:20.669Z",
+  "timeElapsed": 51000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1776435449280.308,
+  "_id": "j57fqer3t42nqbqf649cmrygtd8506by",
+  "day": "2026-04-17",
+  "grid": "PPP.OO#IPPTZO#ITTTZOOILLTZZVIL.SSZVJLSSVVVJJJJUUU####U.U",
+  "startedAt": "2026-04-17T14:17:01.711Z",
+  "timeElapsed": 27000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1776431018253.2085,
+  "_id": "j574xmmr92sh7brjvcx382fzb5851c7x",
+  "day": "2026-04-17",
+  "grid": "SLL.OO#SSLPPO#TSLPPOOTTTPVVVTU.UVZIJUUUVZIJJJJZZI####Z.I",
+  "startedAt": "2026-04-17T12:56:25.329Z",
+  "timeElapsed": 234000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1776349521311.884,
+  "_id": "j57acazmes2mbjq58byfavnj0184yhae",
+  "day": "2026-04-16",
+  "grid": "PPP.OT#PPOOOT#JZOVTTTJZZVLLLJ.ZVVVLJJZSSUUIIIISSU####.UU",
+  "startedAt": "2026-04-16T14:23:03.419Z",
+  "timeElapsed": 221000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1776263785131.4158,
+  "_id": "j57887v8cyn9s76v8gnhatqvzs84x4w4",
+  "day": "2026-04-15",
+  "grid": "VVV.ST#VLISST#VLISTTTLLIJJJJ.PIJZZZPPOZZUUPPOOOU.####OUU",
+  "startedAt": "2026-04-15T14:35:48.240Z",
+  "timeElapsed": 36000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1776206929355.4473,
+  "_id": "j571ae03vzs7sj0qa2kpmjf2ks84t8g9",
+  "day": "2026-04-14",
+  "grid": "VVV.OT#VLOOOT#VLOZTTTILLZSS.IPPZZSSIPPPZUUIJJJJ.U####JUU",
+  "startedAt": "2026-04-14T22:34:43.964Z",
+  "timeElapsed": 280000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1776187244026.8955,
+  "_id": "j57cy6tgn78x2k5byqecetk6s584taf4",
+  "day": "2026-04-14",
+  "grid": "ZZZ.PP#JJZZPP#IJLLPUUIJLOOU.IJLTOUUISSTOOVSSTTT.V####VVV",
+  "startedAt": "2026-04-14T12:26:59.433Z",
+  "timeElapsed": 208000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1776103128211.5513,
+  "_id": "j5748qgddbgjmwt0yth6fjmqhs84rg5y",
+  "day": "2026-04-13",
+  "grid": "OOU.UZ#IOUUUZ#IOOTVZZITTTV.ZISLTVVVSSLJJJJSLLJ.PP####PPP",
+  "startedAt": "2026-04-13T17:58:21.265Z",
+  "timeElapsed": 26000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1776003687423.5723,
+  "_id": "j572736yz02khw9ct78c3g953x84qg3s",
+  "day": "2026-04-12",
+  "grid": "VVV.OO#VZLLSO#VZLSSOOZZLS.JJZPIIIIJPPUUUTJPPU.UTJ####TTT",
+  "startedAt": "2026-04-12T14:19:22.585Z",
+  "timeElapsed": 124000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1775912374983.4905,
+  "_id": "j57d5bcqp8c1bnwtkpfaft85n184mnvd",
+  "day": "2026-04-11",
+  "grid": "ZZZ.OO#ITZZVO#ITTTVOOITL.VVVIPLLLUUPPJJJJUPPJSSUU####SS.",
+  "startedAt": "2026-04-11T12:57:06.853Z",
+  "timeElapsed": 147000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1775869938944.9458,
+  "_id": "j574vk0t00hmjxr16eg8ftwheh84npj9",
+  "day": "2026-04-10",
+  "grid": "IZZ.OO#IJZZZO#IJJJJOOIP.SSLLVPPTSSLVPPTTTLVVVTUUU####U.U",
+  "startedAt": "2026-04-11T01:11:44.956Z",
+  "timeElapsed": 32000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1775832127031.5835,
+  "_id": "j578g1yyjk85sc0bfjsw6jh2kx84jqfz",
+  "day": "2026-04-10",
+  "grid": "VVV.OO#VZLLLO#VZLIJOOZZ.IJPPZSTIJPPSSTIJJPSTTTUUU####U.U",
+  "startedAt": "2026-04-10T14:41:11.680Z",
+  "timeElapsed": 54000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1775662661630.379,
+  "_id": "j575esjy5mqsgn4d0yqfs7scwd84fhbd",
+  "day": "2026-04-08",
+  "grid": "VVV.SL#VPPSSL#VPPSLLJ.POJJJJOOOIIIIOZZZTUUZZTTTU.####TUU",
+  "startedAt": "2026-04-08T15:35:26.617Z",
+  "timeElapsed": 129000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1775660664909.15,
+  "_id": "j578fh78xk7h99aa5f3mb8cmgd84enq0",
+  "day": "2026-04-08",
+  "grid": "LLL.OO#LSSIVO#SSPIVOO.PPIVVVTPPIZZZTTTZZUUTJJJJU.####JUU",
+  "startedAt": "2026-04-08T15:03:34.394Z",
+  "timeElapsed": 116000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1775566529495.3606,
+  "_id": "j578ew672gytx6yjyz13nc376184dpfg",
+  "day": "2026-04-07",
+  "grid": "LLL.PP#LJJZPP#IJZZPT.IJZTTTVIJZOOTVISSOVVVSSOOU.U####UUU",
+  "startedAt": "2026-04-07T12:54:08.259Z",
+  "timeElapsed": 81000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1775565310492.588,
+  "_id": "j57fwvqfwztefgrfbevwn2sakx84d55r",
+  "day": "2026-04-07",
+  "grid": "PPZ.JJ#PPZOOJ#PZZOTJ.IZOOTJVILSTTTVILSSVVVILLSU.U####UUU",
+  "startedAt": "2026-04-07T12:32:51.587Z",
+  "timeElapsed": 138000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1775498849560.8071,
+  "_id": "j57a7xsd5z3y29ssrayymw220184b39w",
+  "day": "2026-04-06",
+  "grid": "SOO.PP#SSOPPP#JSOOU.UJJJJUUUIIIIVVVLLLZZTVLZZZ.TV####TTT",
+  "startedAt": "2026-04-06T18:06:41.294Z",
+  "timeElapsed": 78000.0,
+  "username": "ALU"
+ },
+ {
+  "_creationTime": 1775477576618.4004,
+  "_id": "j572a2nenz2htj8wrd19vcpyqd84ad4t",
+  "day": "2026-04-06",
+  "grid": "LLL.PP#LSSPPP#JZSSU.UJZOOUUUJZZOVVVJJZOOTVIIII.TV####TTT",
+  "startedAt": "2026-04-06T12:09:29.233Z",
+  "timeElapsed": 207000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1775437319595.3142,
+  "_id": "j5775n7wkmyr07j50meye5dgmh84bsfs",
+  "day": "2026-04-05",
+  "grid": "PPJ.SZ#PPJSSZ#IPJS.ZZIJJLLLZIOOLVVVIOUUUTVOOU.UTV####TTT",
+  "startedAt": "2026-04-06T01:01:11.625Z",
+  "timeElapsed": 47000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1775407135449.668,
+  "_id": "j57aamqg1emv24ak2xnzcvknh58481sb",
+  "day": "2026-04-05",
+  "grid": "IJJ.OO#IJTTTO#IJLT.OOIJLTSSZPLLSSZZPPUUUZVPPU.UZV####VVV",
+  "startedAt": "2026-04-05T16:37:55.991Z",
+  "timeElapsed": 59000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1775392109014.8,
+  "_id": "j57ckf0xj3pg59wydjx8h6dyw9849g25",
+  "day": "2026-04-05",
+  "grid": "PZZ.OO#PPZZZO#PPSS.OOISSJJJJILLJTTTILUUUTVILU.UTV####VVV",
+  "startedAt": "2026-04-05T12:27:20.462Z",
+  "timeElapsed": 68000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1775333832907.8362,
+  "_id": "j5757s909n5mfeq7frkb057dh18469t5",
+  "day": "2026-04-04",
+  "grid": "OOU.UT#IOUUUT#IOO.TTTILLVPPPISLVPPZSSLVVVZSJJJJZZ####JZ.",
+  "startedAt": "2026-04-04T20:16:26.257Z",
+  "timeElapsed": 46000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1775310304431.7703,
+  "_id": "j576b5dzpbwq96te7qy79at3vn847axw",
+  "day": "2026-04-04",
+  "grid": "OOU.UZ#VOUUUZ#VOO.SZZVVVTSSZLTTTJSPLLLTJPPIIIIJPP####JJ.",
+  "startedAt": "2026-04-04T13:44:18.237Z",
+  "timeElapsed": 42000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1775227266686.579,
+  "_id": "j573bf4qe16124ntfc4zzmqcqh8453s0",
+  "day": "2026-04-03",
+  "grid": "PZZ.OO#PPZZZO#PP.SSOOIJJTSSVIJLTTTVIJLTVVVIJLLUUU####U.U",
+  "startedAt": "2026-04-03T14:28:16.215Z",
+  "timeElapsed": 114000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1775148172859.7634,
+  "_id": "j571mbxpayza4hawh2cc7mm7bd842qge",
+  "day": "2026-04-02",
+  "grid": "PPU.UT#PPUUUT#P.ZZTTTZZZOLLIVOOOLJIVOSSLJIVVVSSJI####.JJ",
+  "startedAt": "2026-04-02T16:42:28.153Z",
+  "timeElapsed": 24000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1775138615813.387,
+  "_id": "j574e5r5k08x85gnkm3em7r2k1843gc2",
+  "day": "2026-04-02",
+  "grid": "PPT.UU#PPTTTU#P.TSUULOOSSLLLVOSIIIIVOOJJJJVVVZZZJ####.ZZ",
+  "startedAt": "2026-04-02T14:02:22.743Z",
+  "timeElapsed": 447000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1775085436601.331,
+  "_id": "j577rzbn28nsbg55d6kbckbvhx840c4b",
+  "day": "2026-04-01",
+  "grid": "LLL.OO#LPPPTO#.ZPPTOOZZSTTTJZSSJJJJZSVVVUUIIIIVU.####VUU",
+  "startedAt": "2026-04-01T23:16:31.309Z",
+  "timeElapsed": 45000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1775053787235.0369,
+  "_id": "j5743ze1m9faxnhcw074h3djr5840n4k",
+  "day": "2026-04-01",
+  "grid": "PPP.LV#PPLLLV#.SSVVVJSSOJJJJOOOIIIIOZZZTUUZZTTTU.####TUU",
+  "startedAt": "2026-04-01T14:17:24.476Z",
+  "timeElapsed": 307000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1775050293958.7512,
+  "_id": "j572r5avv3v28vrhy8tbmq8dnx840xmt",
+  "day": "2026-04-01",
+  "grid": "LLL.OO#UULJJO#.UZJIOOUUZJIPPVZZJIPPVZSSITPVVVSST.####TTT",
+  "startedAt": "2026-04-01T13:31:08.531Z",
+  "timeElapsed": 25000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1775019981948.2996,
+  "_id": "j570jpchjmadc67cn2xmvq83w1840n8c",
+  "day": "2026-03-31",
+  "grid": "VU.UOO#VUUULO#VVVSLOOJJSSLLIJTSPPPIJTTTPPIJT.ZZ.I####ZZZ",
+  "startedAt": "2026-04-01T05:04:33.397Z",
+  "timeElapsed": 108000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1774965129059.4634,
+  "_id": "j57a4aa4q70a0raq8qnkxpbfr183zh6y",
+  "day": "2026-03-31",
+  "grid": "PP.VVV#PPLLLV#PTLSSVIJTTTSSIJTZZZOIJZZOOOIJJ.OU.U####UUU",
+  "startedAt": "2026-03-31T13:50:47.309Z",
+  "timeElapsed": 81000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1774889405754.8608,
+  "_id": "j57ft9vmt8kxzyzvzqbdm30s5983xktz",
+  "day": "2026-03-30",
+  "grid": "LS.PPP#LSSPPO#LLSOOOTIZJOTTTIZJJJJTIZZUUUVI.ZU.UV####VVV",
+  "startedAt": "2026-03-30T16:48:22.730Z",
+  "timeElapsed": 102000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1774886505522.1973,
+  "_id": "j573jgdfmqj20yw39bsfw5b48s83wdnp",
+  "day": "2026-03-30",
+  "grid": "PP.LOO#PPPLVO#ZZLLVOOIZZZVVVISTTTJJISSTUUJI.ST.UJ####UUJ",
+  "startedAt": "2026-03-30T16:01:00.644Z",
+  "timeElapsed": 44000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1774834118692.832,
+  "_id": "j574qeq0m74hq1agm5psddbsn183w9p4",
+  "day": "2026-03-29",
+  "grid": "LU.UJI#LUUUJI#LLSSJIVZSSJJIVZTTTVVVZZTOOPP.ZT.OPP####OOP",
+  "startedAt": "2026-03-30T01:24:43.024Z",
+  "timeElapsed": 466000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1774827239990.5825,
+  "_id": "j57a9hsw67gm1vf4hb2s4d9g1983v1m3",
+  "day": "2026-03-30",
+  "grid": "IU.UOO#IUUUJO#IJJJJOOIZPPVVVZZPPVLLZSSPVTLZ.SS.TL####TTT",
+  "startedAt": "2026-03-29T23:27:15.172Z",
+  "timeElapsed": 403000.0,
+  "username": "MYS"
+ },
+ {
+  "_creationTime": 1774794570287.5886,
+  "_id": "j575sb3m7wd5j4zjg0bmdg5nk583v2mb",
+  "day": "2026-03-29",
+  "grid": "JT.UUL#JTTTUL#JTVUULLJJVIIIIVVVZZZOSSZZOOO.SS.OPP####PPP",
+  "startedAt": "2026-03-29T14:27:20.363Z",
+  "timeElapsed": 122000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1774729815497.389,
+  "_id": "j579jtp59f65tgys3c2chkm0rs83sfk1",
+  "day": "2026-03-28",
+  "grid": "LL.TOO#LTTTVO#LSZTVOOSSZZVVVSPPZJUUPPPZJU.IIIIJUU####JJ.",
+  "startedAt": "2026-03-28T20:29:38.532Z",
+  "timeElapsed": 36000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1774711418141.2363,
+  "_id": "j5724y39yr44zwksmxyryp2dy983rw6s",
+  "day": "2026-03-28",
+  "grid": "LL.TOO#LTTTVO#LPPTVOOIPPPVVVIJJJJUUIJZZZU.IZZSSUU####SS.",
+  "startedAt": "2026-03-28T14:08:19.658Z",
+  "timeElapsed": 207000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1774634021356.0466,
+  "_id": "j57b1h1439nar55ntqbths3h7n83qrfa",
+  "day": "2026-03-27",
+  "grid": "LL.POO#JLTPPO#JLTPPOOJTTTVVVJJZZSSVZZZSS.VIIIIUUU####U.U",
+  "startedAt": "2026-03-27T17:52:38.713Z",
+  "timeElapsed": 62000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1774621952517.2942,
+  "_id": "j57c6xwrfwehrjxzrbrztv372s83q5zb",
+  "day": "2026-03-27",
+  "grid": "JJ.LLL#JSSLOO#JPSSOZIJPPOOZIVPPTZZIVTTTZ.IVVVTUUU####U.U",
+  "startedAt": "2026-03-27T14:31:23.356Z",
+  "timeElapsed": 68000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1774571085784.5876,
+  "_id": "j57bqw1g4ys5x6pe6v0xcem3ch83qmmf",
+  "day": "2026-03-26",
+  "grid": "ZU.UOO#ZUUUVO#ZZPPVOOIZPPVVVILPSSJJILSS.TJILLTTTJ####.TJ",
+  "startedAt": "2026-03-27T00:24:11.528Z",
+  "timeElapsed": 34000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1774565508040.1118,
+  "_id": "j57fb5xj9kk1yktnjkc5wnp31183n1xs",
+  "day": "2026-03-27",
+  "grid": "SS.VPP#ZSSVPP#ZVVVPTIZZOTTTILZOOOTILLLJO.IJJJJUUU####U.U",
+  "startedAt": "2026-03-26T22:49:15.912Z",
+  "timeElapsed": 150000.0,
+  "username": "MYS"
+ },
+ {
+  "_creationTime": 1774530439519.506,
+  "_id": "j57487ms1m6f7050dwe6heyzyh83m4cf",
+  "day": "2026-03-26",
+  "grid": "PP.VVV#PPUUUV#IPULUVTILLLTTTIOOSSZTIOSS.ZZOOJJJJZ####.JZ",
+  "startedAt": "2026-03-26T13:04:25.135Z",
+  "timeElapsed": 174000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1774455177356.3396,
+  "_id": "j5742frnnrsy31wxjmgs8vr3jx83jdpk",
+  "day": "2026-03-25",
+  "grid": "IU.UJZ#IUUUJZ#IVVVJZZIVTJJSZPVTTTSSPPT.OOSPPLLLO.####LOO",
+  "startedAt": "2026-03-25T16:12:30.140Z",
+  "timeElapsed": 27000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1774450680323.1948,
+  "_id": "j578xz3ypgajdf485vsvpa6btn83jhwd",
+  "day": "2026-03-25",
+  "grid": "PP.ZOO#PPPZVO#ILZZVOOILZJVVVILLJJJJISS.TUUSSTTTU.####TUU",
+  "startedAt": "2026-03-25T14:56:53.994Z",
+  "timeElapsed": 65000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1774363083363.4844,
+  "_id": "j574ew6hfkkaedc4zq8rvrf9c583gdxp",
+  "day": "2026-03-24",
+  "grid": "LS.POO#LSSPPO#LLSPPOOJJIIIITJVVVTTTJV.ZZZTJVZZU.U####UUU",
+  "startedAt": "2026-03-24T14:37:16.628Z",
+  "timeElapsed": 46000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1774355127797.277,
+  "_id": "j57fnk5e26sb68tnvheqcda1c183gkqd",
+  "day": "2026-03-24",
+  "grid": "LL.SOO#LPPSSO#LPPPSOOJJIIIITJVZZTTTJV.ZZZTJVVVU.U####UUU",
+  "startedAt": "2026-03-24T12:24:57.636Z",
+  "timeElapsed": 29000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1774289678378.5315,
+  "_id": "j572xx0hbrz249pagcj9cfnkx983eqv3",
+  "day": "2026-03-23",
+  "grid": "SS.POO#TSSPPO#TTTPPOOTJJILLZUUJILZZU.JILZVUUJI.ZV####VVV",
+  "startedAt": "2026-03-23T18:13:23.180Z",
+  "timeElapsed": 66000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1774288288458.5044,
+  "_id": "j576sj4y1hv6vqgmdvfwkg8spd83ff07",
+  "day": "2026-03-23",
+  "grid": "LL.TTT#LSOOTZ#LSSOTZZJJSOOIZJUUPPIZJ.UPPIVJUUP.IV####VVV",
+  "startedAt": "2026-03-23T17:47:32.074Z",
+  "timeElapsed": 232000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1774111734358.8528,
+  "_id": "j5710vaav306wfxhaz4haqjman83aqez",
+  "day": "2026-03-21",
+  "grid": "IJ.SZL#IJSSZL#IJSZZLLIJJZTUUVOTTTU.VOOOTUUVVVOPPP####PP.",
+  "startedAt": "2026-03-21T16:28:50.858Z",
+  "timeElapsed": 269000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1774095399966.2212,
+  "_id": "j577c2aabq42eftt9fp6wda3z183a9zb",
+  "day": "2026-03-21",
+  "grid": "VU.UJZ#VUUUJZ#VVVOJZZIOOOJJZIOSLLL.ISSLTPPISTTTPP####TP.",
+  "startedAt": "2026-03-21T12:15:36.195Z",
+  "timeElapsed": 63000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1773962931812.6023,
+  "_id": "j572cf0e2td3kqrfte07rtqg31837tqv",
+  "day": "2026-03-20",
+  "grid": "JJ.ZPP#IJZZPP#IJZTPSSIJZTSSVIOTTT.VLOOOVVVLLLOUUU####U.U",
+  "startedAt": "2026-03-19T23:26:23.847Z",
+  "timeElapsed": 146000.0,
+  "username": "MYS"
+ },
+ {
+  "_creationTime": 1773959484662.382,
+  "_id": "j576asgytp8djcr8wh83hf73q18371tb",
+  "day": "2026-03-19",
+  "grid": "IU.UOO#IUUUVO#IJJZVOOIJZZVVVLJZT.SSLJZTSSPLLTTTPP####.PP",
+  "startedAt": "2026-03-19T22:30:56.046Z",
+  "timeElapsed": 28000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1773772423328.5144,
+  "_id": "j57bj8h2hy1nswsv2c6kt7jvyh833gy6",
+  "day": "2026-03-17",
+  "grid": "IJ.PPP#IJSPPZ#IJSSLZZIJJSLTZVO.LLTZVOOOTTTVVVOU.U####UUU",
+  "startedAt": "2026-03-17T18:31:50.382Z",
+  "timeElapsed": 277000.0,
+  "username": "ALU"
+ },
+ {
+  "_creationTime": 1773763457201.7297,
+  "_id": "j576fwysvxm9edqw183pzdr44d8320cb",
+  "day": "2026-03-17",
+  "grid": "IJ.PPP#IJSPPZ#IJSSLZZIJJSLTZVO.LLTZVOOOTTTVVVOU.U####UUU",
+  "startedAt": "2026-03-17T16:03:28.883Z",
+  "timeElapsed": 48000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1773692119047.5989,
+  "_id": "j574ydn7ckrzprtcywnwtp16m18315r2",
+  "day": "2026-03-16",
+  "grid": "LL.ZOO#LPPZZO#LPPPZOOUUUVZSIU.UVSSIJVVVSTIJJJJ.TI####TTT",
+  "startedAt": "2026-03-16T20:13:58.123Z",
+  "timeElapsed": 80000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1773663936861.7605,
+  "_id": "j5726tpfdnfypsvq0d28rv7k8s831j19",
+  "day": "2026-03-16",
+  "grid": "PP.VVV#PPSSZV#PSSZZVOLLTZOOOL.TZOJJLTTTUUJIIII.UJ####UUJ",
+  "startedAt": "2026-03-16T12:08:50.583Z",
+  "timeElapsed": 223000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1773623636819.8618,
+  "_id": "j577csah4afsnbxk6csz5p6bdh831bs7",
+  "day": "2026-03-16",
+  "grid": "OO.ZZZ#VOZZSS#VOOSSLLVVVPPLIU.UPPLIUUUJPTIJJJJ.TI####TTT",
+  "startedAt": "2026-03-16T01:10:03.586Z",
+  "timeElapsed": 233000.0,
+  "username": "MYS"
+ },
+ {
+  "_creationTime": 1773612598882.7234,
+  "_id": "j57cqxtnp99df85t09x2cr63xn82yq74",
+  "day": "2026-03-15",
+  "grid": "SS.TTT#OSSLTJ#OOOLTJIUUOLLJI.UVZJJIUUVZZPIVVV.ZPP####ZPP",
+  "startedAt": "2026-03-15T22:09:20.732Z",
+  "timeElapsed": 36000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1773591234390.76,
+  "_id": "j572q1pq7t7bw9df458qbtge7n82yr4a",
+  "day": "2026-03-15",
+  "grid": "IU.UOO#IUUUTO#ILLLTOOILJTTTZ.SJPPZZSSJPPZVSJJ.PZV####VVV",
+  "startedAt": "2026-03-15T16:08:41.604Z",
+  "timeElapsed": 311000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1773577656224.7617,
+  "_id": "j575aaa4203k7ardh19hp5eyfx82z2mv",
+  "day": "2026-03-15",
+  "grid": "VU.UJZ#VUUUJZ#VVVSJZZOOSSJJZ.OSIIIILOOTTTPLLL.TPP####TPP",
+  "startedAt": "2026-03-15T12:26:34.486Z",
+  "timeElapsed": 61000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1773501341168.1602,
+  "_id": "j57494w4ffjsy9rmrvhfn1gwt982w20b",
+  "day": "2026-03-14",
+  "grid": "VU.UOO#VUUUPO#VVVPPOOIJTPPZ.IJTTTZZIJTLLLZIJJSSLZ####SS.",
+  "startedAt": "2026-03-14T15:14:38.317Z",
+  "timeElapsed": 62000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1773492669563.0737,
+  "_id": "j572pqdsw9rjkn3sjg7pczbsdx82xncg",
+  "day": "2026-03-14",
+  "grid": "VU.UOO#VUUUIO#VVVTIOOSTTTIZ.SSLTIZZJSLLLPZJJJJPPZ####PP.",
+  "startedAt": "2026-03-14T12:49:55.233Z",
+  "timeElapsed": 74000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1773414465795.846,
+  "_id": "j577rreq6ft2jjc4fvrtrgzzqx82tjdx",
+  "day": "2026-03-13",
+  "grid": "JJ.ZOO#JPPZZO#JPPPZOOJSLTZ.VSSLTTTVSLLTVVVIIIIUUU####U.U",
+  "startedAt": "2026-03-13T15:07:04.601Z",
+  "timeElapsed": 40000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1773404448154.0862,
+  "_id": "j572bp8jyxebj48rprm06ptfv982t1qb",
+  "day": "2026-03-13",
+  "grid": "VO.LLZ#VOOOLZ#VVVOLZZSIIII.ZSSTTTJJUSUTPPJUUUTPPJ####P.J",
+  "startedAt": "2026-03-13T12:16:21.852Z",
+  "timeElapsed": 266000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1773378417310.122,
+  "_id": "j576yd62kkwkrkpky77rrv99wh82tyaj",
+  "day": "2026-03-13",
+  "grid": "JJ.UUU#JSSUOU#JLSSOOOJLZZZ.OVLLTZZIVTTTPPIVVVTPPI####P.I",
+  "startedAt": "2026-03-13T05:03:54.527Z",
+  "timeElapsed": 181000.0,
+  "username": "MYS"
+ },
+ {
+  "_creationTime": 1773356042244.0542,
+  "_id": "j576wnfd3ebykr8cpbw5n31zfs82sr2f",
+  "day": "2026-03-13",
+  "grid": "UU.LLL#UTTTOL#UUTZOOOIPTZZ.OIPPVZJJIPPVZSJIVVVSSJ####S.J",
+  "startedAt": "2026-03-12T22:01:39.181Z",
+  "timeElapsed": 1300000.0,
+  "username": "MYS"
+ },
+ {
+  "_creationTime": 1773337678074.3936,
+  "_id": "j574twfw9gqxwzbc24n7smrfbs82rknp",
+  "day": "2026-03-12",
+  "grid": "IS.LLL#ISSOOL#IVSOUUJIVOO.UJTVVVUUJTTTZZJJTZZZPPP####.PP",
+  "startedAt": "2026-03-12T17:47:24.308Z",
+  "timeElapsed": 33000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1773330481642.5894,
+  "_id": "j570djfxj76x02ysk6ze13jhjs82ss97",
+  "day": "2026-03-12",
+  "grid": "IU.UOO#IUUUJO#IJJJJOOIPPL.SSVPPLSSTVPLLTTTVVVZZZT####.ZZ",
+  "startedAt": "2026-03-12T15:47:40.768Z",
+  "timeElapsed": 20000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1773258739251.2346,
+  "_id": "j57bpt9sf1dra53hpdf0b6wvts82qdhh",
+  "day": "2026-03-11",
+  "grid": "IJ.SLZ#IJSSLZ#IJSLLZZIJJ.PPZVVVOPPPVOOOTUUVOTTTU.####TUU",
+  "startedAt": "2026-03-11T19:51:25.912Z",
+  "timeElapsed": 53000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1773245491291.4697,
+  "_id": "j57dc76959w0jkgy6qe41qxegd82q39m",
+  "day": "2026-03-11",
+  "grid": "IU.UOO#IUUUJO#IJJJJOOIPP.VVVLPPPSSVLZZSSTVLLZZZT.####TTT",
+  "startedAt": "2026-03-11T16:10:35.341Z",
+  "timeElapsed": 122000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1773149949867.5288,
+  "_id": "j576w1pn9cp70crjt6v8jc95ps82ntnw",
+  "day": "2026-03-10",
+  "grid": "IU.UOO#IUUUJO#IJJJJOOIP.LLSSVPPLSSTVPPLTTTVVVZZ.T####ZZZ",
+  "startedAt": "2026-03-10T13:37:35.342Z",
+  "timeElapsed": 196000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1773131004376.3667,
+  "_id": "j57e4rcw87jd6svq1hsr7n6ay582n7vt",
+  "day": "2026-03-10",
+  "grid": "SS.VOO#ISSVTO#IVVVTOOIJ.TTTPIJJJJPPLLLZZPPLZZZU.U####UUU",
+  "startedAt": "2026-03-10T08:21:37.999Z",
+  "timeElapsed": 221000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1773125220366.27,
+  "_id": "j578tvwzh8yetyhnga8bwg2a7n82nvb2",
+  "day": "2026-03-09",
+  "grid": "SS.LLZ#OSSVLZ#OOOVLZZI.OVVVZIPTTTJJIPPTUUJIPPT.UJ####UUJ",
+  "startedAt": "2026-03-10T06:46:31.737Z",
+  "timeElapsed": 27000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1773107763056.5347,
+  "_id": "j570xxpm7cp5jkv2hcg5z25h2x82nz4s",
+  "day": "2026-03-09",
+  "grid": "VO.TTT#VOOOTZ#VVVOTZZU.ULLLZUUULSSZJIIIISSJJJJ.PP####PPP",
+  "startedAt": "2026-03-10T01:55:17.982Z",
+  "timeElapsed": 45000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1773062063779.3845,
+  "_id": "j5775x2ecv7s0dkrm9j1n9gpf582kn58",
+  "day": "2026-03-09",
+  "grid": "VU.UOO#VUUUZO#VVVLZOOJ.PLZZIJPPLLZIJPPSSTIJJSS.TI####TTT",
+  "startedAt": "2026-03-09T13:13:09.380Z",
+  "timeElapsed": 74000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1772989759563.446,
+  "_id": "j57dzsrsxh9wrw1g0xxfyzgcdh82gns5",
+  "day": "2026-03-08",
+  "grid": "ZU.UOO#ZUUUSO#ZZTSSOO.ZTSLLLVTTTLJJVIIIIPJVVV.PPJ####PPJ",
+  "startedAt": "2026-03-08T17:06:32.746Z",
+  "timeElapsed": 682000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1772928140627.1091,
+  "_id": "j57exzf38tpe3wys5cm7gg74hx82ggka",
+  "day": "2026-03-07",
+  "grid": "VU.UOO#VUUUOT#VVVOOT.IJJZTTTIJZZLLLIJZSLPPIJZSSPP####SP.",
+  "startedAt": "2026-03-08T00:01:54.710Z",
+  "timeElapsed": 25000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1772901660733.9797,
+  "_id": "j575nmsb5055qn87eyyrf2qr6d82f1xg",
+  "day": "2026-03-07",
+  "grid": "UU.VVV#UJJJJV#UUPPJV.OOPPSSILOPSSTILOOTTTILLZZZTI####ZZ.",
+  "startedAt": "2026-03-07T16:39:58.545Z",
+  "timeElapsed": 61000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1772861176013.3528,
+  "_id": "j573q7cax649gjy200jqxyp3n982fp7p",
+  "day": "2026-03-06",
+  "grid": "LL.VVV#LOOVUU#LZOVU.IZZOOUUIZTPPJJIZTPPJSITTTPJSS####J.S",
+  "startedAt": "2026-03-07T05:21:43.021Z",
+  "timeElapsed": 607000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1772806576742.4756,
+  "_id": "j571b58011wscgsqcqevttkt8x82denm",
+  "day": "2026-03-06",
+  "grid": "LL.TPP#LTTTPP#LZZTP.JVOZZZSJVOOOSSJVVVOSJJIIIIUUU####U.U",
+  "startedAt": "2026-03-06T14:15:30.776Z",
+  "timeElapsed": 45000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1772803581768.722,
+  "_id": "j573x6h8nsxepp00recr0hnhsn82cr13",
+  "day": "2026-03-06",
+  "grid": "OO.LLL#VOTTTL#VOOTZ.IVVVTZZIJJJJSZIJPPSSZIPPPSUUU####U.U",
+  "startedAt": "2026-03-06T13:24:21.118Z",
+  "timeElapsed": 117000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1772759038799.0576,
+  "_id": "j572vkb7mz31g4f2qpxqtvqk8182dh57",
+  "day": "2026-03-05",
+  "grid": "OO.ZZZ#IOZZUU#IOOP.UVITPPUUVITPPVVVTTTJSLLJJJJSSL####.SL",
+  "startedAt": "2026-03-06T01:02:18.043Z",
+  "timeElapsed": 100000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1772732942715.236,
+  "_id": "j576tsgrqvw5fn4453cch17zvd82bjh7",
+  "day": "2026-03-05",
+  "grid": "ZZ.PPP#IZZZPP#IOOU.UVITOUUUVITOOVVVTTTJSLLJJJJSSL####.SL",
+  "startedAt": "2026-03-05T17:47:33.747Z",
+  "timeElapsed": 87000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1772732678915.9148,
+  "_id": "j57ers7mmae45sd04d7vrv09ds82bbhy",
+  "day": "2026-03-05",
+  "grid": "VU.UPP#VUUUPP#VVVZ.POLLLZOOOLSZZOTJSSZTTTJSIIIITJ####.JJ",
+  "startedAt": "2026-03-05T17:43:56.014Z",
+  "timeElapsed": 42000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1772731606591.0505,
+  "_id": "j575ej7tax6431t266h9k4szad82aasq",
+  "day": "2026-03-05",
+  "grid": "SS.VVV#TSSVUU#TTTV.UITZZZUUIZZOLLLIOOOLJPIOJJJJPP####.PP",
+  "startedAt": "2026-03-05T17:24:16.389Z",
+  "timeElapsed": 533000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1772687924507.4668,
+  "_id": "j574b9pd6m0gsc3vcdqtejca2h82bpdn",
+  "day": "2026-03-04",
+  "grid": "VU.UOO#VUUUIO#VVV.IOOLLLZIPPSSLZIPPJSSZZTPJJJJZT.####TTT",
+  "startedAt": "2026-03-05T05:18:12.084Z",
+  "timeElapsed": 31000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1772683547125.2334,
+  "_id": "j5786fsyvzy3w2cjzwh3jrz4ph82aqca",
+  "day": "2026-03-04",
+  "grid": "VU.UPP#VUUUPP#VVV.PSSIIIISSTJJJJTTTJZZZOOTZZLLLO.####LOO",
+  "startedAt": "2026-03-05T04:05:10.018Z",
+  "timeElapsed": 445000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1772659479989.912,
+  "_id": "j57c191wktxkbjnsm1136x9azn829db6",
+  "day": "2026-03-04",
+  "grid": "PP.SOO#PPSSVO#JPS.VOOJJJJVVVLLLIIIILZZZTUUZZTTTU.####TUU",
+  "startedAt": "2026-03-04T21:24:06.290Z",
+  "timeElapsed": 33000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1772648893016.7627,
+  "_id": "j571zvamjn0qvbn66nazsajned828mgf",
+  "day": "2026-03-04",
+  "grid": "VU.UJZ#VUUUJZ#VVV.JZZPOOJJSZPPOLLSSPPOOLTSIIIILT.####TTT",
+  "startedAt": "2026-03-04T18:26:11.324Z",
+  "timeElapsed": 121000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1772554906143.1812,
+  "_id": "j579cezt6tczzmj9gnbcx2f1fs8275t9",
+  "day": "2026-03-03",
+  "grid": "PP.SOO#PPPSSO#IZ.JSOOIZZJJJJITZVVVLITZVLLLTTTVU.U####UUU",
+  "startedAt": "2026-03-03T16:20:32.141Z",
+  "timeElapsed": 792000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1772513090479.6807,
+  "_id": "j571njbbfcbqkyah40175wsfqh826sz6",
+  "day": "2026-03-02",
+  "grid": "PP.SOO#PPPSSO#I.ZZSOOILLZZZJITLJJJJITLUUUVTTTU.UV####VVV",
+  "startedAt": "2026-03-03T04:43:42.916Z",
+  "timeElapsed": 67000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1772486662459.2007,
+  "_id": "j57dzwxepjjajye93ay22pc3qh8258vc",
+  "day": "2026-03-02",
+  "grid": "PP.OOZ#PPPOVZ#S.OOVZZSSVVVJZTSJJJJITTTLUUITLLL.UI####UUI",
+  "startedAt": "2026-03-02T21:22:30.136Z",
+  "timeElapsed": 111000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1772478933695.9856,
+  "_id": "j57ewrqy0nk1nte4yrne4jt1w5824g09",
+  "day": "2026-03-02",
+  "grid": "IU.UOO#IUUUTO#I.SSTOOISSTTTZPPLLLZZPPPJLZVJJJJ.ZV####VVV",
+  "startedAt": "2026-03-02T19:14:18.168Z",
+  "timeElapsed": 126000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1772376732294.1816,
+  "_id": "j578ex3rym3hnb5mqb1zv6dp59822b22",
+  "day": "2026-03-01",
+  "grid": "PP.SOO#PPSSOZ#.PSOOZZJTLLLIZJTTTLIZJTUUUIVJJU.UIV####VVV",
+  "startedAt": "2026-03-01T14:48:28.259Z",
+  "timeElapsed": 223000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1772347253477.2893,
+  "_id": "j570fgy2r84f7jz2zac42j7f81823447",
+  "day": "2026-02-28",
+  "grid": "U.UVVV#UUUOOV#IIIIOVLJJPPOOLJTPPPLLJTTTZZ.JTZZZSS####SS.",
+  "startedAt": "2026-03-01T06:38:45.006Z",
+  "timeElapsed": 127000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1772324306038.1335,
+  "_id": "j572pjhj6f0cnps1x5fjfej2w9823zft",
+  "day": "2026-02-28",
+  "grid": "I.PLLZ#IPPLTZ#IPPLTZZISSTTTZSSOVJUUOOOVJU.OVVVJUU####JJ.",
+  "startedAt": "2026-03-01T00:14:21.945Z",
+  "timeElapsed": 239000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1772312177351.0474,
+  "_id": "j57a7tkvfj0v72j79smh4yk1v5820ner",
+  "day": "2026-02-28",
+  "grid": "P.ISOO#PPISSO#PPILSOOJJILVVVJTLLVUUJTTTVU.JTZZZUU####ZZ.",
+  "startedAt": "2026-02-28T20:55:42.551Z",
+  "timeElapsed": 34000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1772216068899.3198,
+  "_id": "j5772j770bgmn7qhygzy0ar14581y2js",
+  "day": "2026-02-27",
+  "grid": "Z.SSOO#ZZTSSO#VZTTTOOVZTPPLLVVVPPPLJIIII.LJJJJUUU####U.U",
+  "startedAt": "2026-02-27T18:13:37.262Z",
+  "timeElapsed": 51000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1772213950216.0403,
+  "_id": "j575hpve7cd9ty1nqbvt6sdghn81z15y",
+  "day": "2026-02-27",
+  "grid": "O.TTTS#OOOTSS#ZZOTSJJVZZZPPJVLLLPPJVVVLP.JIIIIUUU####U.U",
+  "startedAt": "2026-02-27T17:36:32.347Z",
+  "timeElapsed": 672000.0,
+  "username": "TIF"
+ },
+ {
+  "_creationTime": 1772213802350.2996,
+  "_id": "j5736xaezr3njv24nxs311ara981zmnw",
+  "day": "2026-02-27",
+  "grid": "I.LLOO#IPPLVO#IPPLVOOIPSSVVVTSSJJJJTTTZZ.JTZZZUUU####U.U",
+  "startedAt": "2026-02-27T17:35:30.072Z",
+  "timeElapsed": 53000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1772213721250.823,
+  "_id": "j57eyffkba24q9z3rscxpr0d7581zg78",
+  "day": "2026-02-27",
+  "grid": "O.TTTS#OOOTSS#LLOTSZIVLPPPZIVLPPZZIVVVJZ.IJJJJUUU####U.U",
+  "startedAt": "2026-02-27T17:33:58.137Z",
+  "timeElapsed": 82000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1772213387919.9011,
+  "_id": "j578c3dbgpngwmkbmj04s7tcjs81yy37",
+  "day": "2026-02-27",
+  "grid": "V.JJJJ#VIIIIJ#VVVLLSSPPPLSSTPPOLTTTOOOZZ.TOZZZUUU####U.U",
+  "startedAt": "2026-02-27T17:27:18.895Z",
+  "timeElapsed": 144000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1772205442209.1882,
+  "_id": "j577rp4sn6ns0sqkdmfdc8msys81y2q3",
+  "day": "2026-02-27",
+  "grid": "O.JJJJ#OOOLLJ#PPOSLZIPPSSLZIVPSTZZIVTTTZ.IVVVTUUU####U.U",
+  "startedAt": "2026-02-27T15:15:34.921Z",
+  "timeElapsed": 435000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1772169215654.5027,
+  "_id": "j576dmf1g8da187hbqyyg6czvd81y224",
+  "day": "2026-02-26",
+  "grid": "U.ULLL#UUULPP#IJJPPPTIJSSTTTIJVSSZTIJVO.ZZVVVOOOZ####.OZ",
+  "startedAt": "2026-02-27T05:10:13.879Z",
+  "timeElapsed": 190000.0,
+  "username": "TIF"
+ },
+ {
+  "_creationTime": 1772160941699.8843,
+  "_id": "j57djhwvbh4nt66p7ct7ydyncx81ypns",
+  "day": "2026-02-26",
+  "grid": "U.UIOO#UUUIVO#LLLIVOOLZZIVVVPPZZZJJPPSS.TJPSSTTTJ####.TJ",
+  "startedAt": "2026-02-27T02:55:07.191Z",
+  "timeElapsed": 34000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1772153883145.441,
+  "_id": "j57bmkxs8x9rnek1qys8g62aan81zzsx",
+  "day": "2026-02-26",
+  "grid": "L.IIII#LLLTPP#VVVTPPPVZTTTSSVZOOSSJZZOU.UJZOOUUUJ####.JJ",
+  "startedAt": "2026-02-27T00:56:24.810Z",
+  "timeElapsed": 97000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1772127939108.439,
+  "_id": "j579es1x1z47f5q5gtk75rjjgh81x94d",
+  "day": "2026-02-26",
+  "grid": "J.SSOO#JSSLTO#JLLLTOOJJPTTTIVPPUUUIVPPU.UIVVVZZZI####.ZZ",
+  "startedAt": "2026-02-26T17:44:50.413Z",
+  "timeElapsed": 48000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1772107306317.448,
+  "_id": "j574y2zjafz318mc0r136xs42h81wcqd",
+  "day": "2026-02-26",
+  "grid": "I.SOOZ#ISSOTZ#ISOOTZZILLTTTZPPLVUUJPPLV.UJPVVVUUJ####.JJ",
+  "startedAt": "2026-02-26T12:00:39.374Z",
+  "timeElapsed": 66000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1772047691724.2214,
+  "_id": "j5710kdyf0b2gb81ardw8e2ne981tzve",
+  "day": "2026-02-25",
+  "grid": "Z.LLLI#ZOOSLI#ZZOSSIVJZOOSIVJPPPVVVJPP.TUUJJTTTU.####TUU",
+  "startedAt": "2026-02-25T19:26:26.795Z",
+  "timeElapsed": 99000.0,
+  "username": "CDW"
+ },
+ {
+  "_creationTime": 1772043080348.4866,
+  "_id": "j578g40kh2850dfcn8ke6jwyps81vmpa",
+  "day": "2026-02-25",
+  "grid": "I.SZOO#ISSZVO#ISZZVOOIPZJVVVLPPJJJJLPP.TUULLTTTU.####TUU",
+  "startedAt": "2026-02-25T18:09:25.964Z",
+  "timeElapsed": 387000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1772014640363.2922,
+  "_id": "j576rav0dwnnyh0he5zk1f6vbh81v97c",
+  "day": "2026-02-25",
+  "grid": "U.UPOO#UUUPPO#JJLPPOOIJLLLZZIJTZZZSIJT.VSSITTTVS.####VVV",
+  "startedAt": "2026-02-25T10:15:31.833Z",
+  "timeElapsed": 79000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1771996602033.7627,
+  "_id": "j57fjfke0e74x64dyzyrx7ytqx81vbrr",
+  "day": "2026-02-25",
+  "grid": "I.ZSOO#IZZSSO#IZVLSOOIZVLLLJVVVJJJJPPP.TUUPPTTTU.####TUU",
+  "startedAt": "2026-02-25T05:15:43.566Z",
+  "timeElapsed": 58000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1771970203041.3052,
+  "_id": "j578gtp2ky0w25a16ke0fgnd1n81sjb6",
+  "day": "2026-02-24",
+  "grid": "I.JJJJ#IOJPPP#IOOOPPTIZLOTTTZZLLLSTZU.UVSSZUUUV.S####VVV",
+  "startedAt": "2026-02-24T21:55:06.160Z",
+  "timeElapsed": 84000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1771916089696.405,
+  "_id": "j57f5jrp8y7vbkygyqha32cw7n81r8j1",
+  "day": "2026-02-23",
+  "grid": "I.SPPT#ISSPPT#ISJPTTTIZJJJJLZZOOLLLZ.OUUUVZOOU.UV####VVV",
+  "startedAt": "2026-02-24T06:53:59.020Z",
+  "timeElapsed": 50000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1771881304595.318,
+  "_id": "j573wywgf1thrmex5hgjx23r0181q1ba",
+  "day": "2026-02-23",
+  "grid": "J.SSOO#JSSLTO#JLLLTOOJJITTTZUUIPPZZU.IPPZVUUIP.ZV####VVV",
+  "startedAt": "2026-02-23T21:14:19.591Z",
+  "timeElapsed": 44000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1771859661972.3853,
+  "_id": "j575c1hm09brrtfegnkvwqqm0h81p5kp",
+  "day": "2026-02-23",
+  "grid": "U.UOOZ#UUUOTZ#SSOOTZZJSSTTTZJIIIILLJ.PPPLVJJPP.LV####VVV",
+  "startedAt": "2026-02-23T15:11:54.746Z",
+  "timeElapsed": 146000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1771856357512.9749,
+  "_id": "j576v922zt42qgmdr4p4bmz67x81qhrs",
+  "day": "2026-02-23",
+  "grid": "T.SSOO#TTTSSO#TPPPLOOJZPPLLLJZZIIIIJ.ZUUUVJJZU.UV####VVV",
+  "startedAt": "2026-02-23T14:17:54.087Z",
+  "timeElapsed": 83000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1771828548729.4324,
+  "_id": "j573cm1vdgqmbpy7yn23e1qcrx81qdma",
+  "day": "2026-02-22",
+  "grid": "S.IIII#SSZJJP#TSZZJPPTTTZJPPTOOZJLL.OUUULVOOU.ULV####VVV",
+  "startedAt": "2026-02-23T06:32:58.623Z",
+  "timeElapsed": 169000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1771823461657.4897,
+  "_id": "j574xymj1wytyfhz0rvkfxxf2h81qjha",
+  "day": "2026-02-23",
+  "grid": "U.UIJZ#UUUIJZ#SOOIJZZSSOIJJZLSOOVVVL.PPPTVLLPP.TV####TTT",
+  "startedAt": "2026-02-23T05:08:56.173Z",
+  "timeElapsed": 122000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1771797749501.6165,
+  "_id": "j57cbd1cp3mcvtqvbxd5meaqgd81mqm0",
+  "day": "2026-02-22",
+  "grid": "Z.IIII#ZTTTUU#ZZTOOUVSZTOUUVSSOOVVV.SLJJJJLLL.PPJ####PPP",
+  "startedAt": "2026-02-22T21:52:48.886Z",
+  "timeElapsed": 574000.0,
+  "username": "SAL"
+ },
+ {
+  "_creationTime": 1771780402301.7363,
+  "_id": "j57c4vyqsqgkwpw0wjhw986k6981m22s",
+  "day": "2026-02-22",
+  "grid": "I.LLJZ#IPPLJZ#IPPLJZZIPSSJJZUUTSSOO.UTTTOVUUT.OOV####VVV",
+  "startedAt": "2026-02-22T17:12:32.711Z",
+  "timeElapsed": 36000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1771773010903.6958,
+  "_id": "j57f4qrvmc7kdjak5xb7sng02d81n8vr",
+  "day": "2026-02-22",
+  "grid": "S.JPPT#SSJPPT#ZSJPTTTZJJIIIIZZVOLLL.ZVOOOLVVV.UOU####UUU",
+  "startedAt": "2026-02-22T15:08:11.414Z",
+  "timeElapsed": 513000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1771764833105.254,
+  "_id": "j57bng6t2b6g0861qw05v7jb6s81n63z",
+  "day": "2026-02-22",
+  "grid": "U.USOO#UUUSSO#PPIJSOOPPIJJJJPTIZVVV.TIZZLVTTT.ZLV####ZLL",
+  "startedAt": "2026-02-22T12:51:35.708Z",
+  "timeElapsed": 137000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1771722944732.3345,
+  "_id": "j574dnzx4ne2kqdtsq0ccpn7qh81nd77",
+  "day": "2026-02-21",
+  "grid": "T.UUOO#TTTUVO#TIUUVOOJISSVVVJILSSP.JILLLPPJJZZZPP####ZZ.",
+  "startedAt": "2026-02-22T01:13:55.879Z",
+  "timeElapsed": 365000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1771647297624.4448,
+  "_id": "j57f3qf8mrf0ypjgpwygt5d8gd81kf6y",
+  "day": "2026-02-20",
+  "grid": "L.ZZZT#LZZSST#LLSSTTTJPIIIIVJPPOO.VJPPOVVVJJOOUUU####U.U",
+  "startedAt": "2026-02-21T04:07:08.268Z",
+  "timeElapsed": 462000.0,
+  "username": "MJP"
+ },
+ {
+  "_creationTime": 1771645757189.8303,
+  "_id": "j572mrwqr8r9v3zc0c8se4bf4s81khrz",
+  "day": "2026-02-20",
+  "grid": "T.IIII#TTTZLL#TSSZZLJSSOOZLJVVVOZ.JVPPOOJJVPPPUUU####U.U",
+  "startedAt": "2026-02-21T03:47:22.793Z",
+  "timeElapsed": 111000.0,
+  "username": "TIF"
+ },
+ {
+  "_creationTime": 1771638502731.4695,
+  "_id": "j57cxcjtkeh5thm5zawk304eq181jc8q",
+  "day": "2026-02-20",
+  "grid": "L.PPPT#LLLPPT#JJJJTTTJZIIIIVZZSOO.VZSSOVVVZSOOUUU####U.U",
+  "startedAt": "2026-02-21T01:46:40.133Z",
+  "timeElapsed": 102000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1771638056519.362,
+  "_id": "j574hdqr0dc5s1mdk0jgv6458181jbrw",
+  "day": "2026-02-20",
+  "grid": "T.JJJJ#TTTPPJ#TZIPPSSZZIPSSVZLIOO.VZLIOVVVLLOOUUU####U.U",
+  "startedAt": "2026-02-21T01:40:23.354Z",
+  "timeElapsed": 33000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1771618848358.2893,
+  "_id": "j57bq6fm4hwzvzkzstzztgcrb581grh0",
+  "day": "2026-02-20",
+  "grid": "L.IIII#LLLZZZ#JJJJOZZTTTJOOOVTUUU.OVTUSUPPVVVSSPP####S.P",
+  "startedAt": "2026-02-20T20:14:49.474Z",
+  "timeElapsed": 1982000.0,
+  "username": "GAG"
+ },
+ {
+  "_creationTime": 1771618471569.5615,
+  "_id": "j572bmv1cc3r8csj48nezywsv181h6kx",
+  "day": "2026-02-20",
+  "grid": "U.UTTT#UUUVTS#ZJJVTSSZZJVVVSLZJOO.ILZJOPPILLOOPPI####P.I",
+  "startedAt": "2026-02-20T20:12:05.167Z",
+  "timeElapsed": 126000.0,
+  "username": "SAL"
+ },
+ {
+  "_creationTime": 1771612821368.1726,
+  "_id": "j57cjb60g1ykp1anszf87yk9zs81g7zc",
+  "day": "2026-02-20",
+  "grid": "J.PPOO#JPPPVO#JUULVOOJJULVVVTUULL.ITTTZZSITZZZSSI####S.I",
+  "startedAt": "2026-02-20T18:38:26.493Z",
+  "timeElapsed": 107000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1771558191781.2976,
+  "_id": "j573zxxdvppy0yamzf7r6j7jh181gw7n",
+  "day": "2026-02-19",
+  "grid": "I.VVVL#IJVLLL#IJVSUUUIJSSUZUJJST.ZZPPPTOOZPPTTTOZ####.OO",
+  "startedAt": "2026-02-20T03:29:15.171Z",
+  "timeElapsed": 36000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1771519862307.8564,
+  "_id": "j572js2t4n9eg3ca59jeyetgps81frdb",
+  "day": "2026-02-19",
+  "grid": "U.ULLL#UUULJS#VJJJJSSVIIIIZSVVVT.ZZPPPTOOZPPTTTOZ####.OO",
+  "startedAt": "2026-02-19T16:50:11.479Z",
+  "timeElapsed": 50000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1771518788068.6763,
+  "_id": "j574ck47aszzsctmm8c6vg61s181f9y7",
+  "day": "2026-02-19",
+  "grid": "U.UVVV#UUUVLS#PPTVLSSPPTLLZSPTTT.ZZJJJJOOZJIIIIOZ####.OO",
+  "startedAt": "2026-02-19T16:22:09.190Z",
+  "timeElapsed": 181000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1771517685090.8516,
+  "_id": "j57cxbjs5wtj8z302zc5t05had81fksn",
+  "day": "2026-02-19",
+  "grid": "U.UVVV#UUUVOO#ILLVOPPIJLOOPPIJLS.PTIJSSTTTJJSZZZT####.ZZ",
+  "startedAt": "2026-02-19T16:13:38.634Z",
+  "timeElapsed": 65000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1771506044782.0608,
+  "_id": "j57e53pb6ndwyh5wpy13qtvbnh81enng",
+  "day": "2026-02-19",
+  "grid": "U.UIJZ#UUUIJZ#VVVIJZZPPVIJJZPPVT.LLPSSTOOLSSTTTOL####.OO",
+  "startedAt": "2026-02-19T12:58:15.379Z",
+  "timeElapsed": 118000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1771462798625.2087,
+  "_id": "j57a1j8m9gyweaqy8savt0pxdn81fqw3",
+  "day": "2026-02-18",
+  "grid": "P.JJJJ#PPJLLZ#PPTLSZZTTTLSSZVOT.ISZVOOOIUUVVVOIU.####IUU",
+  "startedAt": "2026-02-19T00:58:25.160Z",
+  "timeElapsed": 68000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1771462664362.6624,
+  "_id": "j57ccdk09115a06egby6qt0jqs81fw06",
+  "day": "2026-02-18",
+  "grid": "P.IVVV#PPIVTS#PPIVTSSJJITTTSJLL.ZZZJLOZZUUJLOOOU.####OUU",
+  "startedAt": "2026-02-19T00:56:03.065Z",
+  "timeElapsed": 99000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1771462460129.3123,
+  "_id": "j5799av52h1m2eznmjmr5zg0qx81efny",
+  "day": "2026-02-18",
+  "grid": "U.UVPP#UUUVPP#IVVVPZZIJJZZZTILJ.TTTILJSOOTLLJSSO.####SOO",
+  "startedAt": "2026-02-19T00:52:05.000Z",
+  "timeElapsed": 132000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1771441657697.9495,
+  "_id": "j57b5cntpepw2jm9s219rjw19d81cn6n",
+  "day": "2026-02-18",
+  "grid": "P.IIII#PPJJJJ#PPJOLLLTTTOOOLVTU.UOSVTUUUSSVVVZZS.####ZZZ",
+  "startedAt": "2026-02-18T19:04:53.099Z",
+  "timeElapsed": 947000.0,
+  "username": "JSP"
+ },
+ {
+  "_creationTime": 1771437051781.2476,
+  "_id": "j570ttmss2j16gkxr5xrmktf7981cc9j",
+  "day": "2026-02-18",
+  "grid": "U.ULLL#UUUPPL#IJPPPOOIJJJJOZITS.OOZITSSVZZTTTSVZ.####VVV",
+  "startedAt": "2026-02-18T17:50:08.945Z",
+  "timeElapsed": 42000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1771436106717.466,
+  "_id": "j570rdh4wm6kjzbsd6nas7nmt981dbrx",
+  "day": "2026-02-18",
+  "grid": "I.ZVVV#IZZPPV#IZPPPVLIZSSOOLTSS.OLLTTTOOUUTJJJJU.####JUU",
+  "startedAt": "2026-02-18T17:34:21.363Z",
+  "timeElapsed": 199000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1771424342365.3647,
+  "_id": "j57fhy31dyd86h7qse1e7spmrs81c3cq",
+  "day": "2026-02-18",
+  "grid": "U.UVOO#UUUVTO#JVVVTOOJPPTTTZJPP.SSZJJPSSZZIIIILZ.####LLL",
+  "startedAt": "2026-02-18T14:17:15.332Z",
+  "timeElapsed": 106000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1771417849219.7405,
+  "_id": "j57aq3f5d8qjcsyst0xd391t9s81ct3g",
+  "day": "2026-02-18",
+  "grid": "U.UOOZ#UUUOVZ#JJOOVZZIJVVVSZIJL.PSSIJLPPTSILLPPT.####TTT",
+  "startedAt": "2026-02-18T12:28:55.743Z",
+  "timeElapsed": 113000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1771336400357.0347,
+  "_id": "j5726p4k2t881c9sjfxnw4ett581a2ms",
+  "day": "2026-02-17",
+  "grid": "U.ULLZ#UUUJLZ#JJJJLZZTTTOOPZVT.OPPIVTOOPPIVVVSS.I####SSI",
+  "startedAt": "2026-02-17T13:51:25.769Z",
+  "timeElapsed": 114000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1771335427809.7969,
+  "_id": "j5733cmsyc1tn62315teca0js581b8a8",
+  "day": "2026-02-17",
+  "grid": "T.LLOO#TTTLZO#TJJLZOOIJSSZZVIJ.SSZVIJPPVVVIPPPU.U####UUU",
+  "startedAt": "2026-02-17T13:36:38.128Z",
+  "timeElapsed": 29000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1771334703216.2354,
+  "_id": "j57bzfem0m2vmxh5zcgt0h7m2s81bzfs",
+  "day": "2026-02-17",
+  "grid": "O.TTTZ#OOOTZZ#PPOTZJIPPSSZJIVP.SSJIVLLLJJIVVVLU.U####UUU",
+  "startedAt": "2026-02-17T13:20:59.079Z",
+  "timeElapsed": 162000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1771309613946.1238,
+  "_id": "j5760wpr0a8gesyw2g0qb5jjs181a1bv",
+  "day": "2026-02-16",
+  "grid": "U.USJJ#UUUSSJ#OZZZSJIOOOZZJIV.OTPPIVTTTPPIVVVT.PL####LLL",
+  "startedAt": "2026-02-17T06:26:13.018Z",
+  "timeElapsed": 40000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1771286538625.0356,
+  "_id": "j574cm5xn3qcarqhdtgb9eztkh81ap2t",
+  "day": "2026-02-16",
+  "grid": "U.ULOO#UUULZO#PPLLZOOPPVSZZIP.VSSZIVVVJSTIJJJJ.TI####TTT",
+  "startedAt": "2026-02-17T00:01:00.568Z",
+  "timeElapsed": 75000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1771258291712.9053,
+  "_id": "j57da9xyh6r8f1jywkx730sfwd81919d",
+  "day": "2026-02-16",
+  "grid": "I.ZOOS#IZZOSS#IZOOSJJIZUUULJT.UVULJTTTVLLJTVVV.PP####PPP",
+  "startedAt": "2026-02-16T16:10:58.573Z",
+  "timeElapsed": 33000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1771246399389.431,
+  "_id": "j571ypw2x3vyy8fywmbzev72sn818eqc",
+  "day": "2026-02-16",
+  "grid": "U.USOO#UUUSSO#VVVLSOOVLLLPPIV.ZZPPIZZZJPTIJJJJ.TI####TTT",
+  "startedAt": "2026-02-16T12:52:36.358Z",
+  "timeElapsed": 42000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1771204498458.1528,
+  "_id": "j574n5ve1q327j5ztse7a7etp9818qwb",
+  "day": "2026-02-15",
+  "grid": "L.IIII#LTTTSS#LLTSSJJUUTPPPJ.UVPPZJUUVOOZJVVV.OZZ####OOZ",
+  "startedAt": "2026-02-16T01:14:13.884Z",
+  "timeElapsed": 43000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1771172473314.5437,
+  "_id": "j577dk9q5rqk06c3p6ay1n44q18166yy",
+  "day": "2026-02-15",
+  "grid": "P.SSOO#PPTSSO#PPTTTOOUUTIIII.UVJJJJUUVZZZJVVV.LZZ####LLL",
+  "startedAt": "2026-02-15T16:19:38.871Z",
+  "timeElapsed": 90000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1771166192047.5264,
+  "_id": "j575f3wagjc7rw8maxrfmvs7gx817bdp",
+  "day": "2026-02-15",
+  "grid": "U.UPOO#UUUPPO#ZJJPPOOZZJIIII.ZJSVVVLZJSSTVLLL.STV####TTT",
+  "startedAt": "2026-02-15T14:35:46.346Z",
+  "timeElapsed": 116000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1771165825505.602,
+  "_id": "j573051t0wn0523ywrxtxjfgjd81656s",
+  "day": "2026-02-15",
+  "grid": "I.ZSOO#IZZSSO#IZLJSOOIZLJJJJ.PLLTTTPPUUUTVPPU.UTV####VVV",
+  "startedAt": "2026-02-15T14:27:18.426Z",
+  "timeElapsed": 186000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1771105682543.5813,
+  "_id": "j57ana26d5hbbcdy44cda9cw0s8157ck",
+  "day": "2026-02-14",
+  "grid": "O.IIII#OOOZJJ#PPOZJUUPPZZJU.VPZTJUUVTTTLLSVVVTLSS####LS.",
+  "startedAt": "2026-02-14T21:35:41.182Z",
+  "timeElapsed": 530000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1771100098188.1729,
+  "_id": "j573akzbwsb6nachvypcjqfvh5815hce",
+  "day": "2026-02-14",
+  "grid": "U.USOO#UUUSSO#IVVVSOOIJJVTZ.ILJVTZZILJTTTZLLJPPPZ####PP.",
+  "startedAt": "2026-02-14T20:14:26.085Z",
+  "timeElapsed": 32000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1771084482128.7927,
+  "_id": "j57e5g914vex9070b5fq98ay25814y3y",
+  "day": "2026-02-14",
+  "grid": "U.UZOO#UUUZZO#VVVTZOOVLLTZS.VLTTTSSJLIIIISJJJJPPP####PP.",
+  "startedAt": "2026-02-14T15:54:10.305Z",
+  "timeElapsed": 31000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1771040505587.7114,
+  "_id": "j5754tr17j4xb8rg8pyhfhwnr18150b6",
+  "day": "2026-02-13",
+  "grid": "O.IIII#OOOZZZ#LLOSSZZLTSSU.ULTTTUUUJTVVVPPJJJJVPP####V.P",
+  "startedAt": "2026-02-14T03:41:01.925Z",
+  "timeElapsed": 43000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1770986915751.1973,
+  "_id": "j5763qzvrjc9eb30cw8nqzrych812kg5",
+  "day": "2026-02-13",
+  "grid": "I.SSOO#IVLSSO#IVLLLOOIVVVU.UJJJJUUUJZZZTPPZZTTTPP####T.P",
+  "startedAt": "2026-02-13T12:47:34.565Z",
+  "timeElapsed": 60000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1770984807263.1973,
+  "_id": "j57dx87a3t6ra8gjqgd6xqsgks813z8b",
+  "day": "2026-02-13",
+  "grid": "U.UZOO#UUUZZO#TLLLZOOTTTLZ.JTSSJJJJSSVVVPPIIIIVPP####V.P",
+  "startedAt": "2026-02-13T12:11:24.113Z",
+  "timeElapsed": 213000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1770983551431.4,
+  "_id": "j574b5fc5sw6dn9w5xgrssryvh812860",
+  "day": "2026-02-13",
+  "grid": "T.LLOO#TTTLJO#TZSLJOOZZSSJ.VZPPSJJVZPPPVVVIIIIUUU####U.U",
+  "startedAt": "2026-02-13T11:51:33.665Z",
+  "timeElapsed": 57000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1770970733893.3582,
+  "_id": "j5725bgx4jpa97t8hf4jqg08dh812ex4",
+  "day": "2026-02-13",
+  "grid": "O.LLPP#OOOLPP#IZOLSPVIZZSS.VITZSVVVITZJJJJTTTJUUU####U.U",
+  "startedAt": "2026-02-13T08:18:23.982Z",
+  "timeElapsed": 29000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1770956187280.4946,
+  "_id": "j57f8cs8vbjsmet6y5zj8485rx813pj5",
+  "day": "2026-02-12",
+  "grid": "I.PPUU#IOPPPU#IOOOUUZILSO.ZZVLSSTZJVLLSTZJVVVTTTJ####.JJ",
+  "startedAt": "2026-02-13T04:15:34.601Z",
+  "timeElapsed": 51000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1770941913604.302,
+  "_id": "j576q1tqg1se6epda477wkmxws8124r8",
+  "day": "2026-02-12",
+  "grid": "T.SSOO#TTTSSO#TPPUUOOIPPU.LLIVPUULJIVZZZLJIVVVZZJ####.JJ",
+  "startedAt": "2026-02-13T00:17:49.008Z",
+  "timeElapsed": 269000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1770886694548.6743,
+  "_id": "j574p7w9j4yc49w6s3syh3dx2n810w0q",
+  "day": "2026-02-12",
+  "grid": "P.STTT#PPSSTZ#PPISTZZJJIU.UZJLIUUUZJLIOVVVJLLOOOV####.OV",
+  "startedAt": "2026-02-12T08:57:37.976Z",
+  "timeElapsed": 36000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1770842472062.739,
+  "_id": "j578fa1vc364e1fjm4wpt7vqqn80zb4n",
+  "day": "2026-02-11",
+  "grid": "U.UVVV#UUULLV#JJSSLVIJSS.LZIJOOPZZIJOPPZTIOOPPZT.####TTT",
+  "startedAt": "2026-02-11T20:38:18.195Z",
+  "timeElapsed": 1079000.0,
+  "username": "SIM"
+ },
+ {
+  "_creationTime": 1770832148363.4143,
+  "_id": "j575e0w7hh2e9wsn2cdk21qkcs80ze8r",
+  "day": "2026-02-11",
+  "grid": "U.USOO#UUUSSO#IIIISOOPPP.VVVPPZZZTVJZZTTTVJJJJLT.####LLL",
+  "startedAt": "2026-02-11T17:48:15.413Z",
+  "timeElapsed": 52000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1770817532216.7402,
+  "_id": "j572jpb89c4h14hsc9je1az2t580ypw4",
+  "day": "2026-02-11",
+  "grid": "P.IIII#PPJJJJ#PPZZZJVTTT.ZZVLTSSVVVLTOSSUULLOOOU.####OUU",
+  "startedAt": "2026-02-11T13:44:33.905Z",
+  "timeElapsed": 58000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1770815586790.7043,
+  "_id": "j57bqw9j4c2yskq8s3tgn2jeh180y3d6",
+  "day": "2026-02-11",
+  "grid": "O.LLLI#OOOSLI#PPOSSIVPPP.SIVJJJJVVVJZZZTUUZZTTTU.####TUU",
+  "startedAt": "2026-02-11T13:05:46.373Z",
+  "timeElapsed": 482000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1770815106921.4736,
+  "_id": "j579ewh7d8x7wz2gjrjyec83mn80znw8",
+  "day": "2026-02-11",
+  "grid": "U.UZOO#UUUZZO#IIIIZOOJLS.ZPPJLSSVPPJLLSVTPJJVVVT.####TTT",
+  "startedAt": "2026-02-11T13:04:24.134Z",
+  "timeElapsed": 42000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1770770926191.0923,
+  "_id": "j5775eeedahby78rzm3h8vv6gx80zatw",
+  "day": "2026-02-10",
+  "grid": "T.IIII#TTTZZZ#TSSLJZZSS.LJPPVOLLJPPVOOOJJPVVVOU.U####UUU",
+  "startedAt": "2026-02-10T08:13:09.663Z",
+  "timeElapsed": 84000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1770728015756.8938,
+  "_id": "j57fj1a4jr7vt9yknepsw8c2sh80wg6v",
+  "day": "2026-02-10",
+  "grid": "P.IIII#PPJJJJ#PPJLVVVSS.LOOVTSSLLOVTTTZZOOTZZZU.U####UUU",
+  "startedAt": "2026-02-10T12:52:09.016Z",
+  "timeElapsed": 85000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1770701428773.1812,
+  "_id": "j57a61e7yxafevkqg5gbpyt5j580xg1p",
+  "day": "2026-02-10",
+  "grid": "U.USOO#UUUSSO#TTTZSOOIT.ZLPPITZZLPPIJZLLPVIJJJJ.V####VVV",
+  "startedAt": "2026-02-10T05:29:40.557Z",
+  "timeElapsed": 132000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1770700073739.54,
+  "_id": "j577cv2dzxb10qrwxjbysrj5t580xctf",
+  "day": "2026-02-09",
+  "grid": "T.IIII#TTTLLL#TOOLPPPJ.OZZPPJSOOZZZJSSUUUVJJSU.UV####VVV",
+  "startedAt": "2026-02-10T05:06:28.290Z",
+  "timeElapsed": 85000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1770684262572.412,
+  "_id": "j575gz8qzrvr5096nbqtx5qv2980wwcg",
+  "day": "2026-02-09",
+  "grid": "U.ULLL#UUUOOL#VVVOZJIV.OOZJIVSTZZJISSTZJJISTTT.PP####PPP",
+  "startedAt": "2026-02-10T00:30:54.827Z",
+  "timeElapsed": 191000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1770680279751.7607,
+  "_id": "j572c19xkkq8vzx8tv7ypzby1h80vybq",
+  "day": "2026-02-09",
+  "grid": "U.UVVV#UUUVPP#ZSSVPPIZ.SSOPIZZOOOTIJZOTTTIJJJJ.TL####LLL",
+  "startedAt": "2026-02-09T23:31:49.138Z",
+  "timeElapsed": 325000.0,
+  "username": "TIF"
+ },
+ {
+  "_creationTime": 1770639134343.517,
+  "_id": "j579j3xwkdx7tcp5db0pj3c9p980t195",
+  "day": "2026-02-09",
+  "grid": "O.TTTS#OOOTSS#UUOTSLLU.IIIILUUZZPPLZZZJPPVJJJJ.PV####VVV",
+  "startedAt": "2026-02-09T12:09:24.660Z",
+  "timeElapsed": 248000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1770600246636.0647,
+  "_id": "j57fzs98mwwz9edsr8x89he6es80t3r7",
+  "day": "2026-02-08",
+  "grid": "U.ULLL#UUULTP#OOTTTPP.OSSTPPVOOSSZJVIIIIZJVVV.ZZJ####ZJJ",
+  "startedAt": "2026-02-09T01:23:17.527Z",
+  "timeElapsed": 48000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1770587235678.885,
+  "_id": "j577dcjjxepkfq8a49wy9mkdy980r6rn",
+  "day": "2026-02-08",
+  "grid": "O.TTTS#OOOTSS#UUOTSLL.UIIIILUUJJJJLPPZZZJVPPP.ZZV####VVV",
+  "startedAt": "2026-02-08T21:46:01.287Z",
+  "timeElapsed": 53000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1770582436926.034,
+  "_id": "j57e6hsn22v5vcm0xbqbfab31h80s5hf",
+  "day": "2026-02-08",
+  "grid": "U.UOOS#UUUOSS#ZZOOSJJ.ZZZTJIVLTTTJIVLLLTJIVVV.PPI####PPP",
+  "startedAt": "2026-02-08T20:26:28.506Z",
+  "timeElapsed": 44000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1770566306854.9805,
+  "_id": "j57ekj5pz54bh4yrgwt416fmkn80ratk",
+  "day": "2026-02-08",
+  "grid": "U.ULLL#UUUSSL#OOSSZZI.OZZZTIVOOTTTIVJJJJTIVVV.JPP####PPP",
+  "startedAt": "2026-02-08T15:57:29.420Z",
+  "timeElapsed": 57000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1770559766526.0564,
+  "_id": "j57810cxfkkjf4c6pstgy7a38980rnqy",
+  "day": "2026-02-08",
+  "grid": "U.ULLL#UUULSS#TTTSSPP.TOOPPPVTOZJJIVOOZZJIVVV.ZJI####ZJI",
+  "startedAt": "2026-02-08T14:07:55.184Z",
+  "timeElapsed": 83000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1770555385679.4727,
+  "_id": "j578e6pcst9devgbgndyt67p6n80rt46",
+  "day": "2026-02-08",
+  "grid": "T.SSOO#TTTSSO#TIJZLOO.IJZLLLVIJZZPPVIJJZPPVVV.UPU####UUU",
+  "startedAt": "2026-02-08T12:55:26.347Z",
+  "timeElapsed": 59000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1770523479364.031,
+  "_id": "j577rmk5yzab9n5xx99aca33px80s8hf",
+  "day": "2026-02-07",
+  "grid": "U.UVIJ#UUUVIJ#TVVVIJ.TTTOIJJTSSOOOZSSLPPOZLLLPPZZ####PZ.",
+  "startedAt": "2026-02-08T04:03:42.483Z",
+  "timeElapsed": 55000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1770513365602.2527,
+  "_id": "j57agkn6y93730g6exqc1s97vn80s5pf",
+  "day": "2026-02-07",
+  "grid": "U.UVVV#UUUOOV#LLLIOV.JPLIOOTJPPITTTJPPISSTJJZZZSS####ZZ.",
+  "startedAt": "2026-02-08T01:15:09.106Z",
+  "timeElapsed": 56000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1770488150661.0308,
+  "_id": "j570n1384hhvapq148f5nz2rvd80pw4y",
+  "day": "2026-02-07",
+  "grid": "U.UZJJ#UUUZZJ#IIIIZJ.VVVPZJLVTPPOOLVTPPOLLTTTOOSS####SS.",
+  "startedAt": "2026-02-07T18:14:41.902Z",
+  "timeElapsed": 43000.0,
+  "username": "J"
+ },
+ {
+  "_creationTime": 1770420587808.4998,
+  "_id": "j57ev125wfnfkp8phhfef1863n80m79j",
+  "day": "2026-02-06",
+  "grid": "P.VVVO#PPVOOO#PPVOU.UIIIIUUUTZZZLLLTTTZZSLTJJJJSS####J.S",
+  "startedAt": "2026-02-06T23:27:22.708Z",
+  "timeElapsed": 144000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1770414323770.3342,
+  "_id": "j570v895t9r903cyyxazfmaby180np2z",
+  "day": "2026-02-06",
+  "grid": "I.ZOOS#IZZOSS#IZOOS.TIZLVTTTLLLVPPTJVVVPPPJJJJUUU####U.U",
+  "startedAt": "2026-02-06T21:40:55.531Z",
+  "timeElapsed": 268000.0,
+  "username": "TIF"
+ },
+ {
+  "_creationTime": 1770392014421.163,
+  "_id": "j578d3220s8hk6h3am8xjm52xd80nnnm",
+  "day": "2026-02-06",
+  "grid": "Z.TTTS#ZZLTSS#VZLTS.OVZLLOOOVVVJOPPJJJJPPPIIIIUUU####U.U",
+  "startedAt": "2026-02-06T15:28:24.806Z",
+  "timeElapsed": 309000.0,
+  "username": "HAN"
+ },
+ {
+  "_creationTime": 1770390061047.6877,
+  "_id": "j57dcw2mqf84d4xq58v436q2pn80ng7s",
+  "day": "2026-02-06",
+  "grid": "T.JJJJ#TTTZZJ#TZZZU.UVVVLUUUVOOLLLIVOPPPSIOOPPSSI####S.I",
+  "startedAt": "2026-02-06T14:58:18.750Z",
+  "timeElapsed": 230000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1770345610194.0225,
+  "_id": "j57217eeqgnbtwspje4gt2h7e980nq2h",
+  "day": "2026-02-05",
+  "grid": "U.ULLL#UUUSSL#IZSS.PPIZZJPPPITZJVVVITZJOOVTTTJJOV####.OO",
+  "startedAt": "2026-02-06T02:39:26.188Z",
+  "timeElapsed": 43000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1770279572703.565,
+  "_id": "j57brkwcad156dp6vh4fsk61q180j67c",
+  "day": "2026-02-05",
+  "grid": "V.SSOO#VSSUUO#VVVU.OOJPPUUZZJPPZZZIJPLLLTIJJLTTTI####.TI",
+  "startedAt": "2026-02-05T08:18:31.753Z",
+  "timeElapsed": 60000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1770263928376.025,
+  "_id": "j570cmnfxzr218c39vtv5n9fax80kcna",
+  "day": "2026-02-04",
+  "grid": "U.ULLL#UUULPP#VVV.PPIVOOSPZIVOSSZZIOOSJZTIJJJJZT.####TTT",
+  "startedAt": "2026-02-05T03:57:14.571Z",
+  "timeElapsed": 92000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1770260050442.087,
+  "_id": "j576h46tv9whrmn2vhw8grtzxs80kyaa",
+  "day": "2026-02-04",
+  "grid": "O.SSUU#OOOSSU#VLO.UUTVLLLTTTVVVZZZTJIIIIZZJJJJPP.####PPP",
+  "startedAt": "2026-02-05T02:52:44.143Z",
+  "timeElapsed": 86000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1770242262914.6118,
+  "_id": "j57c6cqe3jmgven4fqrh0dwy5h80hj87",
+  "day": "2026-02-04",
+  "grid": "I.JJJJ#IPPPSJ#IPP.SSVIZLLLSVZZLOVVVZOOOTUUZOTTTU.####TUU",
+  "startedAt": "2026-02-04T21:56:18.901Z",
+  "timeElapsed": 82000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1770215753607.052,
+  "_id": "j576xf2fee7q3czrn226g1tyd980gcbz",
+  "day": "2026-02-04",
+  "grid": "U.USOO#UUUSSO#PPT.SOOPPTTTLZJPTLLLZJJJJVZZIIIIVZ.####VVV",
+  "startedAt": "2026-02-04T14:34:41.738Z",
+  "timeElapsed": 194000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1770162353817.0486,
+  "_id": "j57f06ka06zywfn71ey49na6hh80fvyr",
+  "day": "2026-02-03",
+  "grid": "U.USOO#UUUSSO#LL.JSOOILZJJJJILZTPPPIZZTPPVIZTTT.V####VVV",
+  "startedAt": "2026-02-03T23:42:29.612Z",
+  "timeElapsed": 200000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1770162242251.7583,
+  "_id": "j57ae4z8ap4gqd0yr562wxv6gn80ec1t",
+  "day": "2026-02-03",
+  "grid": "J.LLLT#JJJJLT#IU.UTTTIUUUPPPIOOSSPPIOSSZZVOOZZZ.V####VVV",
+  "startedAt": "2026-02-03T23:43:16.973Z",
+  "timeElapsed": 129000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1770152702446.136,
+  "_id": "j571k6ryqbd007c7ayfw2xpesd80e1js",
+  "day": "2026-02-03",
+  "grid": "J.VVVZ#JLLLVZ#JL.IVZZJJOIPPZOOOIPPPOSSITUUSSTTT.U####TUU",
+  "startedAt": "2026-02-03T21:03:24.097Z",
+  "timeElapsed": 98000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1770081218683.942,
+  "_id": "j57dt1v23wa0e7rm23yr7t1c5980fdw9",
+  "day": "2026-02-02",
+  "grid": "T.UUPP#TTTUPP#T.UUPOLIJZOOOLIJZOSLLIJZZSSVIJJZ.SV####VVV",
+  "startedAt": "2026-02-03T01:12:37.713Z",
+  "timeElapsed": 60000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1770060305468.5303,
+  "_id": "j5764721j5mves9jr60sfeyx6h80dr82",
+  "day": "2026-02-02",
+  "grid": "T.SSOO#TTTSSO#T.PPLOOJZPPLLLJZPIIIIJZZUUUVJJZU.UV####VVV",
+  "startedAt": "2026-02-02T19:14:32.227Z",
+  "timeElapsed": 620000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1770059617427.4612,
+  "_id": "j57969sqa0z0x4gy2h526hwhgs80cmc6",
+  "day": "2026-02-02",
+  "grid": "I.JJJJ#IUUZZJ#I.UTZZZIUUTVVVLSTTTOVLSSOOOVLLSO.PP####PPP",
+  "startedAt": "2026-02-02T19:12:37.153Z",
+  "timeElapsed": 1574000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1770059070326.7483,
+  "_id": "j5783rqnndrz7kas26gkvmaq7180c4dz",
+  "day": "2026-02-02",
+  "grid": "U.UPOO#UUUPPO#Z.IPPOOZZIJJJJVZIJSLLVZISSTLVVVS.TL####TTT",
+  "startedAt": "2026-02-02T19:02:24.670Z",
+  "timeElapsed": 123000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1770058983578.6309,
+  "_id": "j574tr45dggayf6by3necjs7q180d4sx",
+  "day": "2026-02-02",
+  "grid": "U.UOOS#UUUOSS#J.OOSPPJJJJPPPIIIIVVVLLLZZTVLZZZ.TV####TTT",
+  "startedAt": "2026-02-02T18:57:20.878Z",
+  "timeElapsed": 534000.0,
+  "username": "TIF"
+ },
+ {
+  "_creationTime": 1770049990689.4644,
+  "_id": "j578w216c55j22h9025d6d8s5d80dhy9",
+  "day": "2026-02-02",
+  "grid": "O.IIII#OOOZZZ#T.OPPZZTTTPPPJTSLJJJJSSLUUUVSLLU.UV####VVV",
+  "startedAt": "2026-02-02T16:30:37.933Z",
+  "timeElapsed": 147000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1770049957764.9897,
+  "_id": "j574xryx9ta46ts5fjmjg7hghn80c87q",
+  "day": "2026-02-02",
+  "grid": "U.USOO#UUUSSO#Z.JJSOOZZJIIIIVZJTLLLVZJTTTLVVVT.PP####PPP",
+  "startedAt": "2026-02-02T16:30:56.261Z",
+  "timeElapsed": 97000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1770046035365.4192,
+  "_id": "j572k9z3dm4gzgkfrcd6yppvfd80d6q5",
+  "day": "2026-02-02",
+  "grid": "T.UUOO#TTTUVO#T.UUVOOLZZZVVVLLLZZJIPPPSSJIPPSS.JI####JJI",
+  "startedAt": "2026-02-02T15:21:41.645Z",
+  "timeElapsed": 76000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1769987357625.831,
+  "_id": "j5726xyg0edvkb5reqnf78c3fd80ajky",
+  "day": "2026-02-01",
+  "grid": "J.IIII#JJJJSS#.ZPPOSSZZPPOOOZTUPULOZTUUULVTTT.LLV####VVV",
+  "startedAt": "2026-02-01T23:08:43.671Z",
+  "timeElapsed": 33000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1769889225283.4983,
+  "_id": "j575p83sy33a3x3qv72c5qzyvx80817c",
+  "day": "2026-01-31",
+  "grid": ".ZZZOO#ZZLLLO#IIIILOOJJJJPPPVVVJTPPVUUUTTTVU.UTSS####SS.",
+  "startedAt": "2026-01-31T19:52:58.955Z",
+  "timeElapsed": 45000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1769851785743.1934,
+  "_id": "j5740shxjxh19mz5mazsvkcwq1809yje",
+  "day": "2026-01-31",
+  "grid": ".SSZJJ#SSOZZJ#OOOTZJLOTTTZJLVVVTILLVUUUIPPVU.UIPP####IP.",
+  "startedAt": "2026-01-31T09:29:17.619Z",
+  "timeElapsed": 28000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1769839034330.5667,
+  "_id": "j573gjvphdh8g79rvmcf54mkk9809716",
+  "day": "2026-01-31",
+  "grid": ".SLPOO#SSLPPO#SLLPPOOIIIITTTVVVJJTZVUUUJTZVU.UJZZ####JZ.",
+  "startedAt": "2026-01-31T05:56:43.895Z",
+  "timeElapsed": 30000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1769830466612.72,
+  "_id": "j571yxy9jgh6ncb46g1qwzwb8h809jgz",
+  "day": "2026-01-30",
+  "grid": ".SLIJJ#SSLIJZ#SLLIJZZVVVIJTZPPVOOTZPPVOTTTP.OOUUU####U.U",
+  "startedAt": "2026-01-31T03:33:51.662Z",
+  "timeElapsed": 31000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1769765868705.586,
+  "_id": "j573cear103kfn36favk2x2qss806x42",
+  "day": "2026-01-30",
+  "grid": ".JVVVT#IJVUUT#IJVUTTTIJJUULLISPPPZLSSOPPZLS.OOOZZ####O.Z",
+  "startedAt": "2026-01-30T09:36:53.996Z",
+  "timeElapsed": 54000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1769730459631.2515,
+  "_id": "j57d13ypk4pj38ew8ha9jny6ss805sn0",
+  "day": "2026-01-29",
+  "grid": ".ZIIII#ZZJJJJ#ZLJOVVVZLTOOOVLLTTTOVSSTPPUU.SSPPPU####.UU",
+  "startedAt": "2026-01-29T23:43:54.944Z",
+  "timeElapsed": 224000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1769726754060.334,
+  "_id": "j57crpejnhyhn6518fdme9h7t58049tg",
+  "day": "2026-01-29",
+  "grid": ".ZZZUU#ZZIJJU#PPIJUUTPPIJTTTSPIJOVTSSOOOVL.SOVVVL####.LL",
+  "startedAt": "2026-01-29T22:43:42.185Z",
+  "timeElapsed": 131000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1769649335878.3528,
+  "_id": "j577frd80gx3twtka77pvx39tx804cvh",
+  "day": "2026-01-28",
+  "grid": ".ZJJJJ#ZZSOOJ#ZSSIOUUZSPIOOUVPPILUUVPPILT.VVVLLT.####TTT",
+  "startedAt": "2026-01-29T01:15:12.417Z",
+  "timeElapsed": 223000.0,
+  "username": "TIF"
+ },
+ {
+  "_creationTime": 1769649324650.649,
+  "_id": "j577s47rh5bzpw9mcbnde45gnh804h36",
+  "day": "2026-01-28",
+  "grid": ".ZJJJJ#ZZSOOJ#ZSSIOUUZSPIOOUVPPILUUVPPILT.VVVLLT.####TTT",
+  "startedAt": "2026-01-28T22:50:35.136Z",
+  "timeElapsed": 1056000.0,
+  "username": "SHM"
+ },
+ {
+  "_creationTime": 1769639679433.0361,
+  "_id": "j578ymedw9tha9f3ydmx9p88c9803h12",
+  "day": "2026-01-28",
+  "grid": ".ZJJPP#ZZSJPP#ZSSJUPUZSOJUUUOOOLVVVOLLLVT.IIIIVT.####TTT",
+  "startedAt": "2026-01-28T22:33:21.206Z",
+  "timeElapsed": 345000.0,
+  "username": "TIF"
+ },
+ {
+  "_creationTime": 1769639442868.2644,
+  "_id": "j577c8qkbyh9yag1cap4tkye2x80259g",
+  "day": "2026-01-28",
+  "grid": ".ZZZOO#ZZPPPO#LLLPPOOISLJJJJISSJTTTIUSUVT.IUUUVT.####VVV",
+  "startedAt": "2026-01-28T22:29:47.983Z",
+  "timeElapsed": 54000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1769626514207.4414,
+  "_id": "j576vqe3ftsdzgwj6ase8g0y5x803xmc",
+  "day": "2026-01-28",
+  "grid": ".JJJJT#IPPVJT#IPPVTTTIPSVVVLISSZLLLUSUZOO.UUUZZO.####ZOO",
+  "startedAt": "2026-01-28T18:53:34.918Z",
+  "timeElapsed": 205000.0,
+  "username": "HAN"
+ },
+ {
+  "_creationTime": 1769605367978.4175,
+  "_id": "j5712x1mphwcza10gwggepar5d802dzn",
+  "day": "2026-01-28",
+  "grid": ".SSTTT#JJSSTZ#JIVOTZZJIVOOOZJIVVVOZUIULLL.UUULPP.####PPP",
+  "startedAt": "2026-01-28T13:01:40.461Z",
+  "timeElapsed": 67000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1769604186016.6653,
+  "_id": "j57abnsm9ekmmbx0zq899jhq6x80314c",
+  "day": "2026-01-28",
+  "grid": ".SLIPP#SSLIPP#SLLIPUUOOZIJJUVOZZJUUVOOZJT.VVVZJT.####TTT",
+  "startedAt": "2026-01-28T12:41:53.162Z",
+  "timeElapsed": 72000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1769536835097.6133,
+  "_id": "j575rxfceqpdcbw6fd1w2vk61d800djm",
+  "day": "2026-01-27",
+  "grid": ".ZZZOO#VVVZZO#VIIIIOOVUUULLLPUTULJJPPTTT.JPPTSS.J####SSJ",
+  "startedAt": "2026-01-27T17:56:45.556Z",
+  "timeElapsed": 693000.0,
+  "username": "JSP"
+ },
+ {
+  "_creationTime": 1769501045183.3254,
+  "_id": "j578w9cgx8cnjhzzsfttvp797n800zsn",
+  "day": "2026-01-27",
+  "grid": ".IIIIL#PPPSSL#PPSSOLLJJZTOOOJZZTTTOJZUTU.VJZUUU.V####VVV",
+  "startedAt": "2026-01-27T08:03:08.847Z",
+  "timeElapsed": 55000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1769471203618.4465,
+  "_id": "j57923v7zc9v4w42k8p1evadk57zy5ks",
+  "day": "2026-01-26",
+  "grid": ".ZZZOO#UUUZZO#USUJLOOPSSJLLLPPSJVVVPPJJ.TVIIII.TV####TTT",
+  "startedAt": "2026-01-26T23:39:53.882Z",
+  "timeElapsed": 242000.0,
+  "username": "SHM"
+ },
+ {
+  "_creationTime": 1769451969812.0642,
+  "_id": "j5745hteyvd5vcsve7cqwy67gs7zyb21",
+  "day": "2026-01-26",
+  "grid": ".UUUOO#IUZUOS#IZZOOSSIZTPPPSIZTPPLLJTTT.LVJJJJ.LV####VVV",
+  "startedAt": "2026-01-26T18:22:25.485Z",
+  "timeElapsed": 224000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1769436205636.64,
+  "_id": "j57fcn2mkdsez03dr9gmkkx9717zzm7p",
+  "day": "2026-01-26",
+  "grid": ".ZZZOO#ZZUUUO#SSUJUOOISSJJJJILPPVVVILPP.TVILLP.TV####TTT",
+  "startedAt": "2026-01-26T14:01:54.801Z",
+  "timeElapsed": 90000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1769417031298.3606,
+  "_id": "j5734h80g6peer32vszn93pad97zzvbh",
+  "day": "2026-01-26",
+  "grid": ".JIIII#TJJJJP#TTTSSPPTZSSOPPZZOOOLLZUOU.LVZUUU.LV####VVV",
+  "startedAt": "2026-01-26T08:43:07.709Z",
+  "timeElapsed": 42000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1769389856318.9358,
+  "_id": "j57592sft98yvh12h95244th9n7zzp0z",
+  "day": "2026-01-25",
+  "grid": ".ZIIII#ZZSLUU#ZSSLUJJZSLLUUJPTTTOOJPPT.VOJPPT.VOO####VVV",
+  "startedAt": "2026-01-26T01:09:00.474Z",
+  "timeElapsed": 114000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1769376975748.5317,
+  "_id": "j57bvbzepmd5y89j8mkt3zxqn57zwwvc",
+  "day": "2026-01-25",
+  "grid": ".LLLSS#ULUSST#UUUTTTZIIIIJTZPPOOJZZPPO.JZVPOO.JJV####VVV",
+  "startedAt": "2026-01-25T21:33:27.429Z",
+  "timeElapsed": 167000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1769353449669.144,
+  "_id": "j5761htb2cat8fqgef1ds03y197zxc9y",
+  "day": "2026-01-25",
+  "grid": ".ZZZJJ#ZZSSPJ#TSSPPJITTTPPJITLLLOOIULU.VOIUUU.VOO####VVV",
+  "startedAt": "2026-01-25T15:02:33.239Z",
+  "timeElapsed": 96000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1769330823732.8865,
+  "_id": "j576avjk9pa6mkv36f39k838xs7zxnv2",
+  "day": "2026-01-25",
+  "grid": ".IIIIP#LLLSPP#LZSSPPJZZSJJJJZTUUUOOZTU.UOVTTT.OOV####VVV",
+  "startedAt": "2026-01-25T08:46:31.034Z",
+  "timeElapsed": 32000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1769303575188.987,
+  "_id": "j57cfbbzx5wbmqwcv9fmvm57fd7zx7fa",
+  "day": "2026-01-24",
+  "grid": ".ZZZPP#ZZLPPP#LLLIIIIVVVJJJJVOOUUUJVO.UTUSOOTTTSS####TS.",
+  "startedAt": "2026-01-25T01:11:04.828Z",
+  "timeElapsed": 110000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1769279834225.1714,
+  "_id": "j57b3c3r2y296817jf4qg65h7h7ztmgd",
+  "day": "2026-01-24",
+  "grid": ".ZOOPP#ZZOPPP#ZOOLLLJZIIIILJVVVTTTJVU.UTJJVUUUTSS####SS.",
+  "startedAt": "2026-01-24T18:36:17.678Z",
+  "timeElapsed": 387000.0,
+  "username": "ALU"
+ },
+ {
+  "_creationTime": 1769236750439.3286,
+  "_id": "j57ejamkcs4htgax80pgv2hv157zv0zn",
+  "day": "2026-01-23",
+  "grid": ".VVVUU#ZVIJJU#ZVIJUUTZZIJTTTLZIJSSTL.OSSPPLLOOOPP####O.P",
+  "startedAt": "2026-01-24T06:38:07.008Z",
+  "timeElapsed": 273000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1769191994311.0032,
+  "_id": "j570b0ecpcvh1s08bs8dg18a2h7zr2ss",
+  "day": "2026-01-23",
+  "grid": ".IIIIL#PPPLLL#PPZZZSSOZZTSSVOOOTTTVJ.OTVVVJJJJUUU####U.U",
+  "startedAt": "2026-01-23T18:11:54.516Z",
+  "timeElapsed": 79000.0,
+  "username": "OWO"
+ },
+ {
+  "_creationTime": 1769179120783.5686,
+  "_id": "j5733dmfqsvqgkhynpq7sawd297zsyqn",
+  "day": "2026-01-23",
+  "grid": ".PJJJJ#PPJVVV#PPSVTTTISSVOTLISOOOTLI.OZZLLIZZZUUU####U.U",
+  "startedAt": "2026-01-23T14:37:02.704Z",
+  "timeElapsed": 580000.0,
+  "username": "HAN"
+ },
+ {
+  "_creationTime": 1769139628402.2146,
+  "_id": "j57ccjpwqw8xgdqrc5zytx61y57zsqvx",
+  "day": "2026-01-22",
+  "grid": ".ZZZOO#ZZLIVO#LLLIVOOUUUIVVVUTUIPPJ.TSSPPJTTTSSPJ####.JJ",
+  "startedAt": "2026-01-23T03:38:00.669Z",
+  "timeElapsed": 282000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1769132014644.894,
+  "_id": "j571ddv13ty5wkmf5hhzwszq3d7zrwrd",
+  "day": "2026-01-22",
+  "grid": ".SSPPP#LLSSPP#LZIIIIJLZZJJJJUUZTVVV.UZTOOVUUTTTOV####.OO",
+  "startedAt": "2026-01-23T01:33:04.632Z",
+  "timeElapsed": 149000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1769121838912.329,
+  "_id": "j57e56vgs66e4vcdxepk7qe8357zqm01",
+  "day": "2026-01-23",
+  "grid": ".PLLLV#PPOOLV#PPOVVVIJOOTTTIJJJJTZIU.USTZIUUUSSZZ####S.Z",
+  "startedAt": "2026-01-22T22:41:50.943Z",
+  "timeElapsed": 127000.0,
+  "username": "J.C"
+ },
+ {
+  "_creationTime": 1769109014621.3042,
+  "_id": "j57bg0dj8sp5pr1691tzgjpq2x7zp51q",
+  "day": "2026-01-22",
+  "grid": ".LIIII#TLLLSS#TTTZZSSTZZZPPPUUVOPPJ.UVOOOJUUVVVOJ####.JJ",
+  "startedAt": "2026-01-22T19:08:48.717Z",
+  "timeElapsed": 84000.0,
+  "username": "HAN"
+ },
+ {
+  "_creationTime": 1769061559589.8254,
+  "_id": "j574x3zzfkr0v0hz90qfzq6szd7zps5f",
+  "day": "2026-01-22",
+  "grid": ".ZOOLL#ZZOVLS#ZOOVLSSZJJVVVSUUJPPPI.UJPPTIUUJTTTI####.TI",
+  "startedAt": "2026-01-22T05:56:45.641Z",
+  "timeElapsed": 145000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1768994740732.5203,
+  "_id": "j571yzpt9a4tt93xmhxhk072ax7znce0",
+  "day": "2026-01-21",
+  "grid": ".SPPLZ#SSPPLZ#SIPLLZZJIVVVOZJIVOOO.JIVOTUUJJTTTU.####TUU",
+  "startedAt": "2026-01-21T11:24:40.039Z",
+  "timeElapsed": 59000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1768982845841.4875,
+  "_id": "j571rge9fe36bjhr37zxc1awk57zn7jr",
+  "day": "2026-01-21",
+  "grid": ".PPLLL#PPPTOL#IJJTOOOIJTTTSOIJVZSS.IJVZSUUVVVZZU.####ZUU",
+  "startedAt": "2026-01-21T08:03:36.349Z",
+  "timeElapsed": 229000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1768977082846.9128,
+  "_id": "j576sr2kmd7fq2590vtj3y78s17zna6m",
+  "day": "2026-01-21",
+  "grid": ".ZZZIL#ZZPPIL#OOPPILLJOPVISSJOOVSS.JVVVTUUJJTTTU.####TUU",
+  "startedAt": "2026-01-21T06:25:37.940Z",
+  "timeElapsed": 759000.0,
+  "username": "J.C"
+ },
+ {
+  "_creationTime": 1768964952340.7097,
+  "_id": "j572gstn4c99pwbz6anmbmk6kd7zngde",
+  "day": "2026-01-20",
+  "grid": ".LLLOO#ILPPPO#ISSPPOOITSSZZVITZZZ.VTTTJVVVJJJJU.U####UUU",
+  "startedAt": "2026-01-21T03:07:57.686Z",
+  "timeElapsed": 286000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1768927133841.532,
+  "_id": "j57dzc4c48j523ke1hm8ej8qwx7zk5re",
+  "day": "2026-01-20",
+  "grid": ".ZZZOO#VVVZZO#VPPITOOVPPITTTSSPIT.LJSSILLLJJJJU.U####UUU",
+  "startedAt": "2026-01-20T16:37:39.828Z",
+  "timeElapsed": 459000.0,
+  "username": "TIF"
+ },
+ {
+  "_creationTime": 1768896707939.3157,
+  "_id": "j57dcx90a25ztqvr0m0js8bqkd7zj9jw",
+  "day": "2026-01-20",
+  "grid": ".ZZZOO#ZZIPPO#LLIPPOOLTIPSSVLTISS.VTTTJVVVJJJJU.U####UUU",
+  "startedAt": "2026-01-20T08:09:43.159Z",
+  "timeElapsed": 124000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1768882890011.0386,
+  "_id": "j578c2jwnp1pm2amwzsw4ejzs57zj210",
+  "day": "2026-01-19",
+  "grid": ".UUVVV#JJUVLS#JUUVLSSJOOLLZSJOPP.ZZOOPPPTZIIII.TZ####TTT",
+  "startedAt": "2026-01-20T04:08:22.336Z",
+  "timeElapsed": 782000.0,
+  "username": "SHM"
+ },
+ {
+  "_creationTime": 1768863680632.428,
+  "_id": "j57f0v11evs1wa79f4snmg0ctn7zgrdh",
+  "day": "2026-01-19",
+  "grid": ".JJJJZ#TLLLJZ#TTTLSZZTPPPSSZVOPP.SIVOOOUUIVVVO.UI####UUI",
+  "startedAt": "2026-01-19T22:59:48.652Z",
+  "timeElapsed": 207000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1768845111189.3323,
+  "_id": "j578tefjz8jmy34rchtde45qeh7zhppt",
+  "day": "2026-01-19",
+  "grid": ".ZZZOO#ZZPPPO#SLLPPOOSSLIIIIVSLT.JJVTTTUUJVVVT.UJ####UUJ",
+  "startedAt": "2026-01-19T17:50:26.308Z",
+  "timeElapsed": 84000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1768813173125.6543,
+  "_id": "j5704acc9fybbwf18bv5d782257zhtfr",
+  "day": "2026-01-19",
+  "grid": ".PPLLL#PPPLTS#IIIITSSOOZTTTSVOZZ.JJVOOZUUJVVVZ.UJ####UUJ",
+  "startedAt": "2026-01-19T08:58:57.735Z",
+  "timeElapsed": 35000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1768805275503.519,
+  "_id": "j5779thvj2sjc5n6ztr3wqmbc97zg6wa",
+  "day": "2026-01-19",
+  "grid": ".LLPPP#ILSSPP#ILJSSUUIZJJJJUIZTO.UUZZTOOOVZTTT.OV####VVV",
+  "startedAt": "2026-01-19T06:45:18.141Z",
+  "timeElapsed": 154000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1768773529235.1616,
+  "_id": "j575gzq4rbw8rfsak2dayqaxk97zfgz0",
+  "day": "2026-01-18",
+  "grid": ".SILPP#SSILPP#SZILLPJZZIJJJJZOO.TTTZOUUUTVOOU.UTV####VVV",
+  "startedAt": "2026-01-18T21:58:05.830Z",
+  "timeElapsed": 42000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1768732930085.3943,
+  "_id": "j576b56np4w7ek12t17w7ahzh17ze54w",
+  "day": "2026-01-18",
+  "grid": ".OJJJJ#TOOOLJ#TTTOLLLTPPIIIIVPP.ZZSVPZZZSSVVV.USU####UUU",
+  "startedAt": "2026-01-18T10:41:34.158Z",
+  "timeElapsed": 35000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1768690157028.186,
+  "_id": "j57bg0ybtfjvxh293m47gpatj57zc3js",
+  "day": "2026-01-17",
+  "grid": ".PPPIL#ZZPPIL#JZZZILLJJJJIUUVO.TTTUVOOOTUUVVVOTSS####SS.",
+  "startedAt": "2026-01-17T22:47:16.240Z",
+  "timeElapsed": 120000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1768664367408.3005,
+  "_id": "j571tnpj274me56r9hx2wrwxa97zdf13",
+  "day": "2026-01-17",
+  "grid": ".JIIII#TJJJJL#TTTLLLPTUUOOPPVU.ZOPPVUUZOOSVVVZZSS####ZS.",
+  "startedAt": "2026-01-17T15:38:52.181Z",
+  "timeElapsed": 34000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1768661417783.7007,
+  "_id": "j57ene3t1x9dce9ka8ar45q40d7zdj8g",
+  "day": "2026-01-17",
+  "grid": ".JIIII#TJJJJL#TTTLLLPTUUOOPPVU.ZOPPVUUZOOSVVVZZSS####ZS.",
+  "startedAt": "2026-01-17T14:49:12.331Z",
+  "timeElapsed": 365000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1768608751219.6772,
+  "_id": "j570pkwvmt8gbcfmqwrgqg8y9s7zc8k6",
+  "day": "2026-01-16",
+  "grid": ".ZOOST#ZZOSST#ZOOSTTTZUUJJJJV.UJLLIVUUPPLIVVVPPLI####P.I",
+  "startedAt": "2026-01-17T00:07:53.511Z",
+  "timeElapsed": 138000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1768604921721.2715,
+  "_id": "j571kzfbk11f3sx6hd5zdqqg6h7zajgj",
+  "day": "2026-01-16",
+  "grid": ".SSTTT#ZZSSTI#OZZZTIJOOOPPIJV.OPPIJVLLLPJJVVVLUUU####U.U",
+  "startedAt": "2026-01-16T23:02:44.567Z",
+  "timeElapsed": 356000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1768579080955.7175,
+  "_id": "j573jqszx3pa60q5dah5hay0wh7za2th",
+  "day": "2026-01-16",
+  "grid": ".ZIIII#ZZJJJJ#ZSJPPOOZSSPPOVT.SPOOVTTTLVVVTLLLUUU####U.U",
+  "startedAt": "2026-01-16T15:57:06.013Z",
+  "timeElapsed": 54000.0,
+  "username": "TIF"
+ },
+ {
+  "_creationTime": 1768569055412.5342,
+  "_id": "j578c5n6ptaekwwc1j8m307ap97za4b7",
+  "day": "2026-01-16",
+  "grid": ".SOVVV#SSOOOV#SZZZOVTZZLLTTTU.ULJJTUUULJPPIIIIJPP####J.P",
+  "startedAt": "2026-01-16T12:45:03.206Z",
+  "timeElapsed": 320000.0,
+  "username": "JT"
+ },
+ {
+  "_creationTime": 1768541375189.7217,
+  "_id": "j57fh9epq66vgv3qwqghw956r17zbsdh",
+  "day": "2026-01-15",
+  "grid": ".PPZOO#PPPZZO#LLLJZOOUULJZSS.UVJSSIUUVJJTIVVVTTTI####.TI",
+  "startedAt": "2026-01-16T05:28:02.884Z",
+  "timeElapsed": 770000.0,
+  "username": "SHM"
+ },
+ {
+  "_creationTime": 1768520628237.8838,
+  "_id": "j57bnsf4qq9xd5e4tnfgfz39qd7z9fr6",
+  "day": "2026-01-15",
+  "grid": ".ZZZOO#VVVZZO#VIPPTOOVIPPTJJ.IPTTTJUIULLLJUUULSSJ####.SS",
+  "startedAt": "2026-01-15T23:41:06.193Z",
+  "timeElapsed": 161000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1768517368734.8655,
+  "_id": "j571ksgsmesj7b26kw63tw5jrd7z8wnf",
+  "day": "2026-01-15",
+  "grid": ".ZJJJJ#ZZJSOO#ZISSOLLZISOOLV.ITTTLVUIUTVVVUUUTPPP####.PP",
+  "startedAt": "2026-01-15T22:48:43.263Z",
+  "timeElapsed": 428000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1768500850692.696,
+  "_id": "j57ase5m6nkryyhtayfre552k17z9s5s",
+  "day": "2026-01-15",
+  "grid": ".ZZZOO#ZZTLLO#TTTILOOUUTILSS.UVISSJUUVIPPJVVVPPPJ####.JJ",
+  "startedAt": "2026-01-15T18:12:32.141Z",
+  "timeElapsed": 98000.0,
+  "username": "HAN"
+ },
+ {
+  "_creationTime": 1768430017333.4722,
+  "_id": "j57ebjde3dwsx8ethnpjan9ywn7z7gf6",
+  "day": "2026-01-14",
+  "grid": ".IIIIT#LLPPPT#LJPPTTTLJUUUS.VJUOUSSVJJOOOSVVVZZO.####ZZZ",
+  "startedAt": "2026-01-14T22:31:37.779Z",
+  "timeElapsed": 118000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1768426486528.0608,
+  "_id": "j5744a47sfm3js78e8gzz972q97z676r",
+  "day": "2026-01-14",
+  "grid": ".ZIIII#ZZLPPP#ZJLPPSSZJLLSS.VJOOUUUVJJOUTUVVVOOT.####TTT",
+  "startedAt": "2026-01-14T12:12:13.704Z",
+  "timeElapsed": 168000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1768425264074.2295,
+  "_id": "j5795z47d9j5dz3rb0xmmz6p017z7zf8",
+  "day": "2026-01-14",
+  "grid": ".PPSOO#PPPSSO#IIIISOOJJZVVV.JZZVLLLJZUVUTLJZUUUT.####TTT",
+  "startedAt": "2026-01-14T21:13:16.564Z",
+  "timeElapsed": 386000.0,
+  "username": "HAN"
+ },
+ {
+  "_creationTime": 1768421334436.5386,
+  "_id": "j574mkehgxz2hn4qjvwdyxpdpd7z7171",
+  "day": "2026-01-14",
+  "grid": ".IIIIJ#ZZJJJJ#SZZZPPPSSOOPP.VSOLUUUVOOLUTUVVVLLT.####TTT",
+  "startedAt": "2026-01-14T20:07:33.695Z",
+  "timeElapsed": 80000.0,
+  "username": "TIF"
+ },
+ {
+  "_creationTime": 1768419016329.6174,
+  "_id": "j5755p7jggp5qsfx2te2m9rth57z7m1f",
+  "day": "2026-01-14",
+  "grid": ".ZLLLS#ZZLISS#ZOOISUUZOTIVU.OOTIVUUJTTTVVVJJJJPP.####PPP",
+  "startedAt": "2026-01-14T19:29:48.905Z",
+  "timeElapsed": 27000.0,
+  "username": "TIF"
+ },
+ {
+  "_creationTime": 1768400087932.0483,
+  "_id": "j57ey3k6cw4mq3tmk6sxm6abrs7z6wkn",
+  "day": "2026-01-14",
+  "grid": ".LIIII#JLLLOO#JJJJOUUVVVOOU.VTSZZUUVTSSZZZTTTSPP.####PPP",
+  "startedAt": "2026-01-14T14:11:31.370Z",
+  "timeElapsed": 240000.0,
+  "username": "HAN"
+ },
+ {
+  "_creationTime": 1768398650755.906,
+  "_id": "j57dw75n50nte0s9p6ht2nesg17z76bk",
+  "day": "2026-01-14",
+  "grid": ".ZZZOO#ILLZZO#ILVVVOOILVTPP.ISVTPPPSSTTTUUSJJJJU.####JUU",
+  "startedAt": "2026-01-14T13:49:26.436Z",
+  "timeElapsed": 84000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1768397105375.1562,
+  "_id": "j57cjetmwgv04c737mqa9jj9x57z7cve",
+  "day": "2026-01-14",
+  "grid": ".ZZZOO#ZZVVVO#LLVPPOOILVPPS.ILUPUSSIJUUUTSIJJJJT.####TTT",
+  "startedAt": "2026-01-14T13:22:29.325Z",
+  "timeElapsed": 155000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1768380566058.588,
+  "_id": "j5764x8gff0m5g0mxt87zhpvqd7z7czp",
+  "day": "2026-01-14",
+  "grid": ".JJJJL#PPPVJL#ZPPVILLZVVVIS.ZZOOISSUZUOITSUUUOOT.####TTT",
+  "startedAt": "2026-01-14T08:47:27.544Z",
+  "timeElapsed": 118000.0,
+  "username": "SHM"
+ },
+ {
+  "_creationTime": 1768360664237.0212,
+  "_id": "j572b4sp3sy86cw5d2rpvfd6jx7z6s17",
+  "day": "2026-01-13",
+  "grid": ".SLVVV#SSLLLV#SJJJJVITZZZJ.ITTTZZOITPPOOOIPPPOU.U####UUU",
+  "startedAt": "2026-01-14T03:14:47.580Z",
+  "timeElapsed": 628000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1768360588095.5881,
+  "_id": "j57dd6g1cmj2qzgb9t3kda2mq97z6449",
+  "day": "2026-01-13",
+  "grid": ".SLZOO#SSLZZO#STLLZOOJTTTZ.VJTIIIIVJPPPVVVJJPPU.U####UUU",
+  "startedAt": "2026-01-14T03:14:39.343Z",
+  "timeElapsed": 108000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1768354726746.2598,
+  "_id": "j57cgv84a23v7brs14srqfkdd17z61k9",
+  "day": "2026-01-13",
+  "grid": ".IIIIZ#VVVOZZ#VOOOZJJVOSSZ.JTSSPPPJTTTLPPJTLLLU.U####UUU",
+  "startedAt": "2026-01-14T01:35:02.943Z",
+  "timeElapsed": 223000.0,
+  "username": "SHM"
+ },
+ {
+  "_creationTime": 1768354419918.3457,
+  "_id": "j57ea1922m4nv6zdxbgftzn60s7z68e5",
+  "day": "2026-01-13",
+  "grid": ".PPJLL#PPPJLS#VVVJLSSVTJJO.SVTZZOOOTTTZZZOIIIIU.U####UUU",
+  "startedAt": "2026-01-14T01:30:28.745Z",
+  "timeElapsed": 190000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1768347911444.2815,
+  "_id": "j571jp34qts94rea1zdbq0z5hn7z5ez2",
+  "day": "2026-01-13",
+  "grid": ".SSZZZ#SSZZPP#JJJJPPITTTJP.IVTLLLOIVTLOOOIVVVOU.U####UUU",
+  "startedAt": "2026-01-13T23:44:29.808Z",
+  "timeElapsed": 41000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1768332238274.3228,
+  "_id": "j57c5wtr319628jz3sq7z0z0cn7z4k1d",
+  "day": "2026-01-13",
+  "grid": ".PLUUU#PPLUOU#PPLLOOOITTTS.OIVTZSSJIVTZZSJIVVVZ.J####ZJJ",
+  "startedAt": "2026-01-13T19:21:49.050Z",
+  "timeElapsed": 71000.0,
+  "username": "KSB"
+ },
+ {
+  "_creationTime": 1768332087042.872,
+  "_id": "j57648zbavrtnfqptfw9pgnf6h7z5g55",
+  "day": "2026-01-13",
+  "grid": ".TIIII#VTTTZZ#VTZZZJJVVVSS.JPPOOSSJPPOLLLJPOOLU.U####UUU",
+  "startedAt": "2026-01-13T16:52:16.534Z",
+  "timeElapsed": 1104000.0,
+  "username": "KSB"
+ },
+ {
+  "_creationTime": 1768329504608.2253,
+  "_id": "j57dr903jks1s41k62z97phtzn7z46np",
+  "day": "2026-01-13",
+  "grid": ".IIIIJ#PPJJJJ#PPSOOUUPSSOT.ULSOOTUULZZTTTVLLZZZ.V####VVV",
+  "startedAt": "2026-01-13T18:36:14.155Z",
+  "timeElapsed": 1518000.0,
+  "username": "HAN"
+ },
+ {
+  "_creationTime": 1768323466046.6545,
+  "_id": "j576305a23e97vjmry1syvrsdn7z4jpt",
+  "day": "2026-01-13",
+  "grid": ".ZSSOO#ZZPSSO#ZLPPTOOZLPPT.VJLLTTTVJJJJVVVIIIIU.U####UUU",
+  "startedAt": "2026-01-13T16:55:47.132Z",
+  "timeElapsed": 262000.0,
+  "username": "JSP"
+ },
+ {
+  "_creationTime": 1768309657887.5554,
+  "_id": "j576x8p5gbywsde374ghbcgqyn7z5s8x",
+  "day": "2026-01-13",
+  "grid": ".JJJJZ#TJLLIZ#TTTLIZZTSSLI.ZVOSSIPPVOOOPPPVVVOU.U####UUU",
+  "startedAt": "2026-01-13T13:07:10.899Z",
+  "timeElapsed": 26000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1768308520150.6943,
+  "_id": "j5764mery462a4bd6yprn7ybws7z429a",
+  "day": "2026-01-13",
+  "grid": ".ZIIII#ZZTTTS#ZOOTVSSZPOTV.SPPOOVVVPPLJJJJLLLJU.U####UUU",
+  "startedAt": "2026-01-13T12:48:01.034Z",
+  "timeElapsed": 38000.0,
+  "username": "TIF"
+ },
+ {
+  "_creationTime": 1768265099332.1536,
+  "_id": "j57284rng88msq7e6sv9c7hkk97z4gnh",
+  "day": "2026-01-12",
+  "grid": ".OVVVZ#TOOOVZ#TTTOVZZTPPU.UZPPPUUUSJIIIISSJJJJ.SL####LLL",
+  "startedAt": "2026-01-13T00:41:51.598Z",
+  "timeElapsed": 183000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1768241281295.411,
+  "_id": "j577xjkgr52aakwm808zx835b57z24ad",
+  "day": "2026-01-12",
+  "grid": ".ZZZOT#ZZOOOT#LLOPTTTLVPP.SSLVPPSSIJVVVUUIJJJJ.UI####UUI",
+  "startedAt": "2026-01-12T18:06:35.695Z",
+  "timeElapsed": 331000.0,
+  "username": "TIF"
+ },
+ {
+  "_creationTime": 1768220689246.9783,
+  "_id": "j57e9570wnwbk5ann6g8ktgths7z3px0",
+  "day": "2026-01-12",
+  "grid": ".IIIIO#UUUOOO#UZUOPPPSZZL.PPSSZLVVVJSZLLTVJJJJ.TV####TTT",
+  "startedAt": "2026-01-12T12:23:57.191Z",
+  "timeElapsed": 47000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1768218479527.7007,
+  "_id": "j57f57wk3c3pgm6p1rzd64bbrx7z2nd5",
+  "day": "2026-01-12",
+  "grid": ".LZTTT#VLZZTS#VLLZTSSVVVZ.OSPPPOOOIJPPOUUIJJJJ.UI####UUI",
+  "startedAt": "2026-01-12T11:43:13.972Z",
+  "timeElapsed": 285000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1768183568883.4304,
+  "_id": "j574h0qhp1jaqjv6c7kgpa3gjn7z2jmt",
+  "day": "2026-01-11",
+  "grid": ".SPLLL#SSPPOL#SZPPOOOZZU.UIOZTUUUIJZTVVVIJTTT.VIJ####VJJ",
+  "startedAt": "2026-01-12T02:05:08.177Z",
+  "timeElapsed": 446000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1768182927034.3357,
+  "_id": "j57cgthqna3z7bdh906bvyc23x7z3dad",
+  "day": "2026-01-11",
+  "grid": ".SJJPP#SSJPPP#SZJUULLZZJ.UILZTOUUILZTOOOIVTTT.OIV####VVV",
+  "startedAt": "2026-01-12T01:50:44.036Z",
+  "timeElapsed": 277000.0,
+  "username": "HY"
+ },
+ {
+  "_creationTime": 1768170804677.537,
+  "_id": "j57caswd6bxjzs21ebahdtzxk17z0ddv",
+  "day": "2026-01-11",
+  "grid": ".ZZZPP#ZZOOPP#JJOSSPIJOO.SSIJTLVVVIJTLLLVITTT.UVU####UUU",
+  "startedAt": "2026-01-11T22:20:41.254Z",
+  "timeElapsed": 1690000.0,
+  "username": "POG"
+ },
+ {
+  "_creationTime": 1768169833025.3647,
+  "_id": "j575pax56ndphjbadwsb3vjyq17z1jkc",
+  "day": "2026-01-11",
+  "grid": ".SJJJJ#SSJVVV#SZIUUVLZZI.UVLZTIUULLZTIOOPPTTT.OPP####OOP",
+  "startedAt": "2026-01-11T22:13:43.688Z",
+  "timeElapsed": 359000.0,
+  "username": "TIF"
+ },
+ {
+  "_creationTime": 1768153779409.2556,
+  "_id": "j572qnw0ez69bgp9kx2rvzp8q57z1wt8",
+  "day": "2026-01-11",
+  "grid": ".PPVOO#PPPVJO#IVVVJOOISS.JUUITSSJJUITZZZUUTTT.ZZL####LLL",
+  "startedAt": "2026-01-11T17:43:22.392Z",
+  "timeElapsed": 626000.0,
+  "username": "ETH"
+ },
+ {
+  "_creationTime": 1768149956655.9094,
+  "_id": "j57f9c4q00rq2rz5makq275x8x7z07be",
+  "day": "2026-01-11",
+  "grid": ".IIIIL#VVVLLL#JJVSSUUJTV.SSUJTTTOUUJTZZOOOZZZ.PPO####PPP",
+  "startedAt": "2026-01-11T16:43:36.758Z",
+  "timeElapsed": 138000.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1768149695009.4355,
+  "_id": "j5720ch5yezmnfrrggqey15psx7z14qy",
+  "day": "2026-01-11",
+  "grid": ".ZZZJJ#VVVZZJ#VTTTLJIVST.LJISSTOLLISPPOOOIPPP.UOU####UUU",
+  "startedAt": "2026-01-11T16:36:25.391Z",
+  "timeElapsed": 521000.0,
+  "username": ":\")"
+ },
+ {
+  "_creationTime": 1768149660174.5083,
+  "_id": "j572krrgwv71q5k5f62fp6xaf97z0evp",
+  "day": "2026-01-11",
+  "grid": ".SSZZZ#SSZZLL#JJUUULVIJU.ULVIJOOVVVIJOTTTPIOO.TPP####TPP",
+  "startedAt": "2026-01-11T16:22:28.123Z",
+  "timeElapsed": 1551000.0,
+  "username": "ASS"
+ },
+ {
+  "_creationTime": 1768145444139.8535,
+  "_id": "j576ntzvpnqncp67nbmejfb19n7z0vad",
+  "day": "2026-01-11",
+  "grid": ".JJJJT#UJUTTT#UUUSSTILLL.SSILPVVVZIPPVOOZIPPV.OZZ####OOZ",
+  "startedAt": "2026-01-11T15:29:17.915Z",
+  "timeElapsed": 86000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1768143330589.4097,
+  "_id": "j571w1gfhqvn56v5bdjd4as03x7z08gc",
+  "day": "2026-01-11",
+  "grid": ".PUUUT#PPUZUT#PPZZTTTOOZ.LLLVOZSLJIVOOSSJIVVV.SJI####JJI",
+  "startedAt": "2026-01-11T14:52:32.428Z",
+  "timeElapsed": 823000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1768142824168.4429,
+  "_id": "j57csqxfk4bfhh6q99n513zmn97z1txc",
+  "day": "2026-01-11",
+  "grid": ".SLLLT#SSLTTT#SZZZUTUZZJ.UUUPPJVVVIPPJOOVIPJJ.OVI####OOI",
+  "startedAt": "2026-01-11T14:45:49.144Z",
+  "timeElapsed": 422000.0,
+  "username": "ASS"
+ },
+ {
+  "_creationTime": 1768112342101.8723,
+  "_id": "j57b8w13q7gzr8m2c4szndwd617z18fk",
+  "day": "2026-01-11",
+  "grid": ".PPUUU#PPPUJU#IJJJJSSIOO.SSZITOLLZZITOOLZVTTT.LZV####VVV",
+  "startedAt": "2026-01-11T05:12:53.214Z",
+  "timeElapsed": 360000.0,
+  "username": "NOA"
+ },
+ {
+  "_creationTime": 1768095421793.7405,
+  "_id": "j579deeqxf9hgj4fmdtc2rdnds7z0kb6",
+  "day": "2026-01-10",
+  "grid": ".ZUUUL#ZZUTUL#ZTTTSLLZJ.TSSIPJJJJSIPPOVVVIPPOOOVI####OV.",
+  "startedAt": "2026-01-11T01:34:35.232Z",
+  "timeElapsed": 146000.0,
+  "username": "TIF"
+ },
+ {
+  "_creationTime": 1768081324785.9482,
+  "_id": "j572jbyw1w955g5s6xphe99gs97yy5vw",
+  "day": "2026-01-10",
+  "grid": ".ZZZLT#ZZLLLT#JJJJTTTJS.IIIISSOOVVVSPPOUUVPPPOOUV####UU.",
+  "startedAt": "2026-01-10T21:39:12.987Z",
+  "timeElapsed": 170000.0,
+  "username": "ASS"
+ },
+ {
+  "_creationTime": 1768073704182.924,
+  "_id": "j57dkc4241ahhcdxn01tg8rk7h7yzt0g",
+  "day": "2026-01-10",
+  "grid": ".SUUUT#SSUOUT#SOOOTTTIO.JJJJIVLZZZJIVLLLZZIVVVPPP####PP.",
+  "startedAt": "2026-01-10T19:30:47.475Z",
+  "timeElapsed": 828000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1768060126999.954,
+  "_id": "j57fj0baedkmr58j9c7zhj4nm57yy7kb",
+  "day": "2026-01-10",
+  "grid": ".ZIIII#ZZJJJJ#ZVVVUJUZV.TUUUPVLTTTOPPLTOOOPPLLOSS####SS.",
+  "startedAt": "2026-01-10T15:47:15.914Z",
+  "timeElapsed": 86000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1767999917667.5215,
+  "_id": "j578s94t23qcme3vrzbs90peh97ywvee",
+  "day": "2026-01-09",
+  "grid": ".ZZZPP#ZZTPPP#UUTTTLIU.TLLLIUUOVJJIOOOVJSIOVVVJSS####J.S",
+  "startedAt": "2026-01-09T23:03:44.730Z",
+  "timeElapsed": 92000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1767985033728.2683,
+  "_id": "j571k3wytgyafdtfwz1zrd7kzx7yxtvh",
+  "day": "2026-01-09",
+  "grid": ".ZZZTL#ZZTTTL#IIIITLLJ.VVVPPJUUUVPPJUOUVSPJJOOOSS####O.S",
+  "startedAt": "2026-01-09T18:48:38.797Z",
+  "timeElapsed": 514000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1767981721313.7341,
+  "_id": "j5734bvjh8xspkpbw2bsv0q5wn7yxj23",
+  "day": "2026-01-09",
+  "grid": ".ZZZST#ZZOSST#OOOSTTTO.IIIILVPPPLLLVPPJJJJVVVJUUU####U.U",
+  "startedAt": "2026-01-09T18:00:20.448Z",
+  "timeElapsed": 807000.0,
+  "username": "OWO"
+ },
+ {
+  "_creationTime": 1767981225836.577,
+  "_id": "j57fdkk2md9982rw02zsjphsr97yx7tt",
+  "day": "2026-01-09",
+  "grid": ".SSZJJ#SSOZZJ#OOOVZJIO.TVZJITTTVVVIPPTLLLIPPPLUUU####U.U",
+  "startedAt": "2026-01-09T17:49:43.471Z",
+  "timeElapsed": 237000.0,
+  "username": "JT"
+ },
+ {
+  "_creationTime": 1767967237393.06,
+  "_id": "j57fmhj64s414q73c2a21hgzzh7ywnhv",
+  "day": "2026-01-09",
+  "grid": ".ZIIII#ZZJJJJ#ZTTTPJSZ.TPPSSVOTPPSLVOOOLLLVVVOUUU####U.U",
+  "startedAt": "2026-01-09T13:57:36.933Z",
+  "timeElapsed": 384000.0,
+  "username": "TIF"
+ },
+ {
+  "_creationTime": 1767965031402.1414,
+  "_id": "j57c6040szejhkk2aeamm42rv57yxnpk",
+  "day": "2026-01-09",
+  "grid": ".ZVVVL#ZZSSVL#ZSSTVLLZ.OTTTPOOOTJPPOJJJJPPIIIIUUU####U.U",
+  "startedAt": "2026-01-09T13:22:45.555Z",
+  "timeElapsed": 65000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1767933445408.788,
+  "_id": "j5719dc1yefzf87f2yj13fd0hh7ywctk",
+  "day": "2026-01-08",
+  "grid": ".PPTTT#PPPITS#VVVITSS.ZVIUUSLZVIUJJLZZOUUJLLZOOOJ####.OJ",
+  "startedAt": "2026-01-09T04:35:07.419Z",
+  "timeElapsed": 608000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1767923712758.0747,
+  "_id": "j5771f882qb3w2zf0saf2qghy57yw7rp",
+  "day": "2026-01-08",
+  "grid": ".ZZZTJ#ZZTTTJ#OOPPTJV.OPPJJVLOOPVVVLLLSSUUIIIISSU####.UU",
+  "startedAt": "2026-01-09T01:52:49.017Z",
+  "timeElapsed": 143000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1767923352170.528,
+  "_id": "j57ep6f18y599wha08refw162s7yxhrj",
+  "day": "2026-01-08",
+  "grid": ".ZZZTJ#ZZTTTJ#OOPPTJV.OPPJJVLOOPVVVLLLSSUUIIIISSU####.UU",
+  "startedAt": "2026-01-09T01:40:15.473Z",
+  "timeElapsed": 536000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1767894791822.5532,
+  "_id": "j57ftczf5wy5yaqa9djsz2ke6n7yv56e",
+  "day": "2026-01-08",
+  "grid": ".VVVOO#SLLVTO#SSLVTOO.SLTTTJPPPJJJJPPZZZUUIIIIZZU####.UU",
+  "startedAt": "2026-01-08T17:50:12.040Z",
+  "timeElapsed": 974000.0,
+  "username": "AXC"
+ },
+ {
+  "_creationTime": 1767886980472.3618,
+  "_id": "j57c3jpvgxt2p1cy5nj79r0r5s7ytxen",
+  "day": "2026-01-08",
+  "grid": ".UUUOO#ZUIUOS#ZZIOOSS.ZILLLSVZITPLJVTTTPPJVVVTPPJ####.JJ",
+  "startedAt": "2026-01-08T15:40:41.495Z",
+  "timeElapsed": 138000.0,
+  "username": "TIF"
+ },
+ {
+  "_creationTime": 1767880675285.5178,
+  "_id": "j57d7146ycgh1as4ec7f4mmfps7yvxae",
+  "day": "2026-01-08",
+  "grid": ".ZZZOT#ZZOOOT#UUOSTTT.USSVVVUUSLLLVJIIIILVJJJJPPP####.PP",
+  "startedAt": "2026-01-08T13:55:53.505Z",
+  "timeElapsed": 121000.0,
+  "username": "TIF"
+ },
+ {
+  "_creationTime": 1767880625294.7085,
+  "_id": "j570sxbjtwgp1ydm9q2b8nyg9x7yvkp3",
+  "day": "2026-01-08",
+  "grid": ".SSUUU#SSTUOU#TTTZOOO.PTZZIOVPPLZIJVPPLZIJVVVLLIJ####.JJ",
+  "startedAt": "2026-01-08T13:56:06.976Z",
+  "timeElapsed": 53000.0,
+  "username": "HYL"
+ },
+ {
+  "_creationTime": 1767840476493.8826,
+  "_id": "j57a0j2e8ygnnsewzxbkrhyhch7ytrne",
+  "day": "2026-01-07",
+  "grid": ".SIPPP#SSIPPO#SZIOOO.ZZIOVVVZTJJJJVZTJUUUVTTTULU.####LLL",
+  "startedAt": "2026-01-08T02:46:34.297Z",
+  "timeElapsed": 78000.0,
+  "username": "CXC"
+ },
+ {
+  "_creationTime": 1767836841999.71,
+  "_id": "j571y9av6sckqnmx16dbcgb2b97ytkfh",
+  "day": "2026-01-07",
+  "grid": ".PPUUU#PPPUVU#IIIIVZ.JJVVVZZJLLLOOZJLSSOTZJSSOOT.####TTT",
+  "startedAt": "2026-01-08T01:30:21.784Z",
+  "timeElapsed": 1008000.0,
+  "username": "ASS"
+ },
+ {
+  "_creationTime": 1767831914628.4387,
+  "_id": "j573zp755gy59n9sp7ftezy4n17yt0rj",
+  "day": "2026-01-07",
+  "grid": ".STVVV#SSTTTV#SITPLV.JIPPLLLJIPPZZZJIOZZUUJJOOOU.####OUU",
+  "startedAt": "2026-01-07T23:48:06.959Z",
+  "timeElapsed": 1368000.0,
+  "username": "SHM"
+ },
+ {
+  "_creationTime": 1767831865302.936,
+  "_id": "j5740nyjm6y7stmw27e575erah7yvs1m",
+  "day": "2026-01-07",
+  "grid": ".SSLLL#SSZZZL#JJJJZZ.JIIIIPPVVVOPPPVOOOTUUVOTTTU.####TUU",
+  "startedAt": "2026-01-07T23:48:25.441Z",
+  "timeElapsed": 2154000.0,
+  "username": "MAX"
+ },
+ {
+  "_creationTime": 1767818401917.5408,
+  "_id": "j57dahd3hdk4mbft9q81c29nv97ys17b",
+  "day": "2026-01-07",
+  "grid": ".SIIII#SSVVVL#SPPPVL.JZPPVLLJZOOUUUJZZOUTUJJZOOT.####TTT",
+  "startedAt": "2026-01-07T20:35:06.775Z",
+  "timeElapsed": 280000.0,
+  "username": "HY"
+ },
+ {
+  "_creationTime": 1767814446934.4373,
+  "_id": "j571asmbe3epkytkxh4cx943qd7yr25k",
+  "day": "2026-01-07",
+  "grid": ".SSZZZ#SSZZOO#IIIIVO.JJLLVOOJPPLVVVJPPLTUUJPTTTU.####TUU",
+  "startedAt": "2026-01-07T19:30:25.728Z",
+  "timeElapsed": 213000.0,
+  "username": "GYC"
+ },
+ {
+  "_creationTime": 1767801392726.8447,
+  "_id": "j578cryabyjb6axz5tch1kt0b17ysaye",
+  "day": "2026-01-07",
+  "grid": ".ZIIII#ZZSVVV#ZSSPPV.ZSPPPVOTLLLOOOTTTLOUUTJJJJU.####JUU",
+  "startedAt": "2026-01-07T15:00:50.826Z",
+  "timeElapsed": 594000.0,
+  "username": "TIF"
+ },
+ {
+  "_creationTime": 1767795523054.9648,
+  "_id": "j57am06xjdnctqtddhkxwq3ahx7yr7ef",
+  "day": "2026-01-07",
+  "grid": ".SPTTT#SSPPTL#SJPPTL.IJJJJLLIVVVZZZIVOZZUUIVOOOU.####OUU",
+  "startedAt": "2026-01-07T14:17:18.282Z",
+  "timeElapsed": 82033.0,
+  "username": "AYL"
+ },
+ {
+  "_creationTime": 1767794664699.1743,
+  "_id": "j5725rvmv2se1kgsc445x68wr57yr8dg",
+  "day": "2026-01-07",
+  "grid": ".ZOOJJ#ZZOIJL#ZOOIJL.ZPPIJLLVPPIUUUVPSSUTUVVVSST.####TTT",
+  "startedAt": "2026-01-07T14:01:04.019Z",
+  "timeElapsed": 197677.0,
+  "username": "TIF"
+ },
+ {
+  "_creationTime": 1767756597795.631,
+  "_id": "j5774jn4ym1h9jjyg0n86nz4697yrj0c",
+  "day": "2026-01-06",
+  "grid": ".SIIII#ZSSLLL#ZZSLU.UJZOOUUUJZOTPPPJOOTPPVJJTTT.V####VVV",
+  "startedAt": "2026-01-07T03:29:31.630Z",
+  "timeElapsed": 26105.0,
+  "username": "ASS"
+ },
+ {
+  "_creationTime": 1767752444630.1643,
+  "_id": "j5796cy369ram98gkgm7kz5yfd7ys5qy",
+  "day": "2026-01-06",
+  "grid": ".IIIIS#JJJJSS#JZZZS.TZZLOTTTUULOOOTULLPPOVUUPPP.V####VVV",
+  "startedAt": "2026-01-07T02:17:16.141Z",
+  "timeElapsed": 208241.0,
+  "username": "ASS"
+ },
+ {
+  "_creationTime": 1767751816221.47,
+  "_id": "j579sxdvcdhezr6mepdgzbvfhn7ys634",
+  "day": "2026-01-06",
+  "grid": ".IIIIS#JJJJSS#JLLLS.TZZZLTTTVOZZPPTVOOOPPPVVVOU.U####UUU",
+  "startedAt": "2026-01-07T02:08:21.169Z",
+  "timeElapsed": 78974.0,
+  "username": "ASS"
+ },
+ {
+  "_creationTime": 1767750629526.5781,
+  "_id": "j577z0rqyvjbn50snywmsfezh97yrknr",
+  "day": "2026-01-06",
+  "grid": ".IIIIS#JJJJSS#ZZZJS.TOOZZTTTVOLLPPTVOOLPPPVVVLU.U####UUU",
+  "startedAt": "2026-01-07T01:48:14.491Z",
+  "timeElapsed": 27598.0,
+  "username": "LOL"
+ }
+]

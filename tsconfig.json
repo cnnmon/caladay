@@ -30,5 +30,10 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    // Deno edge function entrypoints (Deno globals, npm:/.ts imports).
+    // _shared/puzzle.ts stays type-checked via imports from lib/.
+    "supabase/functions/submit-solution"
+  ]
 }

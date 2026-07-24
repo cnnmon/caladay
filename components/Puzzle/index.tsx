@@ -1,10 +1,9 @@
 "use client";
 
-import { useMutation, useQuery } from "convex/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { api } from "../../convex/_generated/api";
+import { getSolutionById, submitSolution, SolutionRow } from "../../lib/db";
 import {
   flipShape,
   normalizeShape,
@@ -349,10 +348,25 @@ export default function Puzzle() {
   const [previewSolutionId, setPreviewSolutionId] = useState<string | null>(
     null
   );
-  const previewSolution = useQuery(
-    api.solutions.getById,
-    previewSolutionId ? { id: previewSolutionId as never } : "skip"
+  const [previewSolution, setPreviewSolution] = useState<SolutionRow | null>(
+    null
   );
+
+  // Fetch preview solution when an id is set (from ?solution= URL param)
+  useEffect(() => {
+    if (!previewSolutionId) return;
+    let cancelled = false;
+    getSolutionById(previewSolutionId)
+      .then((solution) => {
+        if (!cancelled) setPreviewSolution(solution);
+      })
+      .catch(() => {
+        // Offline or bad id; stay on today's puzzle
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [previewSolutionId]);
   const [history, setHistory] = useState<SolveHistory>({});
   const [isSolved, setIsSolved] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
@@ -373,8 +387,6 @@ export default function Puzzle() {
     setNativeUI(isNative());
     setReminderOn(isReminderEnabled());
   }, []);
-
-  const createSolution = useMutation(api.solutions.create);
 
   // Load username on mount
   useEffect(() => {
@@ -668,7 +680,7 @@ export default function Puzzle() {
       const savedUsername = getSavedUsername();
       if (savedUsername) {
         // Auto-submit to leaderboard
-        createSolution({
+        submitSolution({
           username: savedUsername,
           grid: state.grid,
           day: state.day,
@@ -1768,7 +1780,7 @@ export default function Puzzle() {
             modalMode === "submit"
               ? async (username: string) => {
                   if (!pendingSolution) throw new Error("No pending solution");
-                  const solutionId = await createSolution({
+                  const solutionId = await submitSolution({
                     username,
                     grid: pendingSolution.grid,
                     day: pendingSolution.day,

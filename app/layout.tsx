@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AnalyticsGate } from "./AnalyticsGate";
-import { ConvexClientProvider } from "./ConvexClientProvider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -39,10 +38,8 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ConvexClientProvider>
-          {children}
-          <AnalyticsGate />
-        </ConvexClientProvider>
+        {children}
+        <AnalyticsGate />
       </body>
     </html>
   );

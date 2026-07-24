@@ -11,16 +11,16 @@ into the iOS project; `npm run ios:open` opens Xcode.
 
 ## One-time setup remaining
 
-- [ ] **Deploy Convex changes**: `npx convex deploy` (server-side validation,
-      moderation, and the `report` mutation must be live BEFORE the app ships —
-      also before the next Vercel deploy, since the web report button calls it).
+- [ ] **Supabase backend**: follow `supabase/README.md` (project + schema +
+      seed + edge function + env vars in Vercel and `.env.local`) BEFORE
+      pushing/shipping — the app has no backend until this is done.
 - [ ] **Signing**: in Xcode → App target → Signing & Capabilities, pick your
       team; bundle ID is `com.caladay.app`.
 - [ ] **App icon**: replace `ios/App/App/Assets.xcassets/AppIcon.appiconset`
       with a real 1024×1024 icon (single-size icon works in current Xcode).
 - [ ] **Widget**: follow `ios/App/CaladayWidget/README.md` (one-time GUI step).
 - [ ] **Privacy policy URL**: required in App Store Connect. Needs to cover:
-      3-letter usernames + solve times stored in Convex (leaderboard),
+      3-letter usernames + solve times stored in Supabase (leaderboard),
       no accounts, no tracking in the iOS app (Vercel Analytics is web-only,
       gated off in `app/AnalyticsGate.tsx`).
 
@@ -54,12 +54,12 @@ names; moderation is server-enforced (see below), with in-app reporting.
 
 ## Guideline-1.2 (UGC) mechanisms — implemented
 
-- Server-side username filtering: `convex/moderation.ts` +
-  `convex/solutions.ts` (`create` throws on banned/invalid names).
+- Server-side username filtering in the submit-solution edge function
+  (`supabase/functions/_shared/puzzle.ts`).
 - Report button on every leaderboard row → `solutions.report` mutation;
-  auto-hides an entry after 3 reports (`convex/solutions.ts`).
+  auto-hides an entry after 3 reports (Postgres trigger in `supabase/migrations/0001_init.sql`).
 - Grid submissions are validated server-side as genuine solutions
-  (`convex/validation.ts`) so the leaderboard can't be spoofed.
+  (`supabase/functions/_shared/puzzle.ts`) so the leaderboard can't be spoofed.
 
 ## Screenshots needed
 

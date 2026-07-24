@@ -1,12 +1,8 @@
-// Shape represented as array of [row, col] offsets from origin
-export type ShapeMatrix = [number, number][];
+// Shape types are defined in the shared puzzle module (used by both the
+// client and the Supabase edge function); re-exported for convenience.
+import type { Shape } from "../supabase/functions/_shared/puzzle";
 
-export interface Shape {
-  id: string;
-  name: string;
-  color: string;
-  cells: ShapeMatrix;
-}
+export type { Shape, ShapeMatrix } from "../supabase/functions/_shared/puzzle";
 
 export interface PlacedShape extends Shape {
   gridRow: number;
