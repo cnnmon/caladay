@@ -42,7 +42,7 @@ names; moderation is server-enforced (see below), with in-app reporting.
 > Caladay is a daily spatial puzzle (the classic "calendar puzzle").
 > Native capabilities beyond the web version:
 > - Haptic feedback on piece placement, invalid moves, and solving
-> - Optional daily reminder via local notifications (bell icon, top right)
+> - Optional daily reminder via local notifications (Settings gear, top right)
 > - Native share sheet for sharing results as an emoji mosaic
 > - Home-screen widget showing today's date and puzzle difficulty
 > - Fully playable offline; the online leaderboard is optional

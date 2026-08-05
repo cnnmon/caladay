@@ -372,6 +372,7 @@ export default function Puzzle() {
   const [hasMounted, setHasMounted] = useState(false);
   const [showSolveModal, setShowSolveModal] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showDuplicateModal, setShowDuplicateModal] = useState(false);
   const [modalMode, setModalMode] = useState<ModalMode>("submit");
   const [pendingSolution, setPendingSolution] =
@@ -1382,20 +1383,41 @@ export default function Puzzle() {
           </button>
         </div>
         <div className="flex items-start gap-2">
-          {/* Daily reminder toggle (native app only) */}
-          {nativeUI && (
-            <button
-              onClick={async () => {
-                setReminderOn(await setReminderEnabled(!reminderOn));
-              }}
-              className="icon-button"
-              title={
-                reminderOn ? "Daily reminder on" : "Enable daily reminder"
-              }
+          {/* Settings */}
+          <button
+            onClick={() => setShowSettingsModal(true)}
+            className="icon-button h-8"
+            title="Settings"
+          >
+            {/* Flat 6-tooth gear: ring + 6 teeth rotated 60° apart */}
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
             >
-              {reminderOn ? "🔔" : "🔕"}
-            </button>
-          )}
+              <circle
+                cx="12"
+                cy="12"
+                r="5.5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
+              {[0, 60, 120, 180, 240, 300].map((angle) => (
+                <rect
+                  key={angle}
+                  x="10.2"
+                  y="1"
+                  width="3.6"
+                  height="5"
+                  rx="1"
+                  transform={`rotate(${angle} 12 12)`}
+                />
+              ))}
+            </svg>
+          </button>
           {/* Username display */}
           {currentUsername && (
             <button
@@ -1662,9 +1684,15 @@ export default function Puzzle() {
             <div className="flex gap-2 sm:gap-3 px-2 flex-wrap justify-center">
               {SHAPES.map((shape) => {
                 const cells = shapeRotations[shape.id];
-                const isDraggingThis = dragState?.shapeId === shape.id;
+                // Only dim once a real drag is underway; a plain tap also
+                // creates dragState and would otherwise blink the tile
+                const isDraggingThis =
+                  dragState?.shapeId === shape.id && dragState.hasMoved;
                 const isSelected = selectedShapeId === shape.id;
                 const isPlaced = isShapePlaced(shape.id);
+                // Fixed square slot: every shape fits in 4x4 palette cells in
+                // any orientation, so rotate/flip never reflows the palette
+                const slotSize = 4 * paletteCellSize + 8;
 
                 return (
                   <motion.div
@@ -1672,9 +1700,10 @@ export default function Puzzle() {
                     ref={(el) => {
                       shapeRefs.current[shape.id] = el;
                     }}
-                    className={`flex items-center justify-center p-1 sm:p-1.5 rounded-md cursor-pointer transition-all ${
+                    className={`flex items-center justify-center rounded-md cursor-pointer transition-all ${
                       isSelected ? "bg-stone-300/60" : "hover:bg-stone-300/40"
                     }`}
+                    style={{ width: slotSize, height: slotSize }}
                     animate={{
                       opacity: isDraggingThis ? 0.3 : 1,
                     }}
@@ -1825,11 +1854,18 @@ export default function Puzzle() {
                     today&apos;s date (month, day, and day of the week).
                   </p>
                   <p>
-                    Drag shapes onto the grid. Tap a shape to select it, tap it
-                    again to rotate, and press &amp; hold to flip — or use the
-                    buttons. Drag a shape off the grid to remove it.
+                    Drag shapes onto the grid; drag a shape off the grid to
+                    remove it.
                   </p>
                 </div>
+                <h3 className="font-bold text-stone-800 mb-2">
+                  Mobile Controls
+                </h3>
+                <ul className="text-stone-600 space-y-1 mb-4 list-disc pl-5">
+                  <li>Tap to select a piece</li>
+                  <li>Tap again to rotate</li>
+                  <li>Press and hold to flip</li>
+                </ul>
                 <h3 className="font-bold text-stone-800 mb-2">
                   Keyboard Shortcuts
                 </h3>
@@ -1860,6 +1896,80 @@ export default function Puzzle() {
                   className="w-full px-4 py-2 rounded-lg bg-stone-800 hover:bg-stone-900 text-white transition-colors"
                 >
                   Got it
+                </button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Settings Modal */}
+        <AnimatePresence>
+          {showSettingsModal && (
+            <motion.div
+              className="fixed inset-0 z-50 flex items-center justify-center p-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <motion.div
+                className="absolute inset-0 bg-black/50"
+                onClick={() => setShowSettingsModal(false)}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              />
+              <motion.div
+                className="relative bg-white rounded-lg p-6 max-w-sm w-full"
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              >
+                <h2 className="text-xl font-bold text-stone-800 mb-4">
+                  Settings
+                </h2>
+                <div className="space-y-4 mb-6">
+                  {nativeUI && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-stone-600">
+                        Daily reminder (9:00 AM)
+                      </span>
+                      <button
+                        onClick={async () => {
+                          setReminderOn(await setReminderEnabled(!reminderOn));
+                        }}
+                        className={`relative w-11 h-6 rounded-full transition-colors ${
+                          reminderOn ? "bg-green-500" : "bg-stone-300"
+                        }`}
+                        title={
+                          reminderOn
+                            ? "Turn off daily reminder"
+                            : "Turn on daily reminder"
+                        }
+                      >
+                        <span
+                          className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${
+                            reminderOn ? "left-[22px]" : "left-0.5"
+                          }`}
+                        />
+                      </button>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between">
+                    <span className="text-stone-600">Something wrong?</span>
+                    <a
+                      href="mailto:cabbagetree876@gmail.com?subject=Caladay%20report"
+                      className="px-3 py-1 rounded-full bg-stone-200 hover:bg-stone-300 text-stone-600 transition-colors"
+                    >
+                      Report a problem
+                    </a>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowSettingsModal(false)}
+                  className="w-full px-4 py-2 rounded-lg bg-stone-800 hover:bg-stone-900 text-white transition-colors"
+                >
+                  Done
                 </button>
               </motion.div>
             </motion.div>
