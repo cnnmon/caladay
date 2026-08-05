@@ -86,8 +86,8 @@ export default function PrivacyPage() {
             <p>
               To remove a leaderboard entry you submitted (or for any other
               privacy question), contact us at{" "}
-              <a className="underline" href="mailto:alexlu876@gmail.com">
-                alexlu876@gmail.com
+              <a className="underline" href="mailto:cabbagetree876@gmail.com">
+                cabbagetree876@gmail.com
               </a>{" "}
               and we&apos;ll delete it. Clearing your browser/app data removes
               everything stored locally.
