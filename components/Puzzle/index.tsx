@@ -1457,7 +1457,7 @@ export default function Puzzle() {
             ) : isSolved || isViewingHistory ? (
               <motion.div
                 key="solved"
-                className="flex items-center gap-3"
+                className="flex flex-col items-center gap-1"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
               >
@@ -1480,7 +1480,7 @@ export default function Puzzle() {
                           setTimeout(() => setShareStatus(null), 2000);
                         }
                       }}
-                      className="icon-button"
+                      className="px-2 py-0.5 text-sm whitespace-nowrap rounded-full bg-stone-300 hover:bg-stone-400 text-stone-600 transition-colors"
                       title="Share your solve"
                     >
                       {shareStatus ?? "Share"}
