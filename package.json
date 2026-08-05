@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "jest",
-    "ios:sync": "next build && cap sync ios",
+    "ios:sync": "next build && cap sync ios && cp public/solutions-cache.csv ios/App/CaladayWidget/solutions-cache.csv",
     "ios:open": "cap open ios"
   },
   "dependencies": {
