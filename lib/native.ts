@@ -3,9 +3,18 @@
 import { Capacitor } from "@capacitor/core";
 import { Haptics, ImpactStyle, NotificationType } from "@capacitor/haptics";
 import { SplashScreen } from "@capacitor/splash-screen";
+import { NativeSettings, IOSSettings } from "capacitor-native-settings";
 
 export function isNative(): boolean {
   return Capacitor.isNativePlatform();
+}
+
+// Open this app's page in the iOS Settings app (for re-enabling a
+// previously denied notification permission — iOS only shows its own
+// permission prompt once per install).
+export function openAppSettings(): void {
+  if (!isNative()) return;
+  NativeSettings.openIOS({ option: IOSSettings.App }).catch(() => {});
 }
 
 // Dismiss the launch splash (launchAutoHide is off so the splash covers

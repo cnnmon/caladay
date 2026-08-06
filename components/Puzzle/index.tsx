@@ -23,6 +23,7 @@ import {
   hapticSolve,
   hideSplash,
   isNative,
+  openAppSettings,
 } from "../../lib/native";
 import { isReminderEnabled, setReminderEnabled } from "../../lib/notifications";
 import { shareSolve } from "../../lib/share";
@@ -2033,9 +2034,19 @@ export default function Puzzle() {
                         </button>
                       </div>
                       {reminderHint && (
-                        <p className="text-xs text-red-500 mt-1">
-                          {reminderHint}
-                        </p>
+                        <div className="mt-1">
+                          <p className="text-xs text-red-500">
+                            {reminderHint}
+                          </p>
+                          {reminderHint.includes("Settings") && (
+                            <button
+                              onClick={openAppSettings}
+                              className="text-xs underline text-stone-500 hover:text-stone-700 mt-0.5"
+                            >
+                              Open Settings
+                            </button>
+                          )}
+                        </div>
                       )}
                     </div>
                   )}

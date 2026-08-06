@@ -20,6 +20,7 @@
     "@capacitor/splash-screen": "^8.0.2",
     "@supabase/supabase-js": "^2.110.8",
     "@vercel/analytics": "^1.6.1",
+    "capacitor-native-settings": "^8.2.0",
     "framer-motion": "^12.23.26",
     "next": "16.1.1",
     "react": "19.2.3",
