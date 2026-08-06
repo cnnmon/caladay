@@ -76,16 +76,24 @@ function LeaderboardContent() {
   const [loadTimedOut, setLoadTimedOut] = useState(false);
 
   // Fetch the leaderboard on mount; flag failure so we don't spin forever.
+  // Offline devices get the message immediately (navigator.onLine), hung
+  // requests after a short timeout.
   useEffect(() => {
     let cancelled = false;
+    if (typeof navigator !== "undefined" && !navigator.onLine) {
+      setLoadTimedOut(true);
+    }
     listSolutions()
       .then((rows) => {
-        if (!cancelled) setSolutions(rows);
+        if (!cancelled) {
+          setSolutions(rows);
+          setLoadTimedOut(false);
+        }
       })
       .catch(() => {
         if (!cancelled) setLoadTimedOut(true);
       });
-    const timer = setTimeout(() => setLoadTimedOut(true), 8000);
+    const timer = setTimeout(() => setLoadTimedOut(true), 4000);
     return () => {
       cancelled = true;
       clearTimeout(timer);
