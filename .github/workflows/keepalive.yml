@@ -1,11 +1,16 @@
 name: Supabase keep-alive
 # Free-tier Supabase projects pause after ~7 days without traffic.
 # One trivial read a day keeps the leaderboard alive regardless of usage.
+# Also watches moderation counts and opens a GitHub issue when reports or
+# hidden entries appear, so silent auto-moderation gets human eyes.
 # No event-derived input is used anywhere in this workflow.
 on:
   schedule:
     - cron: "17 9 * * *" # daily, 09:17 UTC
   workflow_dispatch:
+
+permissions:
+  issues: write
 
 jobs:
   ping:
@@ -16,3 +21,29 @@ jobs:
           curl -sf "https://magjhbcmgjywhmqezgsl.supabase.co/rest/v1/solutions?select=id&limit=1" \
             -H "apikey: sb_publishable_cFHcVtjNbV093WNWBEV6xg__McxPxjs" \
             -o /dev/null
+
+      - name: Check moderation activity
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          stats=$(curl -sf -X POST \
+            "https://magjhbcmgjywhmqezgsl.supabase.co/rest/v1/rpc/moderation_stats" \
+            -H "apikey: sb_publishable_cFHcVtjNbV093WNWBEV6xg__McxPxjs" \
+            -H "Content-Type: application/json" -d '{}')
+          echo "stats: $stats"
+          reports=$(echo "$stats" | jq '.[0].total_reports')
+          hidden=$(echo "$stats" | jq '.[0].hidden_solutions')
+          if [ "$reports" = "0" ] || [ -z "$reports" ]; then
+            echo "No moderation activity."
+            exit 0
+          fi
+          title="Moderation activity: $reports report(s), $hidden hidden entr(y/ies)"
+          gh label create moderation -c "#d73a4a" -d "Leaderboard moderation" --force 2>/dev/null || true
+          existing=$(gh issue list --state open --label moderation --json number --jq '.[0].number')
+          body="As of $(date -u +%F): $reports total report(s), $hidden hidden solution(s). Review in the Supabase dashboard (Table Editor -> reports / solutions where hidden = true). Un-hide a wrongly reported entry by setting hidden = false."
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh issue create --title "$title" --body "$body" --label moderation
+          fi
