@@ -80,9 +80,9 @@ function LeaderboardContent() {
   // requests after a short timeout.
   useEffect(() => {
     let cancelled = false;
-    if (typeof navigator !== "undefined" && !navigator.onLine) {
-      setLoadTimedOut(true);
-    }
+    const offlineCheck = setTimeout(() => {
+      if (!cancelled && !navigator.onLine) setLoadTimedOut(true);
+    }, 0);
     listSolutions()
       .then((rows) => {
         if (!cancelled) {
@@ -96,6 +96,7 @@ function LeaderboardContent() {
     const timer = setTimeout(() => setLoadTimedOut(true), 4000);
     return () => {
       cancelled = true;
+      clearTimeout(offlineCheck);
       clearTimeout(timer);
     };
   }, []);
