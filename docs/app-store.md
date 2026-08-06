@@ -57,7 +57,7 @@ names; moderation is server-enforced (see below), with in-app reporting.
 - Server-side username filtering in the submit-solution edge function
   (`supabase/functions/_shared/puzzle.ts`).
 - Report button on every leaderboard row → `solutions.report` mutation;
-  auto-masks a reported name after 3 reports, leaving the score intact
+  auto-masks a reported name after 10 reports, leaving the score intact
   (Postgres trigger; see `supabase/migrations/0003_moderation_stats.sql`).
 - Grid submissions are validated server-side as genuine solutions
   (`supabase/functions/_shared/puzzle.ts`) so the leaderboard can't be spoofed.
@@ -73,3 +73,17 @@ names; moderation is server-enforced (see below), with in-app reporting.
   pagination eventually.
 - Simulator requires the iOS platform download in Xcode
   (`xcodebuild -downloadPlatform iOS`).
+
+## Moderation email alerts (one-time setup)
+
+The daily keep-alive workflow emails cabbagetree876@gmail.com whenever
+report/masked-name counts change. It needs one repo secret:
+
+1. In the Google account for cabbagetree876@gmail.com: enable 2-Step
+   Verification, then Security -> App passwords -> generate one for "Mail".
+2. GitHub repo -> Settings -> Secrets and variables -> Actions ->
+   New repository secret: name `GMAIL_APP_PASSWORD`, value = that app
+   password.
+
+Until the secret exists, the email step fails (workflow logs show it);
+keep-alive still runs.

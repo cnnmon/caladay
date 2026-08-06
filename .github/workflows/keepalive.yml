@@ -1,16 +1,16 @@
 name: Supabase keep-alive
 # Free-tier Supabase projects pause after ~7 days without traffic.
 # One trivial read a day keeps the leaderboard alive regardless of usage.
-# Also watches moderation counts and opens a GitHub issue when reports or
-# hidden entries appear, so silent auto-moderation gets human eyes.
-# No event-derived input is used anywhere in this workflow.
+# Also watches moderation counts and emails cabbagetree876@gmail.com when
+# they change (requires the GMAIL_APP_PASSWORD repo secret; see
+# docs/app-store.md). No event-derived input is used in this workflow.
 on:
   schedule:
     - cron: "17 9 * * *" # daily, 09:17 UTC
   workflow_dispatch:
 
 permissions:
-  issues: write
+  contents: write
 
 jobs:
   ping:
@@ -22,10 +22,10 @@ jobs:
             -H "apikey: sb_publishable_cFHcVtjNbV093WNWBEV6xg__McxPxjs" \
             -o /dev/null
 
+      - uses: actions/checkout@v4
+
       - name: Check moderation activity
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
+        id: stats
         run: |
           stats=$(curl -sf -X POST \
             "https://magjhbcmgjywhmqezgsl.supabase.co/rest/v1/rpc/moderation_stats" \
@@ -34,16 +34,47 @@ jobs:
           echo "stats: $stats"
           reports=$(echo "$stats" | jq '.[0].total_reports')
           masked=$(echo "$stats" | jq '.[0].masked_names')
-          if [ "$reports" = "0" ] || [ -z "$reports" ]; then
-            echo "No moderation activity."
-            exit 0
-          fi
-          title="Moderation activity: $reports report(s), $masked masked name(s)"
-          gh label create moderation -c "#d73a4a" -d "Leaderboard moderation" --force 2>/dev/null || true
-          existing=$(gh issue list --state open --label moderation --json number --jq '.[0].number')
-          body="As of $(date -u +%F): $reports total report(s), $masked masked name(s). Review in the Supabase dashboard (Table Editor -> solutions where flagged_name is not null). Restore a wrongly reported name by copying flagged_name back into username and clearing flagged_name."
-          if [ -n "$existing" ]; then
-            gh issue comment "$existing" --body "$body"
+          prev_reports=$(jq -r '.reports // 0' .github/moderation-state.json 2>/dev/null || echo 0)
+          prev_masked=$(jq -r '.masked // 0' .github/moderation-state.json 2>/dev/null || echo 0)
+          echo "reports=$reports" >> "$GITHUB_OUTPUT"
+          echo "masked=$masked" >> "$GITHUB_OUTPUT"
+          if [ "$reports" != "$prev_reports" ] || [ "$masked" != "$prev_masked" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
           else
-            gh issue create --title "$title" --body "$body" --label moderation
+            echo "changed=false" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Email moderation summary
+        if: steps.stats.outputs.changed == 'true'
+        uses: dawidd6/action-send-mail@v4
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: cabbagetree876@gmail.com
+          password: ${{ secrets.GMAIL_APP_PASSWORD }}
+          from: Caladay Moderation <cabbagetree876@gmail.com>
+          to: cabbagetree876@gmail.com
+          subject: "Caladay moderation: ${{ steps.stats.outputs.reports }} report(s), ${{ steps.stats.outputs.masked }} masked name(s)"
+          body: |
+            Leaderboard moderation counts changed.
+
+            Total reports: ${{ steps.stats.outputs.reports }}
+            Masked names: ${{ steps.stats.outputs.masked }}
+
+            Review: Supabase dashboard -> Table Editor -> solutions
+            (rows where flagged_name is not null; reports table has the raw reports).
+            Restore a wrongly reported name by copying flagged_name back into
+            username and clearing flagged_name.
+
+      - name: Save state
+        if: steps.stats.outputs.changed == 'true'
+        run: |
+          printf '{"reports": %s, "masked": %s}\n' \
+            "${{ steps.stats.outputs.reports }}" "${{ steps.stats.outputs.masked }}" \
+            > .github/moderation-state.json
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .github/moderation-state.json
+          git commit -m "chore: update moderation state [skip ci]"
+          git push
