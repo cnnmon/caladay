@@ -1561,7 +1561,6 @@ export default function Puzzle() {
                     <button
                       onClick={async () => {
                         const result = await shareSolve(
-                          state.grid,
                           state.day,
                           state.timeElapsed
                         );

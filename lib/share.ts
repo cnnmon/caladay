@@ -101,18 +101,22 @@ function formatShareTime(timeElapsed?: number): string {
   return ` in ${mins}:${secs.toString().padStart(2, "0")}`;
 }
 
+// App Store page (native share). TODO: replace the id with the app's
+// Apple ID from App Store Connect → App Information once known.
+const APP_STORE_URL = "https://apps.apple.com/app/id0000000000";
+const WEB_URL = "https://caladay.vercel.app";
+
 // Returns "shared" | "copied" | "failed" so the caller can show feedback.
+// Shares only the solve time — never the board, so solutions stay secret
+// until the next day.
 export async function shareSolve(
-  gridStr: string,
   day: string,
   timeElapsed?: number
 ): Promise<"shared" | "copied" | "failed"> {
   const text = [
     `caladay ${day} — solved${formatShareTime(timeElapsed)}`,
     "",
-    solveToEmojiGrid(gridStr),
-    "",
-    "https://caladay.vercel.app",
+    `Can you beat it? ${isNative() ? APP_STORE_URL : WEB_URL}`,
   ].join("\n");
 
   try {
