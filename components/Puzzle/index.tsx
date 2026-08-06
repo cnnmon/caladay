@@ -413,18 +413,37 @@ export default function Puzzle() {
     setReminderOn(isReminderEnabled());
   }, []);
 
-  // Drop the native splash only after the settled UI has actually painted
-  // (two frames past hasMounted). Safety timeout in case something above
-  // throws before that — a stuck splash is worse than a flicker.
+  // Webfonts (Geist) swap in a few frames after first paint, reflowing the
+  // toolbar text — the last source of launch flicker. Hold the reveal until
+  // the browser reports fonts loaded (with a cap, in case ready never fires).
+  const [fontsReady, setFontsReady] = useState(false);
+  useEffect(() => {
+    let done = false;
+    const finish = () => {
+      if (!done) {
+        done = true;
+        setFontsReady(true);
+      }
+    };
+    document.fonts.ready.then(finish).catch(finish);
+    const cap = setTimeout(finish, 1500);
+    return () => clearTimeout(cap);
+  }, []);
+
+  const revealed = hasMounted && fontsReady;
+
+  // Drop the native splash only after the settled, fully-fonted UI has
+  // actually painted (two frames past reveal). Safety timeout in case
+  // something above throws — a stuck splash is worse than a flicker.
   useEffect(() => {
     const fallback = setTimeout(hideSplash, 3000);
-    if (hasMounted) {
+    if (revealed) {
       requestAnimationFrame(() => {
         requestAnimationFrame(() => hideSplash());
       });
     }
     return () => clearTimeout(fallback);
-  }, [hasMounted]);
+  }, [revealed]);
 
   // Load username on mount
   useEffect(() => {
@@ -1376,9 +1395,9 @@ export default function Puzzle() {
       className="flex flex-col items-center gap-4 p-4 h-full select-none max-h-dvh overflow-hidden"
       initial={{ opacity: 0 }}
       // Stay invisible until mount effects settle (mobile sizing, saved
-      // username, restored progress) so the reveal is one stable fade
-      // instead of visibly reflowing corners.
-      animate={{ opacity: hasMounted ? 1 : 0 }}
+      // username, restored progress) AND fonts are loaded, so the reveal
+      // is one stable fade instead of visibly reflowing corners.
+      animate={{ opacity: revealed ? 1 : 0 }}
       transition={{ duration: 0.4 }}
       style={{
         WebkitTouchCallout: "none",
