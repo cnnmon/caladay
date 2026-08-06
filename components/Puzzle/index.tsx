@@ -29,6 +29,7 @@ import SolveModal, {
 } from "../SolveModal";
 
 const PROGRESS_KEY = "caesar-progress-v2";
+const SEEN_HELP_KEY = "CALADAY_SEEN_HELP";
 const OLD_STORAGE_KEY = "caesar-puzzle-history";
 const OLD_PROGRESS_KEY = "caesar-puzzle-progress";
 const SHAPES_VERSION = "v2"; // Increment when shapes change to clear cached rotations
@@ -373,6 +374,23 @@ export default function Puzzle() {
   const [showSolveModal, setShowSolveModal] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
+
+  // First launch: open the help modal so new players learn the rules.
+  // Marked seen on dismiss, so an early exit shows it again next time.
+  useEffect(() => {
+    if (!localStorage.getItem(SEEN_HELP_KEY)) {
+      setShowHelpModal(true);
+    }
+  }, []);
+
+  const closeHelpModal = () => {
+    setShowHelpModal(false);
+    try {
+      localStorage.setItem(SEEN_HELP_KEY, "true");
+    } catch {
+      // localStorage unavailable; the modal will show again next launch
+    }
+  };
   const [showDuplicateModal, setShowDuplicateModal] = useState(false);
   const [modalMode, setModalMode] = useState<ModalMode>("submit");
   const [pendingSolution, setPendingSolution] =
@@ -1338,7 +1356,10 @@ export default function Puzzle() {
     <motion.div
       className="flex flex-col items-center gap-4 p-4 h-full select-none max-h-dvh overflow-hidden"
       initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
+      // Stay invisible until mount effects settle (mobile sizing, saved
+      // username, restored progress) so the reveal is one stable fade
+      // instead of visibly reflowing corners.
+      animate={{ opacity: hasMounted ? 1 : 0 }}
       transition={{ duration: 0.4 }}
       style={{
         WebkitTouchCallout: "none",
@@ -1833,7 +1854,7 @@ export default function Puzzle() {
             >
               <motion.div
                 className="absolute inset-0 bg-black/50"
-                onClick={() => setShowHelpModal(false)}
+                onClick={closeHelpModal}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -1892,7 +1913,7 @@ export default function Puzzle() {
                   </p>
                 </div>
                 <button
-                  onClick={() => setShowHelpModal(false)}
+                  onClick={closeHelpModal}
                   className="w-full px-4 py-2 rounded-lg bg-stone-800 hover:bg-stone-900 text-white transition-colors"
                 >
                   Got it
