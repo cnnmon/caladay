@@ -7,7 +7,7 @@ export const metadata = {
 export default function SupportPage() {
   return (
     <div className="h-dvh overflow-y-auto bg-[#f2ede7] px-6 py-8">
-      <div className="max-w-2xl mx-auto text-stone-700">
+      <div className="max-w-2xl mx-auto text-stone-700 select-text">
         <h1 className="text-2xl font-light mb-8">Caladay Support</h1>
 
         <div className="space-y-6 text-sm leading-relaxed">

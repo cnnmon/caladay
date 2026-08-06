@@ -32,6 +32,24 @@ body {
   padding-right: env(safe-area-inset-right);
 }
 
+/* App-wide: no text selection — rapid taps otherwise summon iOS's
+   text-selection loupe (magnifier). Re-enabled where selecting text
+   is genuinely useful: form fields and the prose pages. */
+html,
+body {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+input,
+textarea,
+.select-text,
+.select-text * {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
 button {
   cursor: pointer !important;
 }
