@@ -1392,7 +1392,12 @@ export default function Puzzle() {
 
   return (
     <motion.div
-      className="flex flex-col items-center gap-4 p-4 h-full select-none max-h-dvh overflow-hidden"
+      // relative + w-full: the toolbar below is absolute w-full, and without
+      // an explicit positioned full-width ancestor its containing block
+      // FLIPS between the viewport and this container while framer-motion
+      // animates (transient will-change/transform) — visibly snapping the
+      // toolbar pills outward at every fade's end.
+      className="relative w-full flex flex-col items-center gap-4 p-4 h-full select-none max-h-dvh overflow-hidden"
       initial={{ opacity: 0 }}
       // Stay invisible until mount effects settle (mobile sizing, saved
       // username, restored progress) AND fonts are loaded, so the reveal
@@ -1415,12 +1420,14 @@ export default function Puzzle() {
         setDragCell(null);
       }}
     >
-      <motion.div
-        className="absolute top-0 left-0 p-2 pt-[max(0.5rem,env(safe-area-inset-top))] flex gap-2 items-start w-full justify-between"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-      >
+      {/* Plain div on purpose: a nested opacity animation inside the
+          already-fading container makes WebKit promote and then tear down
+          a compositing layer mid-fade, which re-rasterizes the pill
+          buttons' rounded ends — visible as edge flicker on launch. The
+          container's single fade covers this element. */}
+      {/* No safe-area padding here: the container already sits inside the
+          body's safe-area padding, so it would double-apply. */}
+      <div className="absolute top-0 left-0 p-2 flex gap-2 items-start w-full justify-between">
         <div className="flex gap-2 px-2 p-1">
           <button
             onClick={() => {
@@ -1491,7 +1498,7 @@ export default function Puzzle() {
             </button>
           )}
         </div>
-      </motion.div>
+      </div>
 
       <div className={`flex flex-col gap-4 items-center justify-center h-full`}>
         {/* Header */}
