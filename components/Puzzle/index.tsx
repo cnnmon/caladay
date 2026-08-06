@@ -404,6 +404,7 @@ export default function Puzzle() {
   const [currentUsername, setCurrentUsername] = useState<string | null>(null);
   const [nativeUI, setNativeUI] = useState(false);
   const [reminderOn, setReminderOn] = useState(false);
+  const [reminderHint, setReminderHint] = useState<string | null>(null);
   const [shareStatus, setShareStatus] = useState<string | null>(null);
 
   // Native-only UI (reminder bell) is decided after mount to avoid
@@ -1996,29 +1997,46 @@ export default function Puzzle() {
                 </h2>
                 <div className="space-y-4 mb-6">
                   {nativeUI && (
-                    <div className="flex items-center justify-between">
-                      <span className="text-stone-600">
-                        Daily reminder (9:00 AM)
-                      </span>
-                      <button
-                        onClick={async () => {
-                          setReminderOn(await setReminderEnabled(!reminderOn));
-                        }}
-                        className={`relative w-11 h-6 rounded-full transition-colors ${
-                          reminderOn ? "bg-green-500" : "bg-stone-300"
-                        }`}
-                        title={
-                          reminderOn
-                            ? "Turn off daily reminder"
-                            : "Turn on daily reminder"
-                        }
-                      >
-                        <span
-                          className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${
-                            reminderOn ? "left-[22px]" : "left-0.5"
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-stone-600">
+                          Daily reminder (9:00 AM)
+                        </span>
+                        <button
+                          onClick={async () => {
+                            const status = await setReminderEnabled(
+                              !reminderOn
+                            );
+                            setReminderOn(status === "on");
+                            setReminderHint(
+                              status === "denied"
+                                ? "Notifications are turned off for Caladay. Enable them in the iOS Settings app, then try again."
+                                : status === "error"
+                                  ? "Couldn't set the reminder. Please try again."
+                                  : null
+                            );
+                          }}
+                          className={`relative w-11 h-6 rounded-full transition-colors ${
+                            reminderOn ? "bg-green-500" : "bg-stone-300"
                           }`}
-                        />
-                      </button>
+                          title={
+                            reminderOn
+                              ? "Turn off daily reminder"
+                              : "Turn on daily reminder"
+                          }
+                        >
+                          <span
+                            className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${
+                              reminderOn ? "left-[22px]" : "left-0.5"
+                            }`}
+                          />
+                        </button>
+                      </div>
+                      {reminderHint && (
+                        <p className="text-xs text-red-500 mt-1">
+                          {reminderHint}
+                        </p>
+                      )}
                     </div>
                   )}
                   <div className="flex items-center justify-between">
