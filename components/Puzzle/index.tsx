@@ -26,8 +26,17 @@ import {
   openAppSettings,
 } from "../../lib/native";
 import { isReminderEnabled, setReminderEnabled } from "../../lib/notifications";
+import {
+  getInstallPrompt,
+  clearInstallPrompt,
+  getPlatform,
+  isIOSBrowser,
+  Platform,
+} from "../../lib/platform";
+import { acquireWakeLock, releaseWakeLock } from "../../lib/wakeLock";
 import { shareSolve } from "../../lib/share";
 import DifficultyBar from "../DifficultyBar";
+import { InstallHint } from "../InstallHint";
 import SolveModal, {
   addSubmission,
   getSavedUsername,
@@ -37,6 +46,7 @@ import SolveModal, {
 
 const PROGRESS_KEY = "caesar-progress-v2";
 const SEEN_HELP_KEY = "CALADAY_SEEN_HELP";
+const INSTALL_HINT_SEEN_KEY = "CALADAY_INSTALL_HINT_SEEN";
 const OLD_STORAGE_KEY = "caesar-puzzle-history";
 const OLD_PROGRESS_KEY = "caesar-puzzle-progress";
 const SHAPES_VERSION = "v2"; // Increment when shapes change to clear cached rotations
@@ -407,12 +417,15 @@ export default function Puzzle() {
   const [reminderOn, setReminderOn] = useState(false);
   const [reminderHint, setReminderHint] = useState<string | null>(null);
   const [shareStatus, setShareStatus] = useState<string | null>(null);
+  const [platform, setPlatform] = useState<Platform>("browser");
+  const [showInstallHint, setShowInstallHint] = useState(false);
 
   // Native-only UI (reminder bell) is decided after mount to avoid
   // hydration mismatches with the prerendered HTML.
   useEffect(() => {
     setNativeUI(isNative());
     setReminderOn(isReminderEnabled());
+    setPlatform(getPlatform());
   }, []);
 
   // Webfonts (Geist) swap in a few frames after first paint, reflowing the
@@ -773,6 +786,47 @@ export default function Puzzle() {
     startedAt,
     grid,
   ]);
+
+  // One-time install nudge: right after the first solve in a plain iOS
+  // browser tab (not installed, not the native app), once the solve/duplicate
+  // modals are out of the way. Marked seen when shown, so it never repeats;
+  // Settings → "Install app" stays available forever.
+  useEffect(() => {
+    if (!isSolved || viewingDate) return;
+    if (showSolveModal || showDuplicateModal) return;
+    if (platform !== "browser" || !isIOSBrowser()) return;
+    if (localStorage.getItem(INSTALL_HINT_SEEN_KEY)) return;
+    const timer = setTimeout(() => {
+      try {
+        localStorage.setItem(INSTALL_HINT_SEEN_KEY, "true");
+      } catch {
+        // localStorage unavailable; the nudge may show again next solve.
+      }
+      setShowInstallHint(true);
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, [isSolved, viewingDate, showSolveModal, showDuplicateModal, platform]);
+
+  // Keep the screen awake during an active solve (supported on iOS 18.4+;
+  // silently a no-op elsewhere). The lock auto-releases when the page is
+  // hidden, so re-acquire when play resumes visibility. Native app unchanged.
+  useEffect(() => {
+    if (isNative()) return;
+    const active = isPlaying && !isSolved && !viewingDate;
+    if (!active) {
+      releaseWakeLock();
+      return;
+    }
+    acquireWakeLock();
+    const onVisible = () => {
+      if (document.visibilityState === "visible") acquireWakeLock();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisible);
+      releaseWakeLock();
+    };
+  }, [isPlaying, isSolved, viewingDate]);
 
   // View a previous solve
   const viewSolve = (dayKey: string) => {
@@ -2049,6 +2103,28 @@ export default function Puzzle() {
                       )}
                     </div>
                   )}
+                  {platform === "browser" &&
+                    (isIOSBrowser() || getInstallPrompt() !== null) && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-stone-600">Install app</span>
+                        <button
+                          onClick={() => {
+                            const prompt = getInstallPrompt();
+                            if (!isIOSBrowser() && prompt) {
+                              prompt.prompt().catch(() => {});
+                              clearInstallPrompt();
+                              setShowSettingsModal(false);
+                              return;
+                            }
+                            setShowSettingsModal(false);
+                            setShowInstallHint(true);
+                          }}
+                          className="px-3 py-1 rounded-full bg-stone-200 hover:bg-stone-300 text-stone-600 transition-colors"
+                        >
+                          Add to Home Screen
+                        </button>
+                      </div>
+                    )}
                   <div className="flex items-center justify-between">
                     <span className="text-stone-600">Something wrong?</span>
                     <a
@@ -2069,6 +2145,11 @@ export default function Puzzle() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        <InstallHint
+          isOpen={showInstallHint}
+          onClose={() => setShowInstallHint(false)}
+        />
 
         {/* Duplicate Solution Modal */}
         <AnimatePresence>
