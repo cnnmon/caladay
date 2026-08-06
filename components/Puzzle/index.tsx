@@ -37,6 +37,8 @@ import { acquireWakeLock, releaseWakeLock } from "../../lib/wakeLock";
 import { shareSolve } from "../../lib/share";
 import DifficultyBar from "../DifficultyBar";
 import { InstallHint } from "../InstallHint";
+import { ActionBar } from "./ActionBar";
+import { useCellSize } from "./useBoardSize";
 import SolveModal, {
   addSubmission,
   getSavedUsername,
@@ -47,6 +49,7 @@ import SolveModal, {
 const PROGRESS_KEY = "caesar-progress-v2";
 const SEEN_HELP_KEY = "CALADAY_SEEN_HELP";
 const INSTALL_HINT_SEEN_KEY = "CALADAY_INSTALL_HINT_SEEN";
+const HINT_CHIP_SEEN_KEY = "CALADAY_HINT_CHIP_SEEN";
 const OLD_STORAGE_KEY = "caesar-puzzle-history";
 const OLD_PROGRESS_KEY = "caesar-puzzle-progress";
 const SHAPES_VERSION = "v2"; // Increment when shapes change to clear cached rotations
@@ -332,10 +335,10 @@ function markTargets(
   );
 }
 
-const MAX_CELL_SIZE = 48;
-const MOBILE_CELL_SIZE = 38;
 const PALETTE_CELL_SIZE = 15;
-const MOBILE_PALETTE_CELL_SIZE = 12;
+// Fixed (not derived from cellSize) so the tray's height is stable and the
+// fluid board measurement in useCellSize never feeds back on itself.
+const MOBILE_PALETTE_CELL_SIZE = 14;
 
 // Format seconds as MM:SS
 function formatTime(seconds: number): string {
@@ -419,6 +422,8 @@ export default function Puzzle() {
   const [shareStatus, setShareStatus] = useState<string | null>(null);
   const [platform, setPlatform] = useState<Platform>("browser");
   const [showInstallHint, setShowInstallHint] = useState(false);
+  // One-time gesture hint in the mobile action bar's idle state
+  const [showHintChip, setShowHintChip] = useState(false);
 
   // Native-only UI (reminder bell) is decided after mount to avoid
   // hydration mismatches with the prerendered HTML.
@@ -426,6 +431,7 @@ export default function Puzzle() {
     setNativeUI(isNative());
     setReminderOn(isReminderEnabled());
     setPlatform(getPlatform());
+    setShowHintChip(!localStorage.getItem(HINT_CHIP_SEEN_KEY));
   }, []);
 
   // Webfonts (Geist) swap in a few frames after first paint, reflowing the
@@ -562,7 +568,10 @@ export default function Puzzle() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  const cellSize = isMobile ? MOBILE_CELL_SIZE : MAX_CELL_SIZE;
+  // Board cells: fluid on phones (measured from the space the layout gives
+  // the board area), fixed 48 on desktop — see useBoardSize.ts.
+  const boardAreaRef = useRef<HTMLDivElement>(null);
+  const cellSize = useCellSize(boardAreaRef, isMobile);
   const paletteCellSize = isMobile ? MOBILE_PALETTE_CELL_SIZE : PALETTE_CELL_SIZE;
 
   // Load history after mount to avoid hydration mismatch
@@ -809,6 +818,17 @@ export default function Puzzle() {
     startedAt,
     grid,
   ]);
+
+  // The gesture hint has done its job once the player places a piece
+  useEffect(() => {
+    if (!showHintChip || placedShapes.length === 0) return;
+    setShowHintChip(false);
+    try {
+      localStorage.setItem(HINT_CHIP_SEEN_KEY, "true");
+    } catch {
+      // localStorage unavailable; the hint may show again next launch
+    }
+  }, [placedShapes.length, showHintChip]);
 
   // One-time install nudge: right after the first solve in a plain iOS
   // browser tab (not installed, not the native app), once the solve/duplicate
@@ -1231,6 +1251,11 @@ export default function Puzzle() {
       })()
     : false;
 
+  // Return a placed shape to the tray (keyboard delete + mobile action bar)
+  const removeShape = useCallback((shapeId: string) => {
+    setPlacedShapes((prev) => prev.filter((p) => p.id !== shapeId));
+  }, []);
+
   // Keyboard hotkeys for rotate (R), flip (F), and remove (Backspace/Delete/X)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -1245,7 +1270,7 @@ export default function Puzzle() {
         isShapePlaced(selectedShapeId)
       ) {
         e.preventDefault();
-        setPlacedShapes((prev) => prev.filter((p) => p.id !== selectedShapeId));
+        removeShape(selectedShapeId);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -1259,6 +1284,7 @@ export default function Puzzle() {
     handleRotate,
     handleFlip,
     isShapePlaced,
+    removeShape,
   ]);
 
   // Pointer event handlers (unified mouse + touch)
@@ -1519,7 +1545,9 @@ export default function Puzzle() {
       // FLIPS between the viewport and this container while framer-motion
       // animates (transient will-change/transform) — visibly snapping the
       // toolbar pills outward at every fade's end.
-      className="relative w-full flex flex-col items-center gap-4 p-4 h-full select-none max-h-dvh overflow-hidden"
+      className={`relative w-full flex flex-col items-center gap-4 h-full select-none max-h-dvh overflow-hidden ${
+        isMobile ? "px-3 py-4" : "p-4"
+      }`}
       initial={{ opacity: 0 }}
       // Stay invisible until mount effects settle (mobile sizing, saved
       // username, restored progress) AND fonts are loaded, so the reveal
@@ -1558,13 +1586,13 @@ export default function Puzzle() {
                 : "/leaderboard";
               router.push(url);
             }}
-            className="icon-button"
+            className={`icon-button ${isMobile ? "min-h-11" : ""}`}
           >
             ← Leaderboard
           </button>
           <button
             onClick={() => setShowHelpModal(true)}
-            className="icon-button"
+            className={`icon-button ${isMobile ? "min-h-11 min-w-11" : ""}`}
             title="Help & Hotkeys"
           >
             Help
@@ -1574,7 +1602,7 @@ export default function Puzzle() {
           {/* Settings */}
           <button
             onClick={() => setShowSettingsModal(true)}
-            className="icon-button h-8"
+            className={`icon-button ${isMobile ? "min-h-11 min-w-11" : "h-8"}`}
             title="Settings"
           >
             {/* Flat 6-tooth gear: ring + 6 teeth rotated 60° apart */}
@@ -1613,7 +1641,9 @@ export default function Puzzle() {
                 setModalMode("edit");
                 setShowSolveModal(true);
               }}
-              className="px-2 py-1 rounded-md bg-stone-800 text-white hover:bg-stone-700 font-mono tracking-wider"
+              className={`px-2 py-1 rounded-md bg-stone-800 text-white hover:bg-stone-700 font-mono tracking-wider ${
+                isMobile ? "min-h-11" : ""
+              }`}
               title="Click to change name"
             >
               {currentUsername}
@@ -1622,7 +1652,16 @@ export default function Puzzle() {
         </div>
       </div>
 
-      <div className={`flex flex-col gap-4 items-center justify-center h-full`}>
+      <div
+        className={`flex flex-col items-center h-full w-full ${
+          isMobile
+            ? // Thumb-zone layout: content pinned top (below the absolute
+              // toolbar), board takes the leftover space, tray sits at the
+              // bottom where thumbs live
+              "gap-2 justify-start pt-12"
+            : "gap-4 justify-center"
+        }`}
+      >
         {/* Header */}
         <motion.div
           className="flex flex-col items-center gap-2"
@@ -1702,7 +1741,16 @@ export default function Puzzle() {
           <DifficultyBar date={displayDate} />
         </motion.div>
 
-        {/* Grid */}
+        {/* Grid, inside the measured board area (flex-1 on mobile drives the
+            fluid cellSize; display:contents on desktop keeps layout as-is) */}
+        <div
+          ref={boardAreaRef}
+          className={
+            isMobile
+              ? "flex-1 min-h-0 w-full flex items-center justify-center"
+              : "contents"
+          }
+        >
         <motion.div
           className="border-4 border-[#2B2B23] bg-[#2B2B23] rounded-lg"
           initial={{ opacity: 0, scale: 0.95 }}
@@ -1858,17 +1906,44 @@ export default function Puzzle() {
             </AnimatePresence>
           </div>
         </motion.div>
+        </div>
+
+        {/* Mobile contextual actions: reserved-height row so the board never
+            reflows when a piece is (de)selected */}
+        {isMobile && !isViewingHistory && isPlaying && !isSolved && (
+          <ActionBar
+            visible={!!selectedShapeId}
+            hint={
+              showHintChip
+                ? "tap a piece · tap again to rotate · hold to flip"
+                : null
+            }
+            canRotate={canRotateSelected}
+            canFlip={canFlipSelected}
+            canRemove={!!selectedShapeId && isShapePlaced(selectedShapeId)}
+            onRotate={() => selectedShapeId && handleRotate(selectedShapeId)}
+            onFlip={() => selectedShapeId && handleFlip(selectedShapeId)}
+            onRemove={() => selectedShapeId && removeShape(selectedShapeId)}
+          />
+        )}
 
         {/* Shape palette - always visible */}
         {!isViewingHistory && isPlaying && !isSolved && (
           <motion.div
-            className="flex w-full items-center gap-2"
+            className={`flex w-full items-center gap-2 ${
+              isMobile ? "justify-center" : ""
+            }`}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
             transition={{ duration: 0.4, delay: 0.3 }}
           >
-            <div className="flex gap-2 sm:gap-3 px-2 flex-wrap justify-center">
+            <div
+              className={`flex flex-wrap justify-center ${
+                // Tight gaps so 5 slots fit across a 375pt iPhone (2×5 tray)
+                isMobile ? "gap-1.5" : "gap-2 sm:gap-3 px-2"
+              }`}
+            >
               {SHAPES.map((shape) => {
                 const cells = shapeRotations[shape.id];
                 // Only dim once a real drag is underway; a plain tap also
@@ -1922,7 +1997,8 @@ export default function Puzzle() {
               })}
             </div>
 
-            {/* Rotate/Flip controls */}
+            {/* Rotate/Flip controls (desktop; phones use the action bar) */}
+            {!isMobile && (
             <div className="flex flex-col gap-1 shrink-0 pr-2">
               <button
                 onClick={() =>
@@ -1949,6 +2025,7 @@ export default function Puzzle() {
                 ⇆
               </button>
             </div>
+            )}
           </motion.div>
         )}
 
@@ -2058,8 +2135,9 @@ export default function Puzzle() {
                   Mobile Controls
                 </h3>
                 <ul className="text-stone-600 space-y-1 mb-4 list-disc pl-5">
-                  <li>Tap to select a piece</li>
-                  <li>Tap again to rotate</li>
+                  <li>Drag a piece onto the board — it floats above your finger</li>
+                  <li>Tap to select; Rotate / Flip / Remove buttons appear</li>
+                  <li>Tap a selected piece again to rotate it</li>
                   <li>Press and hold to flip</li>
                 </ul>
                 <h3 className="font-bold text-stone-800 mb-2">
@@ -2274,27 +2352,34 @@ export default function Puzzle() {
           transition={{ delay: 0.5 }}
           className="flex flex-col gap-2 items-center"
         >
-          <p className="text-stone-400 text-center">
-            {isViewingHistory
-              ? "Viewing previous solve"
-              : isSolved
-                ? "Play again tomorrow!"
-                : isPlaying
-                  ? `Use all shapes without touching the current day`
-                  : elapsedTime > 0
-                    ? "Press Resume to continue"
-                    : "Press Start to begin"}
-          </p>
+          {/* In play on phones the rule caption is dropped (Help covers it)
+              and the space goes to the board */}
+          {!(isMobile && isPlaying && !isSolved) && (
+            <p className="text-stone-400 text-center">
+              {isViewingHistory
+                ? "Viewing previous solve"
+                : isSolved
+                  ? "Play again tomorrow!"
+                  : isPlaying
+                    ? `Use all shapes without touching the current day`
+                    : elapsedTime > 0
+                      ? "Press Resume to continue"
+                      : "Press Start to begin"}
+            </p>
+          )}
           <div className="gap-2 items-center flex">
             {(placedShapes.length > 0 || isSolved) && (
-              <motion.button onClick={resetToday} className="icon-button">
+              <motion.button
+                onClick={resetToday}
+                className={`icon-button ${isMobile ? "min-h-11 px-4" : ""}`}
+              >
                 Reset
               </motion.button>
             )}
             {isPlaying && !isSolved && (
               <motion.button
                 onClick={() => setIsPlaying(false)}
-                className="icon-button"
+                className={`icon-button ${isMobile ? "min-h-11 px-4" : ""}`}
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // Reference points for fill and color interpolation
 // Format: [solutions, fillPercent, r, g, b]
@@ -94,6 +94,20 @@ export default function DifficultyBar({ date = new Date(), className = "" }: Dif
   const [solutions, setSolutions] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showTooltip, setShowTooltip] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Hover has no equivalent on touch: tapping the bar toggles the tooltip,
+  // and any tap outside dismisses it.
+  useEffect(() => {
+    if (!showTooltip) return;
+    const onPointerDown = (e: PointerEvent) => {
+      if (!containerRef.current?.contains(e.target as Node)) {
+        setShowTooltip(false);
+      }
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, [showTooltip]);
 
   useEffect(() => {
     let cancelled = false;
@@ -140,9 +154,11 @@ export default function DifficultyBar({ date = new Date(), className = "" }: Dif
 
   return (
     <div
+      ref={containerRef}
       className={`relative flex items-center gap-2 ${className}`}
       onMouseEnter={() => setShowTooltip(true)}
       onMouseLeave={() => setShowTooltip(false)}
+      onClick={() => setShowTooltip((v) => !v)}
     >
       <div className="w-24 h-2 bg-stone-200 rounded-full overflow-hidden cursor-help">
         <div

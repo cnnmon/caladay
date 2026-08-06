@@ -142,7 +142,9 @@ export default function SolveModal({
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          // Top-third on short viewports so the autofocused input clears the
+          // iOS keyboard; centered on taller screens.
+          className="fixed inset-0 z-50 flex items-start pt-[12vh] sm:items-center sm:pt-0 justify-center p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
