@@ -33,15 +33,15 @@ jobs:
             -H "Content-Type: application/json" -d '{}')
           echo "stats: $stats"
           reports=$(echo "$stats" | jq '.[0].total_reports')
-          hidden=$(echo "$stats" | jq '.[0].hidden_solutions')
+          masked=$(echo "$stats" | jq '.[0].masked_names')
           if [ "$reports" = "0" ] || [ -z "$reports" ]; then
             echo "No moderation activity."
             exit 0
           fi
-          title="Moderation activity: $reports report(s), $hidden hidden entr(y/ies)"
+          title="Moderation activity: $reports report(s), $masked masked name(s)"
           gh label create moderation -c "#d73a4a" -d "Leaderboard moderation" --force 2>/dev/null || true
           existing=$(gh issue list --state open --label moderation --json number --jq '.[0].number')
-          body="As of $(date -u +%F): $reports total report(s), $hidden hidden solution(s). Review in the Supabase dashboard (Table Editor -> reports / solutions where hidden = true). Un-hide a wrongly reported entry by setting hidden = false."
+          body="As of $(date -u +%F): $reports total report(s), $masked masked name(s). Review in the Supabase dashboard (Table Editor -> solutions where flagged_name is not null). Restore a wrongly reported name by copying flagged_name back into username and clearing flagged_name."
           if [ -n "$existing" ]; then
             gh issue comment "$existing" --body "$body"
           else

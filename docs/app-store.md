@@ -49,15 +49,16 @@ names; moderation is server-enforced (see below), with in-app reporting.
 >
 > User-generated content (3-character leaderboard names) is moderated:
 > server-side profanity filtering at submission time, plus an in-app report
-> button (flag icon next to each entry); entries are automatically hidden
-> after multiple reports.
+> button (flag icon next to each entry); reported names are automatically
+> masked after multiple reports.
 
 ## Guideline-1.2 (UGC) mechanisms — implemented
 
 - Server-side username filtering in the submit-solution edge function
   (`supabase/functions/_shared/puzzle.ts`).
 - Report button on every leaderboard row → `solutions.report` mutation;
-  auto-hides an entry after 3 reports (Postgres trigger in `supabase/migrations/0001_init.sql`).
+  auto-masks a reported name after 3 reports, leaving the score intact
+  (Postgres trigger; see `supabase/migrations/0003_moderation_stats.sql`).
 - Grid submissions are validated server-side as genuine solutions
   (`supabase/functions/_shared/puzzle.ts`) so the leaderboard can't be spoofed.
 
