@@ -1,0 +1,707 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Caladay — iPhone UX mockups</title>
+<style>
+  /* ------------------------------------------------------------------
+     Page chrome tokens (the phone CONTENT uses Caladay's app tokens
+     verbatim and stays light — the product has a single parchment theme).
+     ------------------------------------------------------------------ */
+  :root {
+    --pg-bg: #e7dfd3;
+    --pg-ink: #2b2b23;
+    --pg-muted: #6f6a5c;
+    --pg-card: #f2ede7;
+    --pg-line: #d5ccbc;
+    --pg-accent: #2e9bdb;
+
+    /* Caladay app tokens (globals.css + puzzle.ts — do not restyle) */
+    --parchment: #f2ede7;
+    --ink: #2b2b23;
+    --peach: #f1c7a2;
+    --cell-line: #e3ded6;
+    --pill: #d6d3d1;        /* stone-300 */
+    --pill-hover: #a8a29e;  /* stone-400 */
+    --pill-text: #57534e;   /* stone-600 */
+    --hint: #a8a29e;        /* stone-400 */
+    --primary: #292524;     /* stone-800 */
+    --invalid: #ef4444;
+
+    --c-L: #a33366; --c-J: #ef7a43; --c-T: #e7920a; --c-S: #849e16;
+    --c-Z: #6ba6ba; --c-I: #0f688e; --c-O: #6777b5; --c-P: #9e78c7;
+    --c-U: #ff88b3; --c-V: #d27089;
+
+    /* fluid cell sizing — the mockup demonstrates the same formula the
+       implementation will use */
+    --cell: 50px;
+    --slot: 64px;
+    --pcell: 13px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --pg-bg: #201e19; --pg-ink: #e8e2d6; --pg-muted: #a49d8d;
+      --pg-card: #2a2822; --pg-line: #3a372f;
+    }
+  }
+  :root[data-theme="light"] {
+    --pg-bg: #e7dfd3; --pg-ink: #2b2b23; --pg-muted: #6f6a5c;
+    --pg-card: #f2ede7; --pg-line: #d5ccbc;
+  }
+  :root[data-theme="dark"] {
+    --pg-bg: #201e19; --pg-ink: #e8e2d6; --pg-muted: #a49d8d;
+    --pg-card: #2a2822; --pg-line: #3a372f;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--pg-bg);
+    color: var(--pg-ink);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------------- page header ---------------- */
+  .page-head {
+    max-width: 1060px; margin: 0 auto; padding: 28px 20px 8px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .page-head h1 { font-size: 20px; font-weight: 650; margin: 0; letter-spacing: -0.01em; }
+  .page-head h1 small { font-weight: 480; color: var(--pg-muted); margin-left: 8px; font-size: 14px; }
+  .page-head p { margin: 0; max-width: 62ch; color: var(--pg-muted); font-size: 13.5px; line-height: 1.55; }
+
+  .tabs { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .tab {
+    border: 1px solid var(--pg-line); background: var(--pg-card); color: var(--pg-ink);
+    border-radius: 999px; padding: 7px 15px; font-size: 13.5px; font-weight: 550;
+    cursor: pointer; transition: transform .12s ease, background .12s ease;
+  }
+  .tab:hover { transform: translateY(-1px); }
+  .tab:focus-visible, .anno-toggle:focus-visible { outline: 2px solid var(--pg-accent); outline-offset: 2px; }
+  .tab[aria-selected="true"] { background: var(--ink); color: var(--parchment); border-color: var(--ink); }
+  .anno-toggle {
+    margin-left: auto; display: flex; gap: 7px; align-items: center;
+    font-size: 12.5px; color: var(--pg-muted); cursor: pointer; user-select: none;
+    border: none; background: none; padding: 6px 2px; font-weight: 550;
+  }
+  .anno-toggle .dot {
+    width: 17px; height: 17px; border-radius: 50%; background: var(--pg-accent); color: #fff;
+    font-size: 10.5px; display: inline-flex; align-items: center; justify-content: center; font-weight: 700;
+  }
+  .anno-toggle[aria-pressed="false"] .dot { background: var(--pg-muted); opacity: .5; }
+
+  /* ---------------- stage: phone + legend ---------------- */
+  .stage {
+    max-width: 1060px; margin: 0 auto; padding: 18px 20px 56px;
+    display: flex; gap: 34px; align-items: flex-start; justify-content: center;
+  }
+  .legend { flex: 0 1 300px; position: sticky; top: 24px; display: flex; flex-direction: column; gap: 10px; padding-top: 8px; }
+  .legend h2 { font-size: 11.5px; text-transform: uppercase; letter-spacing: .09em; color: var(--pg-muted); margin: 0 0 2px; font-weight: 650; }
+  .legend .item { display: flex; gap: 10px; font-size: 13.5px; line-height: 1.5; }
+  .legend .item .dot {
+    flex: none; width: 19px; height: 19px; border-radius: 50%; background: var(--pg-accent);
+    color: #fff; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center;
+    margin-top: 1px;
+  }
+  .legend .note { font-size: 12.5px; color: var(--pg-muted); line-height: 1.55; border-top: 1px solid var(--pg-line); padding-top: 10px; margin-top: 4px; }
+
+  /* ---------------- iPhone frame ---------------- */
+  .phone {
+    flex: none; width: 415px; padding: 11px; background: #1a1a1a; border-radius: 56px;
+    box-shadow: 0 24px 60px rgba(20, 18, 10, .35), inset 0 0 0 2px #3a3a3a;
+    position: relative;
+  }
+  .screen {
+    position: relative; width: 393px; height: 852px; border-radius: 45px; overflow: hidden;
+    background: var(--parchment); color: var(--ink);
+    display: flex; flex-direction: column;
+    user-select: none; -webkit-user-select: none;
+  }
+  .island { position: absolute; top: 11px; left: 50%; transform: translateX(-50%); width: 122px; height: 35px; background: #000; border-radius: 20px; z-index: 40; }
+  .statusbar {
+    flex: none; height: 54px; display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 30px 0; font-size: 15px; font-weight: 650;
+  }
+  .statusbar svg { display: block; }
+  .home-indicator { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 140px; height: 5px; border-radius: 3px; background: #1a1a1a; opacity: .9; z-index: 40; }
+
+  /* ---------------- Caladay screen anatomy ---------------- */
+  .app-header { flex: none; display: flex; align-items: center; gap: 8px; padding: 4px 14px 0; }
+  .app-header .spacer { flex: 1; }
+  .icon-pill {
+    height: 44px; min-width: 44px; padding: 0 12px; border-radius: 999px;
+    background: var(--pill); color: var(--pill-text);
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    font-size: 15px; font-weight: 600; border: none;
+  }
+  .icon-pill svg { display: block; }
+
+  .title-block { flex: none; text-align: center; padding: 8px 0 2px; }
+  .title-block .date { font-size: 26px; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+  .title-block .date .time { color: #4b4a40; }
+  .difficulty { margin: 7px auto 0; display: flex; align-items: center; gap: 9px; justify-content: center; }
+  .difficulty .track { width: 150px; height: 7px; border-radius: 4px; background: #e2dcd2; overflow: hidden; }
+  .difficulty .fill { width: 16%; height: 100%; border-radius: 4px; background: var(--pg-accent); }
+  .difficulty .label { font-size: 14px; font-weight: 600; color: var(--pg-accent); }
+
+  .board-area { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; position: relative; }
+  .board {
+    background: var(--ink); border-radius: 14px; padding: 7px;
+    box-shadow: 0 1px 0 rgba(255,255,255,.4) inset;
+  }
+  .grid {
+    display: grid; grid-template-columns: repeat(7, var(--cell)); grid-auto-rows: var(--cell);
+    background: #fff; border-radius: 8px; overflow: hidden;
+  }
+  .cell {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 560; color: var(--ink);
+    border-right: 1px solid var(--cell-line); border-bottom: 1px solid var(--cell-line);
+    position: relative; background: #fff;
+  }
+  .cell.mon { font-size: 15px; }
+  .cell.blocked { background: var(--ink); border-color: var(--ink); }
+  .cell.target { background: var(--ink); border-color: var(--ink); color: var(--peach); font-weight: 700; }
+  .cell.piece { color: #fff; font-weight: 650; }
+  .cell.piece::after { content: ""; position: absolute; inset: 0; border: 1px solid rgba(255,255,255,.28); pointer-events: none; }
+  .cell.preview-valid::before, .cell.preview-invalid::before {
+    content: ""; position: absolute; inset: 1px; border-radius: 3px; border: 2px solid #fff; opacity: .95;
+  }
+  .cell.preview-valid { background: color-mix(in srgb, var(--pv-color, #6ba6ba) 55%, #fff); }
+  .cell.preview-invalid { background: color-mix(in srgb, var(--invalid) 55%, #fff); }
+
+  /* action bar — height ALWAYS reserved so the board never reflows */
+  .action-bar {
+    flex: none; height: 58px; display: flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 0 14px;
+  }
+  .action-bar .hint { font-size: 14.5px; color: var(--hint); font-weight: 500; }
+  .act {
+    height: 46px; padding: 0 18px; border-radius: 999px; border: none;
+    background: var(--pill); color: var(--pill-text);
+    font-size: 15.5px; font-weight: 650; display: inline-flex; align-items: center; gap: 8px;
+  }
+  .act svg { display: block; }
+  .act.disabled { opacity: .38; }
+
+  .tray { flex: none; display: flex; flex-direction: column; gap: 9px; align-items: center; padding: 2px 12px 6px; }
+  .tray-row { display: flex; gap: 9px; }
+  .slot {
+    width: var(--slot); height: var(--slot); border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; position: relative;
+  }
+  .slot.selected { background: #dcd6cb; box-shadow: 0 0 0 2px var(--pill-hover); }
+  .slot.placed .mini { opacity: .32; filter: grayscale(1); }
+  .slot.drag-origin { opacity: .35; }
+  .slot.drag-origin::after { content: ""; position: absolute; inset: 3px; border: 2px dashed var(--pill-hover); border-radius: 9px; }
+  .mini { display: grid; gap: 1px; }
+  .mini i { width: var(--pcell); height: var(--pcell); border-radius: 2.5px; background: var(--mc); }
+  .mini i.empty { background: transparent; }
+
+  .app-footer { flex: none; display: flex; gap: 10px; justify-content: center; padding: 2px 0 20px; }
+  .app-footer .icon-pill { height: 42px; font-size: 15.5px; padding: 0 18px; }
+
+  /* ---------------- drag artifacts (states 3 & 4) ---------------- */
+  .ghost {
+    position: absolute; z-index: 30; display: grid; gap: 1px; pointer-events: none;
+    filter: drop-shadow(0 10px 16px rgba(43, 43, 35, .3));
+    transform: scale(1.06);
+  }
+  .ghost i { width: var(--cell); height: var(--cell); border-radius: 4px; background: var(--gc); opacity: .92; }
+  .ghost i.empty { background: transparent; }
+  .ghost.invalid i:not(.empty) { background: var(--invalid); }
+  .finger {
+    position: absolute; z-index: 31; width: 46px; height: 46px; border-radius: 50%;
+    background: rgba(43, 43, 35, .28); border: 2px solid rgba(255, 255, 255, .75);
+    box-shadow: 0 2px 10px rgba(0,0,0,.25); pointer-events: none;
+  }
+  .lift-tether {
+    position: absolute; z-index: 29; width: 2px;
+    background: repeating-linear-gradient(to bottom, rgba(43,43,35,.4) 0 4px, transparent 4px 8px);
+    pointer-events: none;
+  }
+  @keyframes shake { 0%,100% { transform: translateX(0); } 20%,60% { transform: translateX(-5px); } 40%,80% { transform: translateX(5px); } }
+  .slot.shaking { animation: shake .45s ease infinite; }
+  @media (prefers-reduced-motion: reduce) { .slot.shaking { animation: none; box-shadow: 0 0 0 2px var(--invalid); } }
+
+  /* ---------------- install sheet (state 5) ---------------- */
+  .scrim { position: absolute; inset: 0; background: rgba(0,0,0,.5); z-index: 34; }
+  .sheet {
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 35;
+    background: #fff; border-radius: 22px 22px 0 0; padding: 10px 22px calc(18px + 26px);
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .sheet .grabber { width: 40px; height: 5px; border-radius: 3px; background: #d6d3d1; margin: 0 auto 2px; }
+  .sheet .head { display: flex; gap: 14px; align-items: center; }
+  .app-icon {
+    flex: none; width: 58px; height: 58px; border-radius: 14px; background: var(--ink);
+    display: grid; place-items: center;
+  }
+  .app-icon .mini-cal { display: grid; grid-template-columns: repeat(3, 11px); gap: 2px; }
+  .app-icon .mini-cal i { width: 11px; height: 11px; border-radius: 2px; }
+  .sheet h3 { margin: 0; font-size: 18px; font-weight: 700; color: #1c1917; }
+  .sheet .sub { margin: 2px 0 0; font-size: 13.5px; color: #78716c; line-height: 1.45; }
+  .step { display: flex; gap: 13px; align-items: center; background: #f5f5f4; border-radius: 13px; padding: 12px 14px; }
+  .step .g { flex: none; width: 34px; height: 34px; border-radius: 9px; background: #fff; display: grid; place-items: center; color: #0a84ff; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+  .step p { margin: 0; font-size: 14.5px; color: #292524; font-weight: 550; }
+  .step p small { display: block; font-weight: 480; color: #78716c; font-size: 12.5px; margin-top: 1px; }
+  .sheet .later { align-self: center; border: none; background: none; color: #78716c; font-size: 14.5px; font-weight: 600; padding: 6px 10px; }
+
+  /* ---------------- annotation pins ---------------- */
+  .pin {
+    position: absolute; z-index: 45; width: 22px; height: 22px; border-radius: 50%;
+    background: var(--pg-accent); color: #fff; font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 0 3px rgba(255,255,255,.85), 0 3px 8px rgba(0,0,0,.3);
+    pointer-events: none;
+  }
+  body[data-annotations="off"] .pin { display: none; }
+
+  /* ---------------- responsive: legend below on medium, full-bleed on phones ---------------- */
+  @media (max-width: 860px) {
+    .stage { flex-direction: column; align-items: center; }
+    .legend { position: static; width: 100%; max-width: 415px; }
+  }
+  /* On an actual phone: drop the fake frame/status bar and let the app
+     screen stack naturally — this IS the proposed layout at real size. */
+  @media (max-width: 500px) {
+    :root {
+      --cell: min(50px, calc((100vw - 44px) / 7));
+      --slot: min(64px, calc((100vw - 66px) / 5));
+      --pcell: min(13px, calc((100vw - 170px) / 22));
+    }
+    .page-head p.blurb, .page-head h1 small { display: none; }
+    .page-head { padding: 12px 14px 4px; gap: 10px; }
+    .page-head h1 { font-size: 17px; }
+    .tab { padding: 5px 11px; font-size: 12px; }
+    .stage { padding: 6px 0 30px; gap: 16px; }
+    .legend { padding: 0 14px; }
+    .phone { width: 100%; padding: 0; background: none; border-radius: 0; box-shadow: none; }
+    .screen { width: 100%; height: auto; border-radius: 0; }
+    .statusbar, .island, .home-indicator { display: none; }
+    .board-area { flex: none; padding: 4px 0; }
+    .app-header { padding-top: 10px; }
+    .sheet { position: fixed; z-index: 60; }
+    .scrim { position: fixed; z-index: 59; }
+  }
+</style>
+</head>
+<body data-annotations="on">
+
+<header class="page-head">
+  <h1>Caladay · iPhone mockups<small>PWA branch — proposed touch UX, app theme preserved</small></h1>
+  <p class="blurb">Static mockups, no game logic. Colors, radii, and pill styling are the app's existing tokens; type is the system stack standing in for Geist. Cells here are 50px (today: 38px) via the same fluid formula the implementation uses — resize this window below 500px to see it.</p>
+  <div class="tabs" role="tablist" aria-label="Mockup states">
+    <button class="tab" role="tab" data-state="playing" aria-selected="true">1 · Playing</button>
+    <button class="tab" role="tab" data-state="selected" aria-selected="false">2 · Piece selected</button>
+    <button class="tab" role="tab" data-state="drag" aria-selected="false">3 · Dragging</button>
+    <button class="tab" role="tab" data-state="invalid" aria-selected="false">4 · Invalid drop</button>
+    <button class="tab" role="tab" data-state="install" aria-selected="false">5 · Install sheet</button>
+    <button class="anno-toggle" aria-pressed="true" id="annoToggle"><span class="dot">i</span> annotations</button>
+  </div>
+</header>
+
+<main class="stage">
+  <div class="phone">
+    <div class="screen" id="screen">
+      <div class="island"></div>
+      <div class="statusbar">
+        <span>9:41</span>
+        <span style="display:flex;gap:7px;align-items:center">
+          <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><path d="M8.5 9.6a1.7 1.7 0 0 1 1.7 1.7L8.5 12l-1.7-.7a1.7 1.7 0 0 1 1.7-1.7Zm0-4.3c1.9 0 3.6.7 4.9 1.9l-1.4 1.5a5 5 0 0 0-7 0L3.6 7.2A7 7 0 0 1 8.5 5.3Zm0-4.3c3 0 5.8 1.2 7.9 3.1L15 5.6a9.2 9.2 0 0 0-13 0L.6 4.1A11.3 11.3 0 0 1 8.5 1Z"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" fill="none" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="15" height="8" rx="2" fill="currentColor"/><path d="M23 4v4a2.2 2.2 0 0 0 0-4Z" fill="currentColor" opacity=".4"/></svg>
+        </span>
+      </div>
+
+      <div class="app-header">
+        <button class="icon-pill" aria-label="Leaderboard">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M6 4h12v5a6 6 0 0 1-12 0Z"/><path d="M12 15v3"/><path d="M8.5 21h7"/></svg>
+        </button>
+        <button class="icon-pill" aria-label="Help">?</button>
+        <span class="spacer"></span>
+        <button class="icon-pill">ABC</button>
+        <button class="icon-pill" aria-label="Settings">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.01a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.01a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1Z"/></svg>
+        </button>
+      </div>
+
+      <div class="title-block">
+        <div class="date">Aug 6, Thu · <span class="time">1:24</span></div>
+        <div class="difficulty"><div class="track"><div class="fill"></div></div><span class="label">Easiest</span></div>
+      </div>
+
+      <div class="board-area" id="boardArea">
+        <div class="board"><div class="grid" id="grid"></div></div>
+      </div>
+
+      <div class="action-bar" id="actionBar"></div>
+
+      <div class="tray" id="tray"></div>
+
+      <div class="app-footer">
+        <button class="icon-pill">Reset</button>
+        <button class="icon-pill">Pause</button>
+      </div>
+
+      <div class="home-indicator"></div>
+    </div>
+  </div>
+
+  <aside class="legend">
+    <h2 id="legendTitle">Notes</h2>
+    <div id="legendItems"></div>
+    <p class="note" id="legendNote"></p>
+  </aside>
+</main>
+
+<script>
+/* Presentational scaffolding only — renders the five static states. */
+
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const DOW = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+/* 8×7 calendar board (matches buildGrid() in components/Puzzle/index.tsx) */
+function baseGrid() {
+  const g = [];
+  for (let r = 0; r < 8; r++) { g.push([]); for (let c = 0; c < 7; c++) g[r].push({ label: "", blocked: false, target: false }); }
+  for (let c = 0; c < 6; c++) { g[0][c].label = MONTHS[c]; g[1][c].label = MONTHS[c + 6]; }
+  g[0][6].blocked = true; g[1][6].blocked = true;
+  let d = 1;
+  for (let r = 2; r <= 6 && d <= 31; r++) for (let c = 0; c < 7 && d <= 31; c++) { g[r][c].label = String(d++); }
+  g[6][3].label = "Sun"; g[6][4].label = "Mon"; g[6][5].label = "Tue"; g[6][6].label = "Wed";
+  for (let c = 0; c < 4; c++) g[7][c].blocked = true;
+  g[7][4].label = "Thu"; g[7][5].label = "Fri"; g[7][6].label = "Sat";
+  /* today: Aug 6, Thursday */
+  g[1][1].target = true; g[2][5].target = true; g[7][4].target = true;
+  return g;
+}
+
+/* piece shapes — [row, col] offsets, colors from supabase/functions/_shared/puzzle.ts */
+const SHAPES = {
+  L: { color: "var(--c-L)", cells: [[0,0],[1,0],[2,0],[2,1]] },
+  J: { color: "var(--c-J)", cells: [[0,0],[0,1],[0,2],[0,3],[1,0]] },
+  T: { color: "var(--c-T)", cells: [[0,0],[0,1],[0,2],[1,1]] },
+  S: { color: "var(--c-S)", cells: [[0,1],[0,2],[1,0],[1,1]] },
+  Z: { color: "var(--c-Z)", cells: [[0,0],[0,1],[1,1],[1,2]] },
+  I: { color: "var(--c-I)", cells: [[0,0],[1,0],[2,0],[3,0]] },
+  O: { color: "var(--c-O)", cells: [[0,0],[0,1],[1,0],[1,1]] },
+  P: { color: "var(--c-P)", cells: [[0,0],[0,1],[1,0],[1,1],[2,0]] },
+  U: { color: "var(--c-U)", cells: [[0,0],[0,2],[1,0],[1,1],[1,2]] },
+  V: { color: "var(--c-V)", cells: [[0,0],[1,0],[2,0],[2,1],[2,2]] },
+};
+const TRAY_ORDER = ["L","J","T","S","Z","I","O","P","U","V"];
+const PLACED = [
+  { id: "J", origin: [1, 2] },   /* Sep Oct Nov Dec 3 */
+  { id: "S", origin: [3, 4] },   /* 13 14 19 20 */
+  { id: "U", origin: [4, 0] },   /* 15 17 22 23 24 */
+];
+
+const STATES = {
+  playing: {
+    legendTitle: "1 · Playing (default)",
+    items: [
+      { anchor: "header", text: "Compact one-row header — every control ≥ 44pt (leaderboard, help, username, settings)." },
+      { anchor: "board", text: "Board fills the width: ~50px cells vs today's fixed 38px, sized by measuring free space (SE → Pro Max)." },
+      { anchor: "actionbar", text: "This row's height is always reserved — gesture hints when idle, buttons when a piece is selected, so the board never jumps." },
+      { anchor: "tray", text: "Tray moves fully into the thumb zone: 2×5 slots, ~64px (up from 56px), bigger piece thumbnails." },
+    ],
+    note: "“Use all shapes…” caption is dropped on phones — Help covers it; the space goes to the board.",
+  },
+  selected: {
+    legendTitle: "2 · Piece selected",
+    items: [
+      { anchor: "selslot", text: "Tap a piece to select it (existing behavior, same highlight)." },
+      { anchor: "actionbar", text: "Rotate / Flip appear as 46pt pills — replacing today's 28px floating buttons. Remove lights up when a placed piece is selected." },
+      { anchor: "tray", text: "Gestures still work: tap the selected piece again to rotate, press-and-hold to flip." },
+    ],
+    note: "Buttons reuse the existing handleRotate/handleFlip logic and disabled states (e.g. flipping a symmetric piece).",
+  },
+  drag: {
+    legendTitle: "3 · Dragging (valid)",
+    items: [
+      { anchor: "ghost", text: "The piece lifts ~56px above your finger — never hidden under it — with a slight scale-up and shadow." },
+      { anchor: "preview", edge: "right", text: "Live snap preview on the board: piece color + white ring = fits here. Drop lands exactly where previewed." },
+      { anchor: "origslot", text: "Origin slot dims while its piece is in the air." },
+    ],
+    note: "Mouse users on desktop get today's exact behavior — the lift applies to touch only.",
+  },
+  invalid: {
+    legendTitle: "4 · Invalid drop",
+    items: [
+      { anchor: "preview", edge: "right", text: "Red preview = overlaps a placed piece, a blocked corner, or today's date." },
+      { anchor: "origslot", text: "Releasing here: the piece flies back to its tray slot with a shake (+ error haptic in the native app)." },
+    ],
+    note: "This wires up feedback that exists in the code today but is never triggered (the dead invalidShake state).",
+  },
+  install: {
+    legendTitle: "5 · Install sheet (PWA)",
+    items: [
+      { anchor: "sheet", text: "Shown once, right after your first solve in Safari — the moment the app has proven itself." },
+      { anchor: "steps", text: "iOS has no install prompt API, so the sheet walks through Share → Add to Home Screen." },
+      { anchor: "later", edge: "right", text: "Dismissible forever; still reachable any time from Settings \u2192 \u201cInstall app\u201d. Never shows when already installed or in the native app." },
+    ],
+    note: "Installed, Caladay launches full-screen with its own icon and splash, and works offline.",
+  },
+};
+
+const grid = document.getElementById("grid");
+const tray = document.getElementById("tray");
+const actionBar = document.getElementById("actionBar");
+const boardArea = document.getElementById("boardArea");
+const screen = document.getElementById("screen");
+
+function shapeAt(state) {
+  /* which cells are covered, by shape id */
+  const covered = {};
+  for (const p of PLACED) for (const [dr, dc] of SHAPES[p.id].cells) covered[`${p.origin[0]+dr},${p.origin[1]+dc}`] = p.id;
+  return covered;
+}
+
+function previewCells(id, origin) {
+  return SHAPES[id].cells.map(([dr, dc]) => `${origin[0]+dr},${origin[1]+dc}`);
+}
+
+function renderBoard(state) {
+  const g = baseGrid();
+  const covered = shapeAt(state);
+  const preview = state === "drag" ? previewCells("Z", [4, 3])
+                : state === "invalid" ? previewCells("Z", [2, 1]) : [];
+  const previewClass = state === "invalid" ? "preview-invalid" : "preview-valid";
+  grid.innerHTML = "";
+  for (let r = 0; r < 8; r++) for (let c = 0; c < 7; c++) {
+    const cell = g[r][c];
+    const div = document.createElement("div");
+    div.className = "cell";
+    if (cell.label && isNaN(+cell.label)) div.classList.add("mon");
+    if (cell.blocked) div.classList.add("blocked");
+    else if (cell.target) { div.classList.add("target"); div.textContent = cell.label; }
+    else {
+      div.textContent = cell.label;
+      const pid = covered[`${r},${c}`];
+      if (pid) { div.classList.add("piece"); div.style.background = SHAPES[pid].color; }
+      if (preview.includes(`${r},${c}`)) { div.classList.add(previewClass); div.style.setProperty("--pv-color", "var(--c-Z)"); }
+    }
+    div.dataset.rc = `${r},${c}`;
+    grid.appendChild(div);
+  }
+}
+
+function miniShape(id, cellVar) {
+  const s = SHAPES[id];
+  const rows = Math.max(...s.cells.map(c => c[0])) + 1;
+  const cols = Math.max(...s.cells.map(c => c[1])) + 1;
+  const el = document.createElement("div");
+  el.className = "mini";
+  el.style.gridTemplateColumns = `repeat(${cols}, ${cellVar})`;
+  el.style.setProperty("--mc", s.color);
+  for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+    const i = document.createElement("i");
+    if (!s.cells.some(([sr, sc]) => sr === r && sc === c)) i.className = "empty";
+    el.appendChild(i);
+  }
+  return el;
+}
+
+function renderTray(state) {
+  tray.innerHTML = "";
+  const placedIds = PLACED.map(p => p.id);
+  const rows = [TRAY_ORDER.slice(0, 5), TRAY_ORDER.slice(5)];
+  for (const row of rows) {
+    const rowEl = document.createElement("div");
+    rowEl.className = "tray-row";
+    for (const id of row) {
+      const slot = document.createElement("div");
+      slot.className = "slot";
+      slot.dataset.shape = id;
+      if (placedIds.includes(id)) slot.classList.add("placed");
+      if (state === "selected" && id === "P") slot.classList.add("selected");
+      if ((state === "drag" || state === "invalid") && id === "Z") slot.classList.add("drag-origin");
+      if (state === "invalid" && id === "Z") slot.classList.add("shaking");
+      slot.appendChild(miniShape(id, "var(--pcell)"));
+      rowEl.appendChild(slot);
+    }
+    tray.appendChild(rowEl);
+  }
+}
+
+function renderActionBar(state) {
+  if (state === "selected") {
+    actionBar.innerHTML = `
+      <button class="act"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.3"/><path d="M21 3v6h-6"/></svg>Rotate</button>
+      <button class="act"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7l-5 5 5 5"/><path d="M16 7l5 5-5 5"/><path d="M12 4v16" stroke-dasharray="2.5 3"/></svg>Flip</button>
+      <button class="act disabled"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>Remove</button>`;
+  } else if (state === "playing") {
+    actionBar.innerHTML = `<span class="hint">tap a piece · tap again to rotate · hold to flip</span>`;
+  } else {
+    actionBar.innerHTML = "";
+  }
+}
+
+function clearOverlays() {
+  for (const el of screen.querySelectorAll(".ghost, .finger, .lift-tether, .scrim, .sheet, .pin")) el.remove();
+}
+
+function renderDragOverlays(state) {
+  /* The ghost sits exactly on its landing (previewed) cells — the finger is
+     LIFT px below the grab point, mirroring the real interaction geometry. */
+  const origin = state === "drag" ? [4, 3] : [2, 1];
+  const originCell = grid.querySelector(`[data-rc="${origin[0]},${origin[1]}"]`);
+  if (!originCell) return;
+  const screenRect = screen.getBoundingClientRect();
+  const rect = originCell.getBoundingClientRect();
+  const cellPx = rect.width;
+  const gx = rect.left - screenRect.left;
+  const gy = rect.top - screenRect.top;
+
+  const s = SHAPES.Z;
+  const rows = Math.max(...s.cells.map(c => c[0])) + 1;
+  const cols = Math.max(...s.cells.map(c => c[1])) + 1;
+  const ghost = document.createElement("div");
+  ghost.className = "ghost" + (state === "invalid" ? " invalid" : "");
+  ghost.style.gridTemplateColumns = `repeat(${cols}, ${cellPx}px)`;
+  ghost.style.setProperty("--gc", s.color);
+  for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+    const i = document.createElement("i");
+    i.style.width = i.style.height = cellPx + "px";
+    if (!s.cells.some(([sr, sc]) => sr === r && sc === c)) i.className = "empty";
+    ghost.appendChild(i);
+  }
+  ghost.style.left = gx + "px";
+  ghost.style.top = gy + "px";
+
+  /* grab point = center of the piece's (1,1) cell; finger LIFT below it */
+  const lift = 56;
+  const fx = gx + 1.5 * cellPx;
+  const gyGrab = gy + 1.5 * cellPx;
+  const fy = gyGrab + lift;
+
+  const tether = document.createElement("div");
+  tether.className = "lift-tether";
+  tether.style.left = fx - 1 + "px";
+  tether.style.top = gyGrab + cellPx / 2 + "px";
+  tether.style.height = lift - cellPx / 2 - 25 + "px";
+
+  const finger = document.createElement("div");
+  finger.className = "finger";
+  finger.style.left = fx - 23 + "px";
+  finger.style.top = fy - 23 + "px";
+
+  screen.appendChild(tether);
+  screen.appendChild(ghost);
+  screen.appendChild(finger);
+}
+
+function renderInstall() {
+  const scrim = document.createElement("div");
+  scrim.className = "scrim";
+  const sheet = document.createElement("div");
+  sheet.className = "sheet";
+  sheet.id = "sheet";
+  sheet.innerHTML = `
+    <div class="grabber"></div>
+    <div class="head">
+      <div class="app-icon"><div class="mini-cal">
+        <i style="background:#fff"></i><i style="background:var(--c-J)"></i><i style="background:#fff"></i>
+        <i style="background:var(--c-Z)"></i><i style="background:#fff"></i><i style="background:var(--c-U)"></i>
+        <i style="background:#fff"></i><i style="background:var(--peach)"></i><i style="background:#fff"></i>
+      </div></div>
+      <div>
+        <h3>Add Caladay to your Home Screen</h3>
+        <p class="sub">Full-screen play, its own icon, and works offline.</p>
+      </div>
+    </div>
+    <div class="step" id="stepShare">
+      <span class="g"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M8 6.5 12 3l4 3.5"/><rect x="4" y="10" width="16" height="11" rx="2.5" stroke-dasharray="0"/></svg></span>
+      <p>Tap <b>Share</b> in Safari's toolbar</p>
+    </div>
+    <div class="step">
+      <span class="g"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><path d="M12 8.5v7M8.5 12h7"/></svg></span>
+      <p>Choose <b>Add to Home Screen</b><small>Scroll down a little to find it</small></p>
+    </div>
+    <button class="later" id="laterBtn">Maybe later</button>`;
+  screen.appendChild(scrim);
+  screen.appendChild(sheet);
+}
+
+/* annotation pins anchored to elements */
+function pinFor(el, n, edge) {
+  if (!el) return;
+  const screenRect = screen.getBoundingClientRect();
+  const r = el.getBoundingClientRect();
+  const pin = document.createElement("div");
+  pin.className = "pin";
+  pin.textContent = n;
+  const x = edge === "left" ? r.left - screenRect.left - 8 : r.right - screenRect.left - 13;
+  const y = r.top - screenRect.top + (edge === "mid" ? r.height / 2 - 11 : -4);
+  pin.style.left = Math.min(Math.max(x, 4), screen.clientWidth - 26) + "px";
+  pin.style.top = Math.max(y, 4) + "px";
+  screen.appendChild(pin);
+}
+
+function renderPins(state) {
+  const anchors = {
+    header: () => screen.querySelector(".app-header"),
+    board: () => screen.querySelector(".board"),
+    actionbar: () => actionBar,
+    tray: () => tray,
+    selslot: () => tray.querySelector(".slot.selected"),
+    origslot: () => tray.querySelector(".slot.drag-origin"),
+    ghost: () => screen.querySelector(".ghost"),
+    preview: () => { const all = grid.querySelectorAll(".preview-valid, .preview-invalid"); return all[all.length - 1]; },
+    sheet: () => screen.querySelector(".sheet .grabber"),
+    steps: () => screen.querySelector("#stepShare"),
+    later: () => screen.querySelector("#laterBtn"),
+  };
+  STATES[state].items.forEach((item, i) => {
+    const el = anchors[item.anchor] && anchors[item.anchor]();
+    pinFor(el, i + 1, item.edge || "left");
+  });
+}
+
+function renderLegend(state) {
+  document.getElementById("legendTitle").textContent = STATES[state].legendTitle;
+  const wrap = document.getElementById("legendItems");
+  wrap.innerHTML = "";
+  STATES[state].items.forEach((item, i) => {
+    const div = document.createElement("div");
+    div.className = "item";
+    div.innerHTML = `<span class="dot">${i + 1}</span><span>${item.text}</span>`;
+    wrap.appendChild(div);
+  });
+  document.getElementById("legendNote").textContent = STATES[state].note;
+}
+
+function show(state) {
+  clearOverlays();
+  renderBoard(state);
+  renderTray(state);
+  renderActionBar(state);
+  renderLegend(state);
+  if (state === "drag" || state === "invalid") renderDragOverlays(state);
+  if (state === "install") renderInstall();
+  renderPins(state); /* synchronous — gBCR forces layout; rAF would queue while the tab is hidden */
+  for (const t of document.querySelectorAll(".tab")) t.setAttribute("aria-selected", String(t.dataset.state === state));
+}
+
+for (const t of document.querySelectorAll(".tab")) t.addEventListener("click", () => show(t.dataset.state));
+document.getElementById("annoToggle").addEventListener("click", (e) => {
+  const btn = e.currentTarget;
+  const on = btn.getAttribute("aria-pressed") !== "true";
+  btn.setAttribute("aria-pressed", String(on));
+  document.body.dataset.annotations = on ? "on" : "off";
+});
+let resizeRaf = 0;
+window.addEventListener("resize", () => {
+  cancelAnimationFrame(resizeRaf);
+  resizeRaf = requestAnimationFrame(() => {
+    const current = document.querySelector('.tab[aria-selected="true"]').dataset.state;
+    show(current);
+  });
+});
+show("playing");
+</script>
+</body>
+</html>
