@@ -17,7 +17,13 @@ import {
   ShapeMatrix,
   SolveHistory,
 } from "../../lib/types";
-import { hapticInvalid, hapticPlace, hapticSolve, isNative } from "../../lib/native";
+import {
+  hapticInvalid,
+  hapticPlace,
+  hapticSolve,
+  hideSplash,
+  isNative,
+} from "../../lib/native";
 import { isReminderEnabled, setReminderEnabled } from "../../lib/notifications";
 import { shareSolve } from "../../lib/share";
 import DifficultyBar from "../DifficultyBar";
@@ -406,6 +412,19 @@ export default function Puzzle() {
     setNativeUI(isNative());
     setReminderOn(isReminderEnabled());
   }, []);
+
+  // Drop the native splash only after the settled UI has actually painted
+  // (two frames past hasMounted). Safety timeout in case something above
+  // throws before that — a stuck splash is worse than a flicker.
+  useEffect(() => {
+    const fallback = setTimeout(hideSplash, 3000);
+    if (hasMounted) {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => hideSplash());
+      });
+    }
+    return () => clearTimeout(fallback);
+  }, [hasMounted]);
 
   // Load username on mount
   useEffect(() => {

@@ -2,9 +2,17 @@
 // so the Vercel deployment behaves exactly as before.
 import { Capacitor } from "@capacitor/core";
 import { Haptics, ImpactStyle, NotificationType } from "@capacitor/haptics";
+import { SplashScreen } from "@capacitor/splash-screen";
 
 export function isNative(): boolean {
   return Capacitor.isNativePlatform();
+}
+
+// Dismiss the launch splash (launchAutoHide is off so the splash covers
+// the whole load-hydrate-paint window; see capacitor.config.ts).
+export function hideSplash(): void {
+  if (!isNative()) return;
+  SplashScreen.hide({ fadeOutDuration: 250 }).catch(() => {});
 }
 
 // Light tap when a piece snaps onto the board

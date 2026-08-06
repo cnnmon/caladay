@@ -9,6 +9,16 @@ const config: CapacitorConfig = {
     backgroundColor: "#f2ede7",
     contentInset: "never",
   },
+  plugins: {
+    SplashScreen: {
+      // Keep the splash up until the web app has painted its settled UI
+      // (hideSplash() in lib/native.ts), preventing the raw-WebView flicker
+      // between splash dismissal and first paint.
+      launchAutoHide: false,
+      backgroundColor: "#f2ede7",
+      showSpinner: false,
+    },
+  },
 };
 
 export default config;
