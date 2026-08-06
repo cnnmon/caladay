@@ -1,14 +1,14 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "Privacy Policy — Caladay",
+  title: "Privacy & Terms — Caladay",
 };
 
 export default function PrivacyPage() {
   return (
     <div className="h-dvh overflow-y-auto bg-[#f2ede7] px-6 py-8">
       <div className="max-w-2xl mx-auto text-stone-700">
-        <h1 className="text-2xl font-light mb-1">Privacy Policy</h1>
+        <h1 className="text-2xl font-light mb-1">Privacy &amp; Terms</h1>
         <p className="text-sm text-stone-400 mb-8">Last updated: July 22, 2026</p>
 
         <div className="space-y-6 text-sm leading-relaxed">
@@ -99,6 +99,22 @@ export default function PrivacyPage() {
             <p>
               Caladay is suitable for all ages and collects no personal
               information beyond the optional 3-letter display name.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="font-medium text-base mb-2">
+              Leaderboard rules (terms of use)
+            </h2>
+            <p>
+              By submitting a solve to the leaderboard you agree to: choose a
+              display name that isn&apos;t offensive, hateful, or impersonating
+              someone; and accept that we may hide or remove entries at our
+              discretion (including automatically after user reports). The
+              service is provided as-is, free of charge, with no warranty; we
+              may modify or discontinue it at any time. Use of the app is
+              otherwise governed by Apple&apos;s standard licensed application
+              end user license agreement.
             </p>
           </section>
 
