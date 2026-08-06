@@ -207,10 +207,8 @@ function LeaderboardContent() {
         {!solutions ? (
           loadTimedOut ? (
             <div className="text-center text-stone-400 py-8">
-              Can&apos;t reach the leaderboard right now.
-              <br />
-              Check your connection — your solves are still saved on this
-              device.
+              Can&apos;t reach the leaderboard, please check your internet
+              connection.
             </div>
           ) : (
             <div className="text-center text-stone-400 py-8">Loading...</div>
