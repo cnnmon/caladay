@@ -22,6 +22,11 @@ interface DbRow {
 
 let client: SupabaseClient | null = null;
 
+// Shared client (also used by the /admin page for auth + moderation)
+export function getSupabase(): SupabaseClient {
+  return getClient();
+}
+
 function getClient(): SupabaseClient {
   if (!client) {
     client = createClient(

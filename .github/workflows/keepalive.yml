@@ -1,16 +1,12 @@
 name: Supabase keep-alive
 # Free-tier Supabase projects pause after ~7 days without traffic.
 # One trivial read a day keeps the leaderboard alive regardless of usage.
-# Also watches moderation counts and emails cabbagetree876@gmail.com when
-# they change (requires the GMAIL_APP_PASSWORD repo secret; see
-# docs/app-store.md). No event-derived input is used in this workflow.
+# Moderation review happens at /admin on the site.
+# No event-derived input is used anywhere in this workflow.
 on:
   schedule:
     - cron: "17 9 * * *" # daily, 09:17 UTC
   workflow_dispatch:
-
-permissions:
-  contents: write
 
 jobs:
   ping:
@@ -21,60 +17,3 @@ jobs:
           curl -sf "https://magjhbcmgjywhmqezgsl.supabase.co/rest/v1/solutions?select=id&limit=1" \
             -H "apikey: sb_publishable_cFHcVtjNbV093WNWBEV6xg__McxPxjs" \
             -o /dev/null
-
-      - uses: actions/checkout@v4
-
-      - name: Check moderation activity
-        id: stats
-        run: |
-          stats=$(curl -sf -X POST \
-            "https://magjhbcmgjywhmqezgsl.supabase.co/rest/v1/rpc/moderation_stats" \
-            -H "apikey: sb_publishable_cFHcVtjNbV093WNWBEV6xg__McxPxjs" \
-            -H "Content-Type: application/json" -d '{}')
-          echo "stats: $stats"
-          reports=$(echo "$stats" | jq '.[0].total_reports')
-          masked=$(echo "$stats" | jq '.[0].masked_names')
-          prev_reports=$(jq -r '.reports // 0' .github/moderation-state.json 2>/dev/null || echo 0)
-          prev_masked=$(jq -r '.masked // 0' .github/moderation-state.json 2>/dev/null || echo 0)
-          echo "reports=$reports" >> "$GITHUB_OUTPUT"
-          echo "masked=$masked" >> "$GITHUB_OUTPUT"
-          if [ "$reports" != "$prev_reports" ] || [ "$masked" != "$prev_masked" ]; then
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Email moderation summary
-        if: steps.stats.outputs.changed == 'true'
-        uses: dawidd6/action-send-mail@v4
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          secure: true
-          username: cabbagetree876@gmail.com
-          password: ${{ secrets.GMAIL_APP_PASSWORD }}
-          from: Caladay Moderation <cabbagetree876@gmail.com>
-          to: cabbagetree876@gmail.com
-          subject: "Caladay moderation: ${{ steps.stats.outputs.reports }} report(s), ${{ steps.stats.outputs.masked }} masked name(s)"
-          body: |
-            Leaderboard moderation counts changed.
-
-            Total reports: ${{ steps.stats.outputs.reports }}
-            Masked names: ${{ steps.stats.outputs.masked }}
-
-            Review: Supabase dashboard -> Table Editor -> solutions
-            (rows where flagged_name is not null; reports table has the raw reports).
-            Restore a wrongly reported name by copying flagged_name back into
-            username and clearing flagged_name.
-
-      - name: Save state
-        if: steps.stats.outputs.changed == 'true'
-        run: |
-          printf '{"reports": %s, "masked": %s}\n' \
-            "${{ steps.stats.outputs.reports }}" "${{ steps.stats.outputs.masked }}" \
-            > .github/moderation-state.json
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add .github/moderation-state.json
-          git commit -m "chore: update moderation state [skip ci]"
-          git push

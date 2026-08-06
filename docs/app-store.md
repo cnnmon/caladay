@@ -74,16 +74,8 @@ names; moderation is server-enforced (see below), with in-app reporting.
 - Simulator requires the iOS platform download in Xcode
   (`xcodebuild -downloadPlatform iOS`).
 
-## Moderation email alerts (one-time setup)
+## Moderation review
 
-The daily keep-alive workflow emails cabbagetree876@gmail.com whenever
-report/masked-name counts change. It needs one repo secret:
-
-1. In the Google account for cabbagetree876@gmail.com: enable 2-Step
-   Verification, then Security -> App passwords -> generate one for "Mail".
-2. GitHub repo -> Settings -> Secrets and variables -> Actions ->
-   New repository secret: name `GMAIL_APP_PASSWORD`, value = that app
-   password.
-
-Until the secret exists, the email step fails (workflow logs show it);
-keep-alive still runs.
+Reported entries are reviewed at https://caladay.vercel.app/admin
+(Supabase Auth login, cabbagetree876@gmail.com). Names auto-mask at 10
+reports; the admin page can restore/mask names and hide/unhide entries.
