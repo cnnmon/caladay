@@ -511,8 +511,13 @@ export default function Puzzle() {
     // (pieces select themselves eagerly on pointerdown, so this must be
     // captured before that to make tap-again-to-rotate work)
     wasSelected: boolean;
+    // Vertical lift applied to the ghost on touch so the piece stays
+    // visible above the finger; 0 for mouse. The snap math subtracts the
+    // same value, so the piece lands exactly where the eye sees it.
+    liftY: number;
   } | null>(null);
   const DRAG_THRESHOLD = 5;
+  const LIFT_PX = 56;
   const [selectedShapeId, setSelectedShapeId] = useState<string | null>(null);
   const [invalidShake, setInvalidShake] = useState<string | null>(null);
   const [hasLoadedProgress, setHasLoadedProgress] = useState(false);
@@ -528,7 +533,25 @@ export default function Puzzle() {
   const longPressFired = useRef(false);
   const LONG_PRESS_MS = 450;
   const gridRef = useRef<HTMLDivElement>(null);
+  // Pointer capture target: the root container. Capturing on the pressed
+  // element breaks for board pieces, whose hitbox unmounts on first move
+  // (releasing capture mid-drag); the root owns move/up and never unmounts.
+  const rootRef = useRef<HTMLDivElement>(null);
   const shapeRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  // Brief shake on a piece that can't do what was asked (blocked rotate/flip
+  // in place, invalid drop). Board cells and the palette slot both read it.
+  const shakeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const triggerInvalidShake = useCallback((shapeId: string) => {
+    setInvalidShake(shapeId);
+    if (shakeTimer.current) clearTimeout(shakeTimer.current);
+    shakeTimer.current = setTimeout(() => setInvalidShake(null), 400);
+  }, []);
+  useEffect(
+    () => () => {
+      if (shakeTimer.current) clearTimeout(shakeTimer.current);
+    },
+    []
+  );
   const [isMobile, setIsMobile] = useState(false);
 
   // Detect mobile screen size
@@ -1157,12 +1180,17 @@ export default function Puzzle() {
       const currentCells = shapeRotations[shapeId];
       const newCells = normalizeShape(rotateShape(currentCells));
 
-      // Check if transformation is valid for placed shapes
-      if (!canTransformPlacedShape(shapeId, newCells)) return;
+      // A placed shape that can't take the new orientation shakes in place
+      // instead of silently ignoring the tap
+      if (!canTransformPlacedShape(shapeId, newCells)) {
+        hapticInvalid();
+        triggerInvalidShake(shapeId);
+        return;
+      }
 
       setShapeRotations((prev) => ({ ...prev, [shapeId]: newCells }));
     },
-    [shapeRotations, canTransformPlacedShape]
+    [shapeRotations, canTransformPlacedShape, triggerInvalidShake]
   );
 
   // Flip a shape (works for both palette and placed shapes)
@@ -1171,12 +1199,15 @@ export default function Puzzle() {
       const currentCells = shapeRotations[shapeId];
       const newCells = normalizeShape(flipShape(currentCells));
 
-      // Check if transformation is valid for placed shapes
-      if (!canTransformPlacedShape(shapeId, newCells)) return;
+      if (!canTransformPlacedShape(shapeId, newCells)) {
+        hapticInvalid();
+        triggerInvalidShake(shapeId);
+        return;
+      }
 
       setShapeRotations((prev) => ({ ...prev, [shapeId]: newCells }));
     },
-    [shapeRotations, canTransformPlacedShape]
+    [shapeRotations, canTransformPlacedShape, triggerInvalidShake]
   );
 
   // Check if rotate/flip would do anything for the selected shape
@@ -1241,20 +1272,33 @@ export default function Puzzle() {
       e.preventDefault();
       e.stopPropagation();
 
-      // Capture pointer for reliable tracking
-      (e.target as HTMLElement).setPointerCapture(e.pointerId);
+      // Capture on the root container (not the pressed element — board
+      // hitboxes unmount on first move, which would release capture)
+      try {
+        rootRef.current?.setPointerCapture(e.pointerId);
+      } catch {
+        // Pointer already ended; capture is best-effort
+      }
 
-      const target = e.currentTarget as HTMLElement;
-      const rect = target.getBoundingClientRect();
-
-      // Calculate offset relative to clicked element
-      let offsetX = e.clientX - rect.left;
-      let offsetY = e.clientY - rect.top;
-
-      // For placed shapes with cell-based hitboxes, add the cell's position within the shape
-      if (cellOffset) {
-        offsetX += cellOffset.col * cellSize;
-        offsetY += cellOffset.row * cellSize;
+      let offsetX: number;
+      let offsetY: number;
+      if (isFromGrid) {
+        // Grab offset relative to the pressed hitbox, in board pixels
+        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+        // Cell-based hitboxes: add the cell's position within the shape
+        if (cellOffset) {
+          offsetX += cellOffset.col * cellSize;
+          offsetY += cellOffset.row * cellSize;
+        }
+      } else {
+        // Palette slots render at paletteCellSize but the ghost renders at
+        // cellSize, so a rect-based offset makes the piece jump on pickup.
+        // Grab palette pieces by their center instead.
+        const cells = shapeRotations[shapeId];
+        offsetX = ((Math.max(...cells.map(([, c]) => c)) + 1) * cellSize) / 2;
+        offsetY = ((Math.max(...cells.map(([r]) => r)) + 1) * cellSize) / 2;
       }
 
       // Long-press (no movement) flips the shape
@@ -1281,9 +1325,10 @@ export default function Puzzle() {
         // selectedShapeId still holds the pre-press value here: the eager
         // select in the piece's own onPointerDown hasn't re-rendered yet
         wasSelected: selectedShapeId === shapeId,
+        liftY: e.pointerType === "touch" ? LIFT_PX : 0,
       });
     },
-    [cellSize, handleFlip, selectedShapeId]
+    [cellSize, handleFlip, selectedShapeId, shapeRotations, LIFT_PX]
   );
 
   const handlePointerMove = useCallback(
@@ -1312,7 +1357,7 @@ export default function Puzzle() {
       // component on every pointer move makes dragging feel laggy.
       ghostPos.current = {
         x: e.clientX - dragState.offsetX,
-        y: e.clientY - dragState.offsetY,
+        y: e.clientY - dragState.offsetY - dragState.liftY,
       };
       if (ghostRef.current) {
         ghostRef.current.style.transform = `translate3d(${ghostPos.current.x}px, ${ghostPos.current.y}px, 0)`;
@@ -1332,11 +1377,17 @@ export default function Puzzle() {
         );
       }
 
-      // ...and when the targeted grid cell changes (drives the hover preview)
+      // ...and when the targeted grid cell changes (drives the hover preview).
+      // Subtract liftY so the snap tracks the ghost the eye sees, not the finger.
       if ((dragState.hasMoved || shouldStartDrag) && gridRef.current) {
         const gridRect = gridRef.current.getBoundingClientRect();
         const x = e.clientX - gridRect.left - dragState.offsetX + cellSize / 2;
-        const y = e.clientY - gridRect.top - dragState.offsetY + cellSize / 2;
+        const y =
+          e.clientY -
+          gridRect.top -
+          dragState.offsetY -
+          dragState.liftY +
+          cellSize / 2;
         const gridCol = Math.floor(x / cellSize);
         const gridRow = Math.floor(y / cellSize);
         setDragCell((prev) =>
@@ -1377,7 +1428,12 @@ export default function Puzzle() {
 
       const gridRect = gridRef.current.getBoundingClientRect();
       const x = e.clientX - gridRect.left - dragState.offsetX + cellSize / 2;
-      const y = e.clientY - gridRect.top - dragState.offsetY + cellSize / 2;
+      const y =
+        e.clientY -
+        gridRect.top -
+        dragState.offsetY -
+        dragState.liftY +
+        cellSize / 2;
       const gridCol = Math.floor(x / cellSize);
       const gridRow = Math.floor(y / cellSize);
 
@@ -1389,14 +1445,23 @@ export default function Puzzle() {
           { ...shape, cells: shapeRotations[shape.id], gridRow, gridCol },
         ]);
       } else if (gridRow >= 0 && gridRow < 8 && gridCol >= 0 && gridCol < 7) {
-        // Attempted a placement on the board but it was invalid
+        // Attempted a placement on the board but it was invalid; the piece
+        // returns to the tray, and its slot shakes to say why
         // (dropping outside the board is just returning the piece)
         hapticInvalid();
+        triggerInvalidShake(dragState.shapeId);
       }
 
       setDragState(null);
     },
-    [dragState, cellSize, isValidPlacement, shapeRotations, handleRotate]
+    [
+      dragState,
+      cellSize,
+      isValidPlacement,
+      shapeRotations,
+      handleRotate,
+      triggerInvalidShake,
+    ]
   );
 
   // Render shape as positioned div
@@ -1448,6 +1513,7 @@ export default function Puzzle() {
 
   return (
     <motion.div
+      ref={rootRef}
       // relative + w-full: the toolbar below is absolute w-full, and without
       // an explicit positioned full-width ancestor its containing block
       // FLIPS between the viewport and this container while framer-motion
@@ -1827,6 +1893,8 @@ export default function Puzzle() {
                     style={{ width: slotSize, height: slotSize }}
                     animate={{
                       opacity: isDraggingThis ? 0.3 : 1,
+                      // Invalid drop: the piece lands back here, shaking
+                      x: invalidShake === shape.id ? [0, -4, 4, -4, 4, 0] : 0,
                     }}
                     transition={{ duration: 0.15 }}
                     onClick={() => setSelectedShapeId(shape.id)}
@@ -1899,9 +1967,16 @@ export default function Puzzle() {
             >
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 0.8, scale: 1 }}
+              // Lifted touch drags get a slight scale-up and shadow so the
+              // piece reads as "in the air"; mouse drags keep today's look.
+              animate={{ opacity: 0.8, scale: dragState.liftY > 0 ? 1.06 : 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
               transition={{ duration: 0.1 }}
+              style={
+                dragState.liftY > 0
+                  ? { filter: "drop-shadow(0 8px 16px rgba(43, 43, 35, 0.3))" }
+                  : undefined
+              }
             >
               {renderShape(
                 dragState.shapeId,
