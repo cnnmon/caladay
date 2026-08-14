@@ -132,10 +132,16 @@ function LeaderboardContent() {
     {} as Record<string, NonNullable<typeof solutions>>
   );
 
-  // Sort days descending
-  const sortedDays = groupedByDay
-    ? Object.keys(groupedByDay).sort((a, b) => b.localeCompare(a))
-    : [];
+  // Sort days descending. Today is always present even with no entries
+  // yet — otherwise the first solver of the day races their own
+  // submission and the leaderboard defaults to yesterday.
+  const sortedDays = (() => {
+    if (!groupedByDay) return [];
+    const days = Object.keys(groupedByDay);
+    const today = getDateKey();
+    if (!days.includes(today)) days.push(today);
+    return days.sort((a, b) => b.localeCompare(a));
+  })();
 
   // Read URL param once on mount
   useEffect(() => {
