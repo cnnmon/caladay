@@ -2049,6 +2049,19 @@ export default function Puzzle() {
                       )}
                     </div>
                   )}
+                  {!nativeUI && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-stone-600">On iPhone?</span>
+                      <a
+                        href="https://apps.apple.com/app/id6798105948"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1 rounded-full bg-stone-800 hover:bg-stone-900 text-white transition-colors"
+                      >
+                        Get the app
+                      </a>
+                    </div>
+                  )}
                   <div className="flex items-center justify-between">
                     <span className="text-stone-600">Something wrong?</span>
                     <a

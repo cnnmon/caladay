@@ -101,9 +101,9 @@ function formatShareTime(timeElapsed?: number): string {
   return ` in ${mins}:${secs.toString().padStart(2, "0")}`;
 }
 
-// Shared in every solve share. Swap for the App Store URL
-// (https://apps.apple.com/app/id<APPLE_ID>) once the app is live.
-const SHARE_URL = "https://caladay.vercel.app";
+// Native shares point to the App Store listing; web shares to the site.
+const APP_STORE_URL = "https://apps.apple.com/app/id6798105948";
+const WEB_URL = "https://caladay.vercel.app";
 
 // Returns "shared" | "copied" | "failed" so the caller can show feedback.
 // Shares only the solve time — never the board, so solutions stay secret
@@ -115,7 +115,7 @@ export async function shareSolve(
   const text = [
     `caladay ${day} — solved${formatShareTime(timeElapsed)}`,
     "",
-    `Can you beat it? ${SHARE_URL}`,
+    `Can you beat it? ${isNative() ? APP_STORE_URL : WEB_URL}`,
   ].join("\n");
 
   try {
