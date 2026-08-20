@@ -24,6 +24,7 @@ import {
   hideSplash,
   isNative,
   openAppSettings,
+  requestAppReview,
 } from "../../lib/native";
 import { isReminderEnabled, setReminderEnabled } from "../../lib/notifications";
 import { shareSolve } from "../../lib/share";
@@ -37,6 +38,7 @@ import SolveModal, {
 
 const PROGRESS_KEY = "caesar-progress-v2";
 const SEEN_HELP_KEY = "CALADAY_SEEN_HELP";
+const REVIEW_PROMPTED_KEY = "CALADAY_REVIEW_PROMPTED";
 const OLD_STORAGE_KEY = "caesar-puzzle-history";
 const OLD_PROGRESS_KEY = "caesar-puzzle-progress";
 const SHAPES_VERSION = "v2"; // Increment when shapes change to clear cached rotations
@@ -729,6 +731,16 @@ export default function Puzzle() {
       setHistory(newHistory);
       clearProgress();
 
+      // Invested player (3rd distinct day solved): ask iOS for the rating
+      // prompt once, shortly after the win moment. No-op on web.
+      if (
+        Object.keys(newHistory).length >= 3 &&
+        !localStorage.getItem(REVIEW_PROMPTED_KEY)
+      ) {
+        localStorage.setItem(REVIEW_PROMPTED_KEY, "true");
+        setTimeout(requestAppReview, 2500);
+      }
+
       // Check if this solution was already submitted
       if (isGridAlreadySubmitted(state.grid)) {
         setShowDuplicateModal(true);
@@ -745,6 +757,7 @@ export default function Puzzle() {
           day: state.day,
           startedAt: state.startedAt,
           timeElapsed: state.timeElapsed,
+          platform: isNative() ? "ios" : "web",
         })
           .then((solutionId) => {
             addSubmission(solutionId, state.grid);
@@ -1882,6 +1895,7 @@ export default function Puzzle() {
                     day: pendingSolution.day,
                     startedAt: pendingSolution.startedAt,
                     timeElapsed: pendingSolution.timeElapsed,
+                    platform: isNative() ? "ios" : "web",
                   });
                   return { solutionId, grid: pendingSolution.grid };
                 }

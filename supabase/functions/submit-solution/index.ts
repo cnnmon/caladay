@@ -77,6 +77,9 @@ Deno.serve(async (req) => {
     return errorResponse("Invalid solve time");
   }
   const startedAt = typeof body.startedAt === "string" ? body.startedAt : null;
+  // Closed set; anything unexpected records as "web"
+  const platform =
+    (body as { platform?: unknown }).platform === "ios" ? "ios" : "web";
 
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,
@@ -91,6 +94,7 @@ Deno.serve(async (req) => {
       day: body.day,
       started_at: startedAt,
       time_elapsed: timeElapsed,
+      platform,
     })
     .select("id")
     .single();

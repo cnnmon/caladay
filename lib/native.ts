@@ -1,5 +1,6 @@
 // Native (Capacitor) integrations. Every function is a no-op on the web
 // so the Vercel deployment behaves exactly as before.
+import { InAppReview } from "@capacitor-community/in-app-review";
 import { Capacitor } from "@capacitor/core";
 import { Haptics, ImpactStyle, NotificationType } from "@capacitor/haptics";
 import { SplashScreen } from "@capacitor/splash-screen";
@@ -7,6 +8,14 @@ import { NativeSettings, IOSSettings } from "capacitor-native-settings";
 
 export function isNative(): boolean {
   return Capacitor.isNativePlatform();
+}
+
+// Ask iOS to show the in-app rating prompt. The OS decides whether it
+// actually appears (capped at ~3 times/year per device) — treat this as
+// a hint, never a guarantee.
+export function requestAppReview(): void {
+  if (!isNative()) return;
+  InAppReview.requestReview().catch(() => {});
 }
 
 // Open this app's page in the iOS Settings app (for re-enabling a
