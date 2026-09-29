@@ -2168,17 +2168,6 @@ export default function Puzzle() {
           transition={{ delay: 0.5 }}
           className="puzzle-footer flex flex-col gap-2 items-center"
         >
-          <p className="text-sm text-stone-500 text-center">
-            {isViewingHistory
-              ? "Viewing previous solve"
-              : isSolved
-                ? "Play again tomorrow!"
-                : isPlaying
-                  ? "Leave today’s date uncovered"
-                  : elapsedTime > 0
-                    ? "Press Resume to continue"
-                    : "Press Start to begin"}
-          </p>
           <div className="puzzle-actions">
             {!isViewingHistory && isPlaying && !isSolved && (
               <>
