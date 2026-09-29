@@ -1,7 +1,8 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
+import { createPortal } from "react-dom";
 import { isUsernameBanned, validateUsername } from "../supabase/functions/_shared/puzzle";
 
 const USERNAME_KEY = "CALADAY_USERNAME";
@@ -46,6 +47,30 @@ export default function SolveModal({
   const [username, setUsername] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const titleId = useId();
+  const [visibleViewport, setVisibleViewport] = useState<{ top: number; height: number } | null>(null);
+
+  // The keyboard shrinks the visual viewport without necessarily resizing
+  // the layout viewport used by fixed positioning in Safari and WKWebView.
+  useEffect(() => {
+    if (!isOpen) return;
+    const viewport = window.visualViewport;
+    const updateViewport = () => {
+      setVisibleViewport({
+        top: viewport?.offsetTop ?? 0,
+        height: viewport?.height ?? window.innerHeight,
+      });
+    };
+    updateViewport();
+    viewport?.addEventListener("resize", updateViewport);
+    viewport?.addEventListener("scroll", updateViewport);
+    window.addEventListener("resize", updateViewport);
+    return () => {
+      viewport?.removeEventListener("resize", updateViewport);
+      viewport?.removeEventListener("scroll", updateViewport);
+      window.removeEventListener("resize", updateViewport);
+    };
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen) {
@@ -117,11 +142,19 @@ export default function SolveModal({
   const submitText = mode === "submit" ? "Submit" : "Save";
   const skipText = mode === "submit" ? "Skip" : "Cancel";
 
-  return (
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          className="fixed left-0 right-0 z-50 flex items-center justify-center p-4"
+          style={{
+            top: visibleViewport?.top ?? 0,
+            height: visibleViewport?.height ?? "100dvh",
+            paddingTop: "max(16px, env(safe-area-inset-top))",
+            paddingBottom: "max(16px, env(safe-area-inset-bottom))",
+          }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -137,19 +170,23 @@ export default function SolveModal({
 
           {/* Modal */}
           <motion.div
-            className="relative bg-white rounded-lg p-6 max-w-sm w-full"
+            className="relative bg-white rounded-lg p-6 max-w-sm w-full max-h-full overflow-y-auto overscroll-contain"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={titleId}
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
           >
-            <p className="text-stone-600 text-center mb-4">{title}</p>
+            <p id={titleId} className="text-stone-600 text-center mb-4">{title}</p>
 
             <div className="mb-4">
-              <label className="block text-sm text-stone-500 mb-1">
+              <label htmlFor={`${titleId}-username`} className="block text-sm text-stone-500 mb-1">
                 Enter your name (3 characters max)
               </label>
               <input
+                id={`${titleId}-username`}
                 type="text"
                 value={username}
                 onChange={(e) => handleUsernameChange(e.target.value)}
@@ -183,6 +220,7 @@ export default function SolveModal({
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   );
 }
