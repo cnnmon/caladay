@@ -2,6 +2,7 @@
 // Uses the native share sheet on iOS, navigator.share on capable web
 // browsers, and clipboard copy as the final fallback.
 import { Share } from "@capacitor/share";
+import { Clipboard } from "@capacitor/clipboard";
 import { isNative } from "./native";
 
 // Only 7 colored-square emoji exist for 10 shapes, so repeats are
@@ -118,7 +119,12 @@ export async function copySolve(
   timeElapsed?: number
 ): Promise<"copied" | "failed"> {
   try {
-    await navigator.clipboard.writeText(solveShareText(day, timeElapsed));
+    const text = solveShareText(day, timeElapsed);
+    if (isNative()) {
+      await Clipboard.write({ string: text });
+    } else {
+      await navigator.clipboard.writeText(text);
+    }
     return "copied";
   } catch {
     return "failed";

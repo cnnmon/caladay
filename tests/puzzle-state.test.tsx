@@ -9,6 +9,7 @@ const mockGetSolution = jest.fn();
 const mockReview = jest.fn();
 const mockRouter = { push: jest.fn(), replace: jest.fn() };
 let mockParams = new URLSearchParams();
+let mockNative = false;
 
 jest.mock("next/navigation", () => ({
   useRouter: () => mockRouter,
@@ -19,7 +20,7 @@ jest.mock("../lib/db", () => ({
   getSolutionById: (...args: unknown[]) => mockGetSolution(...args),
 }));
 jest.mock("../lib/native", () => ({
-  isNative: () => false,
+  isNative: () => mockNative,
   hapticSolve: jest.fn(), hapticPlace: jest.fn(), hapticInvalid: jest.fn(),
   hideSplash: jest.fn(), openAppSettings: jest.fn(),
   requestAppReview: () => mockReview(),
@@ -85,6 +86,7 @@ beforeEach(() => {
   mockSubmit.mockResolvedValue("id");
   mockGetSolution.mockResolvedValue(preview);
   mockParams = new URLSearchParams();
+  mockNative = false;
   Object.defineProperty(document, "fonts", {
     configurable: true, value: { ready: Promise.resolve() },
   });
@@ -96,7 +98,12 @@ afterEach(() => {
   jest.useRealTimers();
 });
 
-it.each([true, false])("restores a completed puzzle and Share without resubmitting (saved name: %s)", async (hasName) => {
+it.each([
+  { hasName: true, native: false },
+  { hasName: false, native: false },
+  { hasName: true, native: true },
+])("restores a completed puzzle with Copy and Share without resubmitting (saved name: $hasName, native: $native)", async ({ hasName, native }) => {
+  mockNative = native;
   if (!hasName) localStorage.removeItem("CALADAY_USERNAME");
   seedProgress();
   await act(async () => { render(<Puzzle />); });
@@ -109,6 +116,7 @@ it.each([true, false])("restores a completed puzzle and Share without resubmitti
   await act(async () => { render(<Puzzle />); });
   expect(screen.getByText("🎉 Congratulations!")).toBeInTheDocument();
   expect(screen.getByTitle("Share your solve")).toBeInTheDocument();
+  expect(screen.getByTitle("Copy your solve")).toBeInTheDocument();
   expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("1:40");
   expect(screen.queryByRole("button", { name: "Start" })).not.toBeInTheDocument();
   expect(mockSubmit).toHaveBeenCalledTimes(hasName ? 1 : 0);

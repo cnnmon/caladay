@@ -1626,6 +1626,27 @@ export default function Puzzle() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={async () => {
+                          const result = await copySolve(state.day, state.timeElapsed);
+                          setCopyStatus(result === "copied" ? "copied!" : "Copy failed");
+                          setTimeout(() => setCopyStatus(null), 2000);
+                        }}
+                        className="inline-flex items-center gap-1 px-2 py-0.5 text-sm whitespace-nowrap rounded-full bg-stone-300 hover:bg-stone-400 text-stone-600 transition-colors"
+                        title="Copy your solve"
+                        aria-live="polite"
+                      >
+                        <svg
+                          width="14" height="14" viewBox="0 0 24 24"
+                          fill="none" stroke="currentColor" strokeWidth="2"
+                          strokeLinecap="round" strokeLinejoin="round"
+                          aria-hidden="true" focusable="false"
+                        >
+                          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                        </svg>
+                        {copyStatus ?? "Copy"}
+                      </button>
+                      <button
+                        onClick={async () => {
                           const result = await shareSolve(
                             state.day,
                             state.timeElapsed
@@ -1640,20 +1661,6 @@ export default function Puzzle() {
                       >
                         {shareStatus ?? "Share"}
                       </button>
-                      {!nativeUI && (
-                        <button
-                          onClick={async () => {
-                            const result = await copySolve(state.day, state.timeElapsed);
-                            setCopyStatus(result === "copied" ? "copied!" : "Copy failed");
-                            setTimeout(() => setCopyStatus(null), 2000);
-                          }}
-                          className="px-2 py-0.5 text-sm whitespace-nowrap rounded-full bg-stone-300 hover:bg-stone-400 text-stone-600 transition-colors"
-                          title="Copy your solve"
-                          aria-live="polite"
-                        >
-                          {copyStatus ?? "Copy"}
-                        </button>
-                      )}
                     </div>
                   ) : null;
                 })()}
@@ -2193,16 +2200,18 @@ export default function Puzzle() {
                   disabled={!canRotateSelected}
                   className="icon-button disabled:opacity-30 disabled:cursor-not-allowed"
                   title="Rotate selected shape (R)"
+                  aria-label="Rotate selected shape"
                 >
-                  <span aria-hidden="true">↻</span> Rotate
+                  <span className="text-xl leading-none" aria-hidden="true">↻</span>
                 </button>
                 <button
                   onClick={() => selectedShapeId && handleFlip(selectedShapeId)}
                   disabled={!canFlipSelected}
                   className="icon-button disabled:opacity-30 disabled:cursor-not-allowed"
                   title="Flip selected shape (F)"
+                  aria-label="Flip selected shape"
                 >
-                  <span aria-hidden="true">⇆</span> Flip
+                  <span className="text-xl leading-none" aria-hidden="true">⇆</span>
                 </button>
               </>
             )}
