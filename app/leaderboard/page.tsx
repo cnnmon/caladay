@@ -351,18 +351,6 @@ function LeaderboardContent() {
                                 (you)
                               </span>
                             )}
-                            {(solution.platform === "ios" || solution.platform === "web") && (
-                              <span
-                                className="ml-2 text-xs text-stone-400 font-sans font-normal tracking-normal"
-                                title={
-                                  solution.platform === "ios"
-                                    ? "Solved in the iOS app"
-                                    : "Solved in a web browser"
-                                }
-                              >
-                                {solution.platform === "ios" ? "app" : "web"}
-                              </span>
-                            )}
                           </span>
                         </div>
                         <div className="flex items-center gap-2">
