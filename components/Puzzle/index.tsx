@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { getSolutionById, submitSolution, SolutionRow } from "../../lib/db";
 import {
   flipShape,
@@ -1949,241 +1950,268 @@ export default function Puzzle() {
           }
         />
 
-        {/* Help Modal */}
-        <AnimatePresence>
-          {showHelpModal && (
-            <motion.div
-              className="fixed inset-0 z-50 flex items-center justify-center p-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <motion.div
-                className="absolute inset-0 bg-black/50"
-                onClick={closeHelpModal}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              />
-              <motion.div
-                className="relative bg-white rounded-lg p-6 max-w-md w-full"
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              >
-                <h2 className="text-xl font-bold text-stone-800 mb-4">
-                  How to Play
-                </h2>
-                <div className="text-stone-600 space-y-3 mb-4">
-                  <p>
-                    Fill the calendar grid using all 10 shapes without covering
-                    today&apos;s date (month, day, and day of the week).
-                  </p>
-                  <p>
-                    Drag shapes onto the grid; drag a shape off the grid to
-                    remove it.
-                  </p>
-                </div>
-                <h3 className="font-bold text-stone-800 mb-2">
-                  Mobile Controls
-                </h3>
-                <ul className="text-stone-600 space-y-1 mb-4 list-disc pl-5">
-                  <li>Tap to select a piece</li>
-                  <li>Tap again to rotate</li>
-                  <li>Press and hold to flip</li>
-                </ul>
-                <h3 className="font-bold text-stone-800 mb-2">
-                  Keyboard Shortcuts
-                </h3>
-                <div className="text-stone-600 space-y-1 mb-4 font-mono text-sm">
-                  <p>
-                    <span className="inline-block w-24 text-stone-500">R</span>
-                    Rotate
-                  </p>
-                  <p>
-                    <span className="inline-block w-24 text-stone-500">F</span>
-                    Flip
-                  </p>
-                  <p>
-                    <span className="inline-block w-24 text-stone-500">
-                      Backspace
-                    </span>
-                    Remove
-                  </p>
-                  <p>
-                    <span className="inline-block w-24 text-stone-500">
-                      Delete / X
-                    </span>
-                    Remove
-                  </p>
-                </div>
-                <button
-                  onClick={closeHelpModal}
-                  className="w-full px-4 py-2 rounded-lg bg-stone-800 hover:bg-stone-900 text-white transition-colors"
+        {hasMounted && createPortal(
+          <>
+            {/* Help Modal */}
+            <AnimatePresence>
+              {showHelpModal && (
+                <motion.div
+                  className="fixed inset-0 z-50 flex items-center justify-center p-4"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
                 >
-                  Got it
-                </button>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Settings Modal */}
-        <AnimatePresence>
-          {showSettingsModal && (
-            <motion.div
-              className="fixed inset-0 z-50 flex items-center justify-center p-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <motion.div
-                className="absolute inset-0 bg-black/50"
-                onClick={() => setShowSettingsModal(false)}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              />
-              <motion.div
-                className="relative bg-white rounded-lg p-6 max-w-sm w-full"
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              >
-                <h2 className="text-xl font-bold text-stone-800 mb-4">
-                  Settings
-                </h2>
-                <div className="space-y-4 mb-6">
-                  {nativeUI && (
-                    <div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-stone-600">
-                          Daily reminder (9:00 AM)
+                  <motion.div
+                    className="absolute inset-0 bg-black/50"
+                    onClick={closeHelpModal}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  />
+                  <motion.div
+                    className="relative bg-white rounded-lg p-6 max-w-md w-full max-h-full overflow-y-auto overscroll-contain"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="help-modal-title"
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.9, opacity: 0 }}
+                    transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                  >
+                    <h2 id="help-modal-title" className="text-xl font-bold text-stone-800 mb-4">
+                      How to Play
+                    </h2>
+                    <div className="text-stone-600 space-y-3 mb-4">
+                      <p>
+                        Fill the calendar grid using all 10 shapes without covering
+                        today&apos;s date (month, day, and day of the week).
+                      </p>
+                      <p>
+                        Drag shapes onto the grid; drag a shape off the grid to
+                        remove it.
+                      </p>
+                    </div>
+                    <h3 className="font-bold text-stone-800 mb-2">
+                      Mobile Controls
+                    </h3>
+                    <ul className="text-stone-600 space-y-1 mb-4 list-disc pl-5">
+                      <li>Tap to select a piece</li>
+                      <li>Tap again to rotate</li>
+                      <li>Press and hold to flip</li>
+                    </ul>
+                    <h3 className="font-bold text-stone-800 mb-2">
+                      Keyboard Shortcuts
+                    </h3>
+                    <div className="text-stone-600 space-y-1 mb-4 font-mono text-sm">
+                      <p>
+                        <span className="inline-block w-24 text-stone-500">R</span>
+                        Rotate
+                      </p>
+                      <p>
+                        <span className="inline-block w-24 text-stone-500">F</span>
+                        Flip
+                      </p>
+                      <p>
+                        <span className="inline-block w-24 text-stone-500">
+                          Backspace
                         </span>
-                        <button
-                          onClick={async () => {
-                            const status = await setReminderEnabled(
-                              !reminderOn
-                            );
-                            setReminderOn(status === "on");
-                            setReminderHint(
-                              status === "denied"
-                                ? "Notifications are turned off for Caladay. Enable them in the iOS Settings app, then try again."
-                                : status === "error"
-                                  ? "Couldn't set the reminder. Please try again."
-                                  : null
-                            );
-                          }}
-                          className={`relative w-11 h-6 rounded-full transition-colors ${
-                            reminderOn ? "bg-green-500" : "bg-stone-300"
-                          }`}
-                          title={
-                            reminderOn
-                              ? "Turn off daily reminder"
-                              : "Turn on daily reminder"
-                          }
+                        Remove
+                      </p>
+                      <p>
+                        <span className="inline-block w-24 text-stone-500">
+                          Delete / X
+                        </span>
+                        Remove
+                      </p>
+                    </div>
+                    {!nativeUI && (
+                      <p className="text-sm text-stone-600 mb-4">
+                        We also have a mobile app!{" "}
+                        <a
+                          href="https://apps.apple.com/app/id6798105948"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline underline-offset-2"
                         >
-                          <span
-                            className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${
-                              reminderOn ? "left-[22px]" : "left-0.5"
-                            }`}
-                          />
-                        </button>
-                      </div>
-                      {reminderHint && (
-                        <div className="mt-1">
-                          <p className="text-xs text-red-500">
-                            {reminderHint}
-                          </p>
-                          {reminderHint.includes("Settings") && (
+                          Download
+                        </a>
+                      </p>
+                    )}
+                    <button
+                      onClick={closeHelpModal}
+                      className="w-full px-4 py-2 rounded-lg bg-stone-800 hover:bg-stone-900 text-white transition-colors"
+                    >
+                      Got it
+                    </button>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Settings Modal */}
+            <AnimatePresence>
+              {showSettingsModal && (
+                <motion.div
+                  className="fixed inset-0 z-50 flex items-center justify-center p-4"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  <motion.div
+                    className="absolute inset-0 bg-black/50"
+                    onClick={() => setShowSettingsModal(false)}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  />
+                  <motion.div
+                    className="relative bg-white rounded-lg p-6 max-w-sm w-full max-h-full overflow-y-auto overscroll-contain"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="settings-modal-title"
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.9, opacity: 0 }}
+                    transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                  >
+                    <h2 id="settings-modal-title" className="text-xl font-bold text-stone-800 mb-4">
+                      Settings
+                    </h2>
+                    <div className="space-y-4 mb-6">
+                      {nativeUI && (
+                        <div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-stone-600">
+                              Daily reminder (9:00 AM)
+                            </span>
                             <button
-                              onClick={openAppSettings}
-                              className="text-xs underline text-stone-500 hover:text-stone-700 mt-0.5"
+                              onClick={async () => {
+                                const status = await setReminderEnabled(
+                                  !reminderOn
+                                );
+                                setReminderOn(status === "on");
+                                setReminderHint(
+                                  status === "denied"
+                                    ? "Notifications are turned off for Caladay. Enable them in the iOS Settings app, then try again."
+                                    : status === "error"
+                                      ? "Couldn't set the reminder. Please try again."
+                                      : null
+                                );
+                              }}
+                              className={`relative w-11 h-6 rounded-full transition-colors ${
+                                reminderOn ? "bg-green-500" : "bg-stone-300"
+                              }`}
+                              title={
+                                reminderOn
+                                  ? "Turn off daily reminder"
+                                  : "Turn on daily reminder"
+                              }
                             >
-                              Open Settings
+                              <span
+                                className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${
+                                  reminderOn ? "left-[22px]" : "left-0.5"
+                                }`}
+                              />
                             </button>
+                          </div>
+                          {reminderHint && (
+                            <div className="mt-1">
+                              <p className="text-xs text-red-500">
+                                {reminderHint}
+                              </p>
+                              {reminderHint.includes("Settings") && (
+                                <button
+                                  onClick={openAppSettings}
+                                  className="text-xs underline text-stone-500 hover:text-stone-700 mt-0.5"
+                                >
+                                  Open Settings
+                                </button>
+                              )}
+                            </div>
                           )}
                         </div>
                       )}
+                      {!nativeUI && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-stone-600">On iPhone?</span>
+                          <a
+                            href="https://apps.apple.com/app/id6798105948"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-3 py-1 rounded-full bg-stone-800 hover:bg-stone-900 text-white transition-colors"
+                          >
+                            Get the app
+                          </a>
+                        </div>
+                      )}
+                      <div className="flex items-center justify-between">
+                        <span className="text-stone-600">Something wrong?</span>
+                        <a
+                          href="mailto:cabbagetree876@gmail.com?subject=Caladay%20report"
+                          className="px-3 py-1 rounded-full bg-stone-200 hover:bg-stone-300 text-stone-600 transition-colors"
+                        >
+                          Report a problem
+                        </a>
+                      </div>
                     </div>
-                  )}
-                  {!nativeUI && (
-                    <div className="flex items-center justify-between">
-                      <span className="text-stone-600">On iPhone?</span>
-                      <a
-                        href="https://apps.apple.com/app/id6798105948"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-3 py-1 rounded-full bg-stone-800 hover:bg-stone-900 text-white transition-colors"
-                      >
-                        Get the app
-                      </a>
-                    </div>
-                  )}
-                  <div className="flex items-center justify-between">
-                    <span className="text-stone-600">Something wrong?</span>
-                    <a
-                      href="mailto:cabbagetree876@gmail.com?subject=Caladay%20report"
-                      className="px-3 py-1 rounded-full bg-stone-200 hover:bg-stone-300 text-stone-600 transition-colors"
+                    <button
+                      onClick={() => setShowSettingsModal(false)}
+                      className="w-full px-4 py-2 rounded-lg bg-stone-800 hover:bg-stone-900 text-white transition-colors"
                     >
-                      Report a problem
-                    </a>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setShowSettingsModal(false)}
-                  className="w-full px-4 py-2 rounded-lg bg-stone-800 hover:bg-stone-900 text-white transition-colors"
-                >
-                  Done
-                </button>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                      Done
+                    </button>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-        {/* Duplicate Solution Modal */}
-        <AnimatePresence>
-          {showDuplicateModal && (
-            <motion.div
-              className="fixed inset-0 z-50 flex items-center justify-center p-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <motion.div
-                className="absolute inset-0 bg-black/50"
-                onClick={() => setShowDuplicateModal(false)}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              />
-              <motion.div
-                className="relative bg-white rounded-lg p-6 max-w-sm w-full text-center"
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              >
-                <p className="text-4xl mb-3">🎉</p>
-                <h2 className="text-xl font-bold text-stone-800 mb-2">
-                  You solved it again!
-                </h2>
-                <p className="text-stone-600 mb-4">
-                  This solution is the same as one you&apos;ve already
-                  submitted, so it won&apos;t appear on the leaderboard again.
-                </p>
-                <button
-                  onClick={() => setShowDuplicateModal(false)}
-                  className="w-full px-4 py-2 rounded-lg bg-stone-800 hover:bg-stone-900 text-white transition-colors"
+            {/* Duplicate Solution Modal */}
+            <AnimatePresence>
+              {showDuplicateModal && (
+                <motion.div
+                  className="fixed inset-0 z-50 flex items-center justify-center p-4"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
                 >
-                  OK
-                </button>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                  <motion.div
+                    className="absolute inset-0 bg-black/50"
+                    onClick={() => setShowDuplicateModal(false)}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  />
+                  <motion.div
+                    className="relative bg-white rounded-lg p-6 max-w-sm w-full text-center max-h-full overflow-y-auto overscroll-contain"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="duplicate-modal-title"
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.9, opacity: 0 }}
+                    transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                  >
+                    <p className="text-4xl mb-3">🎉</p>
+                    <h2 id="duplicate-modal-title" className="text-xl font-bold text-stone-800 mb-2">
+                      You solved it again!
+                    </h2>
+                    <p className="text-stone-600 mb-4">
+                      This solution is the same as one you&apos;ve already
+                      submitted, so it won&apos;t appear on the leaderboard again.
+                    </p>
+                    <button
+                      onClick={() => setShowDuplicateModal(false)}
+                      className="w-full px-4 py-2 rounded-lg bg-stone-800 hover:bg-stone-900 text-white transition-colors"
+                    >
+                      OK
+                    </button>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </>,
+          document.body,
+        )}
 
         <motion.div
           ref={footerRef}

@@ -188,3 +188,20 @@ it("ignores malformed history without blocking a new puzzle", async () => {
   expect(screen.getByRole("button", { name: "Start" })).toBeInTheDocument();
   expect(loadSolveHistory()).toEqual({ [yesterday.day]: yesterday });
 });
+
+it.each([false, true])("shows the mobile app link only on web in initial and reopened Help (native: %s)", async (native) => {
+  mockNative = native;
+  localStorage.removeItem("CALADAY_SEEN_HELP");
+  await act(async () => { render(<Puzzle />); });
+  expect(screen.getByRole("dialog", { name: "How to Play" })).toBeInTheDocument();
+  expect(screen.queryAllByText(/We also have a mobile app!/)).toHaveLength(native ? 0 : 1);
+  if (!native) {
+    expect(screen.getByRole("link", { name: "Download" }))
+      .toHaveAttribute("href", "https://apps.apple.com/app/id6798105948");
+  }
+
+  fireEvent.click(screen.getByRole("button", { name: "Got it" }));
+  fireEvent.click(screen.getByRole("button", { name: "Help", exact: true }));
+  expect(screen.queryAllByText(/We also have a mobile app!/)).toHaveLength(native ? 0 : 1);
+  expect(screen.queryAllByRole("link", { name: "Download" })).toHaveLength(native ? 0 : 1);
+});
