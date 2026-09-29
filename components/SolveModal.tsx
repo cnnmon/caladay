@@ -1,8 +1,7 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useId, useState } from "react";
-import { createPortal } from "react-dom";
+import Modal from "./Modal";
 import { isUsernameBanned, validateUsername } from "../supabase/functions/_shared/puzzle";
 
 const USERNAME_KEY = "CALADAY_USERNAME";
@@ -48,30 +47,6 @@ export default function SolveModal({
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const titleId = useId();
-  const [visibleViewport, setVisibleViewport] = useState<{ top: number; height: number } | null>(null);
-
-  // The keyboard shrinks the visual viewport without necessarily resizing
-  // the layout viewport used by fixed positioning in Safari and WKWebView.
-  useEffect(() => {
-    if (!isOpen) return;
-    const viewport = window.visualViewport;
-    const updateViewport = () => {
-      setVisibleViewport({
-        top: viewport?.offsetTop ?? 0,
-        height: viewport?.height ?? window.innerHeight,
-      });
-    };
-    updateViewport();
-    viewport?.addEventListener("resize", updateViewport);
-    viewport?.addEventListener("scroll", updateViewport);
-    window.addEventListener("resize", updateViewport);
-    return () => {
-      viewport?.removeEventListener("resize", updateViewport);
-      viewport?.removeEventListener("scroll", updateViewport);
-      window.removeEventListener("resize", updateViewport);
-    };
-  }, [isOpen]);
-
   useEffect(() => {
     if (isOpen) {
       const saved = getSavedUsername();
@@ -142,89 +117,49 @@ export default function SolveModal({
   const submitText = mode === "submit" ? "Submit" : "Save";
   const skipText = mode === "submit" ? "Skip" : "Cancel";
 
-  if (typeof document === "undefined") return null;
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} labelledBy={titleId}>
+      <p id={titleId} className="text-stone-600 text-center mb-4">{title}</p>
 
-  return createPortal(
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          className="fixed inset-0 z-50"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+      <div className="mb-4">
+        <label htmlFor={`${titleId}-username`} className="block text-sm text-stone-500 mb-1">
+          Enter your name (3 characters max)
+        </label>
+        <input
+          id={`${titleId}-username`}
+          type="text"
+          value={username}
+          onChange={(e) => handleUsernameChange(e.target.value)}
+          maxLength={3}
+          className="w-full px-4 py-2 border border-stone-300 rounded-lg text-center text-2xl font-mono uppercase tracking-widest focus:outline-none focus:ring-2 focus:ring-stone-400 text-stone-800"
+          autoComplete="off"
+          autoCorrect="off"
+          spellCheck={false}
+          placeholder="AAA"
+          autoFocus
+        />
+        {error && (
+          <p role="alert" className="text-red-500 text-sm mt-1 text-center">{error}</p>
+        )}
+      </div>
+
+      <div className="flex gap-2">
+        <button
+          onClick={onClose}
+          className="flex-1 px-4 py-2 rounded-lg bg-stone-200 hover:bg-stone-300 text-stone-700 transition-colors"
         >
-          {/* Backdrop */}
-          <motion.div
-            className="absolute inset-0 bg-black/50"
-            onClick={onClose}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          />
-
-          {/* Only the dialog follows the keyboard; the backdrop covers the screen. */}
-          <div
-            className="absolute left-0 right-0 flex items-center justify-center p-4 pointer-events-none"
-            style={{
-              top: visibleViewport?.top ?? 0,
-              height: visibleViewport?.height ?? "100dvh",
-              paddingTop: "max(16px, env(safe-area-inset-top))",
-              paddingBottom: "max(16px, env(safe-area-inset-bottom))",
-            }}
-          >
-            <motion.div
-              className="relative bg-white rounded-lg p-6 max-w-sm w-full max-h-full overflow-y-auto overscroll-contain pointer-events-auto"
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby={titleId}
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            >
-              <p id={titleId} className="text-stone-600 text-center mb-4">{title}</p>
-
-              <div className="mb-4">
-                <label htmlFor={`${titleId}-username`} className="block text-sm text-stone-500 mb-1">
-                  Enter your name (3 characters max)
-                </label>
-                <input
-                  id={`${titleId}-username`}
-                  type="text"
-                  value={username}
-                  onChange={(e) => handleUsernameChange(e.target.value)}
-                  maxLength={3}
-                  className="w-full px-4 py-2 border border-stone-300 rounded-lg text-center text-2xl font-mono uppercase tracking-widest focus:outline-none focus:ring-2 focus:ring-stone-400 text-stone-800"
-                  placeholder="AAA"
-                  autoFocus
-                />
-                {error && (
-                  <p role="alert" className="text-red-500 text-sm mt-1 text-center">{error}</p>
-                )}
-              </div>
-
-              <div className="flex gap-2">
-                <button
-                  onClick={onClose}
-                  className="flex-1 px-4 py-2 rounded-lg bg-stone-200 hover:bg-stone-300 text-stone-700 transition-colors"
-                >
-                  {skipText}
-                </button>
-                <button
-                  onClick={handleSubmit}
-                  disabled={
-                    isSubmitting || !!validateUsername(username) || isUsernameBanned(username)
-                  }
-                  className="flex-1 px-4 py-2 rounded-lg bg-stone-800 hover:bg-stone-900 text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isSubmitting ? "Saving..." : submitText}
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>,
-    document.body,
+          {skipText}
+        </button>
+        <button
+          onClick={handleSubmit}
+          disabled={
+            isSubmitting || !!validateUsername(username) || isUsernameBanned(username)
+          }
+          className="flex-1 px-4 py-2 rounded-lg bg-stone-800 hover:bg-stone-900 text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isSubmitting ? "Saving..." : submitText}
+        </button>
+      </div>
+    </Modal>
   );
 }
