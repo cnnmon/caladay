@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import Modal from "./Modal";
 import { isUsernameBanned, validateUsername } from "../supabase/functions/_shared/puzzle";
 
@@ -37,23 +37,17 @@ export function saveUsername(username: string): void {
   }
 }
 
-export default function SolveModal({
-  isOpen,
-  onClose,
-  onSubmit,
-  mode,
-}: LeaderboardModalProps) {
-  const [username, setUsername] = useState("");
+export default function SolveModal({ isOpen, ...props }: LeaderboardModalProps) {
+  return isOpen ? <NameDialog key={props.mode} {...props} /> : null;
+}
+
+function NameDialog({ onClose, onSubmit, mode }: Omit<LeaderboardModalProps, "isOpen">) {
+  const [username, setUsername] = useState(() => getSavedUsername() ?? "");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const activeRequest = useRef<symbol | null>(null);
   const titleId = useId();
-  useEffect(() => {
-    if (isOpen) {
-      const saved = getSavedUsername();
-      setUsername(saved ?? "");
-      setError("");
-    }
-  }, [isOpen]);
+  useEffect(() => () => { activeRequest.current = null; }, []);
 
   const handleUsernameChange = (value: string) => {
     const upper = value.toUpperCase().slice(0, 3);
@@ -66,6 +60,7 @@ export default function SolveModal({
   };
 
   const handleSubmit = async () => {
+    if (activeRequest.current) return;
     if (!username || username.length === 0) {
       setError("Please enter a name");
       return;
@@ -90,10 +85,15 @@ export default function SolveModal({
     // Submit mode
     if (!onSubmit) return;
 
+    const request = Symbol();
+    activeRequest.current = request;
     setIsSubmitting(true);
     try {
       await onSubmit(username);
     } catch (err) {
+      if (activeRequest.current !== request) return;
+      activeRequest.current = null;
+      setIsSubmitting(false);
       // submitSolution throws Error with a user-facing message
       setError(
         err instanceof Error && err.message
@@ -101,9 +101,11 @@ export default function SolveModal({
           : "Failed to submit. Please try again."
       );
       return;
-    } finally {
-      setIsSubmitting(false);
     }
+    // The request may finish after this popup was dismissed or reopened.
+    if (activeRequest.current !== request) return;
+    activeRequest.current = null;
+    setIsSubmitting(false);
     // A local preference failure must never invite a second server insert.
     saveUsername(username);
     onClose();
@@ -118,7 +120,7 @@ export default function SolveModal({
   const skipText = mode === "submit" ? "Skip" : "Cancel";
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} labelledBy={titleId}>
+    <Modal isOpen onClose={onClose} labelledBy={titleId}>
       <p id={titleId} className="text-stone-600 text-center mb-4">{title}</p>
 
       <div className="mb-4">

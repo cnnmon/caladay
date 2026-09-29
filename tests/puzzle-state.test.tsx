@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom";
-import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import Puzzle from "../components/Puzzle";
 import { SHAPES } from "../lib/shapes";
 import { loadSolveHistory } from "../lib/puzzle-history";
@@ -133,6 +133,24 @@ it("keeps an unfinished replay ahead of the saved solve when reopening", async (
   expect(mockSubmit).not.toHaveBeenCalled();
 });
 
+it("lets a saved solve be submitted after skipping or failing without replaying the puzzle", async () => {
+  localStorage.setItem("caesar-puzzle-history", JSON.stringify({ [today.day]: today }));
+  await act(async () => { render(<Puzzle />); });
+  expect(mockSubmit).not.toHaveBeenCalled();
+  fireEvent.click(screen.getByTitle("Submit to leaderboard"));
+  await act(async () => { fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Submit", exact: true })); });
+  expect(mockSubmit).toHaveBeenCalledWith({ ...today, startedAt: undefined, username: "ALU", platform: "web" });
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+});
+
+it("does not offer to resubmit a saved solve that is already on the leaderboard", async () => {
+  localStorage.setItem("caesar-puzzle-history", JSON.stringify({ [today.day]: today }));
+  localStorage.setItem("CALADAY_SUBMISSIONS", JSON.stringify([{ id: "saved-id", grid: today.grid }]));
+  await act(async () => { render(<Puzzle />); });
+  expect(screen.queryByTitle("Submit to leaderboard")).not.toBeInTheDocument();
+  expect(mockSubmit).not.toHaveBeenCalled();
+});
+
 it("counts persisted distinct days toward the review prompt", async () => {
   const earlier = {
     day: "2026-07-20",
@@ -187,6 +205,28 @@ it("ignores malformed history without blocking a new puzzle", async () => {
   await act(async () => { render(<Puzzle />); });
   expect(screen.getByRole("button", { name: "Start" })).toBeInTheDocument();
   expect(loadSolveHistory()).toEqual({ [yesterday.day]: yesterday });
+});
+
+it("keeps the puzzle playable when browser storage cannot be read or written", async () => {
+  for (const method of ["getItem", "setItem", "removeItem"] as const) {
+    jest.spyOn(Storage.prototype, method).mockImplementation(() => { throw new Error("Storage unavailable"); });
+  }
+  await act(async () => { render(<Puzzle />); });
+  fireEvent.click(screen.getByRole("button", { name: "Got it" }));
+  fireEvent.click(screen.getByRole("button", { name: "Start" }));
+  await act(async () => { jest.advanceTimersByTime(2000); });
+  expect(screen.getByRole("button", { name: "Pause" })).toBeInTheDocument();
+  expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("0:02");
+});
+
+it("still submits a solve when storage writes fail on the review-prompt path", async () => {
+  const earlier = { day: "2026-07-20", grid: "UUOOPP#.ULOPP#UULOOPTZZLLTTTJZZZS.TJJJJSSVIIII.SV####VVV" };
+  localStorage.setItem("caesar-puzzle-history", JSON.stringify({ [earlier.day]: earlier, [yesterday.day]: yesterday }));
+  seedProgress();
+  jest.spyOn(Storage.prototype, "setItem").mockImplementation(() => { throw new Error("Quota"); });
+  await act(async () => { render(<Puzzle />); });
+  expect(screen.getByText("🎉 Congratulations!")).toBeInTheDocument();
+  expect(mockSubmit).toHaveBeenCalledTimes(1);
 });
 
 it.each([false, true])("shows the mobile app link only on web in initial and reopened Help (native: %s)", async (native) => {

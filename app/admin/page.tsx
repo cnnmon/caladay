@@ -141,7 +141,7 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-dvh bg-[#f2ede7] px-6 py-6">
+    <div className="scroll-page bg-[#f2ede7] px-6 py-6">
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-xl font-light text-stone-700">

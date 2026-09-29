@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Modal from "../Modal";
 import { getSolutionById, submitSolution, SolutionRow } from "../../lib/db";
 import {
@@ -29,7 +29,7 @@ import {
 } from "../../lib/native";
 import { isReminderEnabled, setReminderEnabled } from "../../lib/notifications";
 import { copySolve, shareSolve } from "../../lib/share";
-import { isGridAlreadySubmitted } from "../../lib/submissions";
+import { getServerSubmissionSnapshot, getSubmissionSnapshot, isGridAlreadySubmitted, subscribeSubmissions } from "../../lib/submissions";
 import { loadSolveHistory, saveSolveHistory } from "../../lib/puzzle-history";
 import DifficultyBar from "../DifficultyBar";
 import SolveModal, {
@@ -83,15 +83,20 @@ function loadProgress(): ProgressState | null {
 
 function saveProgress(state: ProgressState): void {
   if (typeof window === "undefined") return;
-  localStorage.setItem(
-    PROGRESS_KEY,
-    JSON.stringify({ ...state, version: SHAPES_VERSION })
-  );
+  try {
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify({ ...state, version: SHAPES_VERSION }));
+  } catch {
+    // Keep playing if the browser cannot persist progress.
+  }
 }
 
 function clearProgress(): void {
   if (typeof window === "undefined") return;
-  localStorage.removeItem(PROGRESS_KEY);
+  try {
+    localStorage.removeItem(PROGRESS_KEY);
+  } catch {
+    // Clearing a saved game must not prevent starting another one.
+  }
 }
 
 // Convert placed shapes to a 56-character grid string
@@ -346,6 +351,8 @@ function getSolveTime(state: SavedPuzzleState): number {
 export default function Puzzle() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  // Refresh the submission action when an automatic save succeeds or fails.
+  useSyncExternalStore(subscribeSubmissions, getSubmissionSnapshot, getServerSubmissionSnapshot);
 
   const [currentDate, setCurrentDate] = useState(() => new Date());
   const [grid, setGrid] = useState(() => markTargets(buildGrid(), currentDate));
@@ -395,7 +402,9 @@ export default function Puzzle() {
   // First launch: open the help modal so new players learn the rules.
   // Marked seen on dismiss, so an early exit shows it again next time.
   useEffect(() => {
-    if (!localStorage.getItem(SEEN_HELP_KEY)) {
+    try {
+      setShowHelpModal(!localStorage.getItem(SEEN_HELP_KEY));
+    } catch {
       setShowHelpModal(true);
     }
   }, []);
@@ -507,7 +516,6 @@ export default function Puzzle() {
   } | null>(null);
   const DRAG_THRESHOLD = 5;
   const [selectedShapeId, setSelectedShapeId] = useState<string | null>(null);
-  const [invalidShake, setInvalidShake] = useState<string | null>(null);
   const [hasLoadedProgress, setHasLoadedProgress] = useState(false);
   // Grid cell currently targeted while dragging; only re-renders on cell change
   const [dragCell, setDragCell] = useState<{ row: number; col: number } | null>(
@@ -790,12 +798,13 @@ export default function Puzzle() {
 
       // Invested player (3rd distinct day solved): ask iOS for the rating
       // prompt once, shortly after the win moment. No-op on web.
-      if (
-        Object.keys(newHistory).length >= 3 &&
-        !localStorage.getItem(REVIEW_PROMPTED_KEY)
-      ) {
-        localStorage.setItem(REVIEW_PROMPTED_KEY, "true");
-        setTimeout(requestAppReview, 2500);
+      try {
+        if (Object.keys(newHistory).length >= 3 && !localStorage.getItem(REVIEW_PROMPTED_KEY)) {
+          localStorage.setItem(REVIEW_PROMPTED_KEY, "true");
+          setTimeout(requestAppReview, 2500);
+        }
+      } catch {
+        // The optional review prompt must not interrupt leaderboard submission.
       }
 
       // Check if this solution was already submitted
@@ -842,54 +851,6 @@ export default function Puzzle() {
     startedAt,
     grid,
   ]);
-
-  // View a previous solve
-  const viewSolve = (dayKey: string) => {
-    const state = history[dayKey];
-    if (!state) return;
-
-    // Use day key to determine the date
-    const date = new Date(state.day + "T12:00:00");
-
-    setViewingDate(dayKey);
-    setGrid(markTargets(buildGrid(), date));
-    setFinalTime(getSolveTime(state));
-
-    // Restore placed shapes from grid string
-    const parsed = stringToPlacedShapes(state.grid);
-    if (parsed) {
-      setPlacedShapes(parsed.shapes);
-      setShapeRotations(parsed.rotations);
-    }
-  };
-
-  // Return to today's puzzle
-  const backToToday = () => {
-    setViewingDate(null);
-    setViewingImported(false);
-    setImportedShapes([]);
-    setImportedRotations({});
-    setPreviewSolutionId(null);
-    setGrid(markTargets(buildGrid(), currentDate));
-    setPlacedShapes([]);
-    setShapeRotations(Object.fromEntries(SHAPES.map((s) => [s.id, s.cells])));
-
-    // Restore today's progress if solved
-    const todayKey = getDateKey(currentDate);
-    const todayState = history[todayKey];
-    if (todayState) {
-      const parsed = stringToPlacedShapes(todayState.grid);
-      if (parsed) {
-        setPlacedShapes(parsed.shapes);
-        setShapeRotations(parsed.rotations);
-        setIsSolved(true);
-        setFinalTime(getSolveTime(todayState));
-      }
-    } else {
-      setIsSolved(false);
-      setFinalTime(null);
-    }
-  };
 
   // Reset today's puzzle (resets timer too)
   const resetToday = () => {
@@ -949,146 +910,6 @@ export default function Puzzle() {
     ]
   );
 
-  // Export grid state as a 56-character string (7 cols × 8 rows)
-  // Format: Shape letters (L,J,T,S,Z,I,O,P,U,V), '.' for empty, '#' for blocked
-  const exportSolution = useCallback((): string => {
-    let result = "";
-    for (let row = 0; row < 8; row++) {
-      for (let col = 0; col < 7; col++) {
-        const cell = grid[row]?.[col];
-        if (!cell || cell.isBlocked) {
-          result += "#";
-        } else {
-          const cellInfo = getCellInfo(row, col);
-          result += cellInfo ? cellInfo.shapeId : ".";
-        }
-      }
-    }
-    return result;
-  }, [grid, getCellInfo]);
-
-  // Import solution from a 56-character string
-  const importSolution = useCallback(
-    (
-      solutionStr: string
-    ): {
-      success: boolean;
-      error?: string;
-      shapes?: PlacedShape[];
-      rotations?: Record<string, ShapeMatrix>;
-    } => {
-      // Validate length
-      if (solutionStr.length !== 56) {
-        return {
-          success: false,
-          error: `Invalid length: ${solutionStr.length} (expected 56)`,
-        };
-      }
-
-      // Parse the string into a grid map
-      const shapePositions: Record<string, Array<[number, number]>> = {};
-
-      for (let i = 0; i < 56; i++) {
-        const row = Math.floor(i / 7);
-        const col = i % 7;
-        const char = solutionStr[i].toUpperCase();
-
-        if (char !== "." && char !== "#") {
-          if (!shapePositions[char]) {
-            shapePositions[char] = [];
-          }
-          shapePositions[char].push([row, col]);
-        }
-      }
-
-      // Validate each shape
-      const validShapeIds = SHAPES.map((s) => s.id);
-      const newPlacedShapes: PlacedShape[] = [];
-      const newRotations: Record<string, ShapeMatrix> = {};
-
-      for (const [shapeId, positions] of Object.entries(shapePositions)) {
-        // Check if it's a valid shape ID
-        if (!validShapeIds.includes(shapeId)) {
-          return { success: false, error: `Unknown shape: ${shapeId}` };
-        }
-
-        const shape = SHAPES.find((s) => s.id === shapeId)!;
-
-        // Check cell count matches
-        const expectedCells = shape.cells.length;
-        if (positions.length !== expectedCells) {
-          return {
-            success: false,
-            error: `Shape ${shapeId} has ${positions.length} cells (expected ${expectedCells})`,
-          };
-        }
-
-        // Find the top-left corner (overall min row and min col)
-        const minRow = Math.min(...positions.map(([r]) => r));
-        const minCol = Math.min(...positions.map(([, c]) => c));
-
-        // Compute cells relative to top-left
-        const relativeCells: ShapeMatrix = positions.map(([r, c]) => [
-          r - minRow,
-          c - minCol,
-        ]);
-
-        // Normalize the cells (sort for comparison)
-        const normalizeForCompare = (cells: ShapeMatrix): string =>
-          [...cells]
-            .sort((a, b) => a[0] - b[0] || a[1] - b[1])
-            .map(([r, c]) => `${r},${c}`)
-            .join("|");
-
-        const normalizedInput = normalizeForCompare(relativeCells);
-
-        // Try to find a matching rotation
-        let foundRotation: ShapeMatrix | null = null;
-        let testCells = shape.cells;
-
-        for (let rot = 0; rot < 4; rot++) {
-          // Normalize and compare
-          const normalized = normalizeShape(testCells);
-          if (normalizeForCompare(normalized) === normalizedInput) {
-            foundRotation = normalized;
-            break;
-          }
-          // Also try flipped
-          const flipped = normalizeShape(flipShape(testCells));
-          if (normalizeForCompare(flipped) === normalizedInput) {
-            foundRotation = flipped;
-            break;
-          }
-          // Rotate for next iteration
-          testCells = rotateShape(testCells);
-        }
-
-        if (!foundRotation) {
-          return {
-            success: false,
-            error: `Shape ${shapeId} cells don't match any valid rotation`,
-          };
-        }
-
-        newPlacedShapes.push({
-          ...shape,
-          gridRow: minRow,
-          gridCol: minCol,
-          cells: foundRotation,
-        });
-        newRotations[shapeId] = foundRotation;
-      }
-
-      // Return the parsed solution (don't apply directly)
-      return {
-        success: true,
-        shapes: newPlacedShapes,
-        rotations: newRotations,
-      };
-    },
-    []
-  );
-
   // Check if placement is valid
   const isValidPlacement = useCallback(
     (shapeId: string, gridRow: number, gridCol: number): boolean => {
@@ -1109,7 +930,7 @@ export default function Puzzle() {
       }
       return true;
     },
-    [grid, shapeRotations, placedShapes, getCellInfo]
+    [grid, shapeRotations, getCellInfo]
   );
 
   // Calculate hover preview when dragging (only after movement threshold)
@@ -1625,6 +1446,19 @@ export default function Puzzle() {
                   const state = history[dayKey];
                   return state ? (
                     <div className="flex items-center gap-2">
+                      {!isViewingHistory && !isGridAlreadySubmitted(state.grid) && (
+                        <button
+                          onClick={() => {
+                            setPendingSolution(state);
+                            setModalMode("submit");
+                            setShowSolveModal(true);
+                          }}
+                          className="px-2 py-0.5 text-sm whitespace-nowrap rounded-full bg-stone-300 hover:bg-stone-400 text-stone-600 transition-colors"
+                          title="Submit to leaderboard"
+                        >
+                          Submit
+                        </button>
+                      )}
                       <button
                         onClick={async () => {
                           const result = await copySolve(state.day, state.timeElapsed);
@@ -1691,7 +1525,6 @@ export default function Puzzle() {
             {grid.map((row, rowIdx) =>
               row.map((cell, colIdx) => {
                 const cellInfo = getCellInfo(rowIdx, colIdx);
-                const isShaking = cellInfo && invalidShake === cellInfo.shapeId;
                 return (
                   <motion.div
                     key={`${rowIdx}-${colIdx}`}
@@ -1712,9 +1545,7 @@ export default function Puzzle() {
                       left: colIdx * cellSize,
                     }}
                     animate={{
-                      backgroundColor: isShaking
-                        ? "#ef4444"
-                        : cellInfo?.color ||
+                      backgroundColor: cellInfo?.color ||
                           (cell.isBlocked
                             ? "#2B2B23"
                             : cell.isTarget
@@ -1725,7 +1556,6 @@ export default function Puzzle() {
                         : cell.isTarget
                           ? "#27272a"
                           : "#71717a",
-                      x: isShaking ? [0, -4, 4, -4, 4, 0] : 0,
                     }}
                     transition={{
                       backgroundColor: { duration: 0.2 },
@@ -2044,7 +1874,7 @@ export default function Puzzle() {
                       const status = await setReminderEnabled(
                         !reminderOn
                       );
-                      setReminderOn(status === "on");
+                      if (status !== "error") setReminderOn(status === "on");
                       setReminderHint(
                         status === "denied"
                           ? "Notifications are turned off for Caladay. Enable them in the iOS Settings app, then try again."

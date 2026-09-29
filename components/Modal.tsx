@@ -1,6 +1,6 @@
 "use client";
 
-import { type MouseEvent, type ReactNode, useEffect, useState } from "react";
+import { type MouseEvent, type ReactNode, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 interface ModalProps {
@@ -15,6 +15,20 @@ export default function Modal({
   isOpen, onClose, labelledBy, children, className = "max-w-sm",
 }: ModalProps) {
   const [viewport, setViewport] = useState<{ top: number; height: number } | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const dialog = dialogRef.current;
+    const previousFocus = document.activeElement;
+    // Preserve the name input's autofocus; Help and Settings need focus too.
+    if (dialog && !dialog.contains(previousFocus)) dialog.focus({ preventScroll: true });
+    return () => {
+      if (previousFocus instanceof HTMLElement && previousFocus.isConnected) {
+        previousFocus.focus({ preventScroll: true });
+      }
+    };
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -53,6 +67,22 @@ export default function Modal({
       onKeyDown={(event) => {
         event.stopPropagation();
         if (event.key === "Escape") onClose();
+        if (event.key === "Tab") {
+          const controls = dialogRef.current?.querySelectorAll<HTMLElement>(
+            'button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex="-1"])',
+          );
+          const first = controls?.[0];
+          const last = controls?.[controls.length - 1];
+          if (!first || !last) {
+            event.preventDefault();
+          } else if (event.shiftKey && (document.activeElement === first || document.activeElement === dialogRef.current)) {
+            event.preventDefault();
+            last.focus();
+          } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
+          }
+        }
       }}
     >
       {/* The card follows the keyboard; the shade always fills the screen. */}
@@ -67,10 +97,12 @@ export default function Modal({
         }}
       >
         <div
+          ref={dialogRef}
+          tabIndex={-1}
           role="dialog"
           aria-modal="true"
           aria-labelledby={labelledBy}
-          className={`relative w-full max-h-full overflow-y-auto overscroll-contain rounded-lg bg-white p-6 ${className}`}
+          className={`relative w-full max-h-full overflow-y-auto overscroll-contain rounded-lg bg-white p-6 outline-none ${className}`}
         >
           {children}
         </div>

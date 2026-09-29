@@ -12,7 +12,19 @@ export type ReminderStatus = "on" | "off" | "denied" | "error";
 
 export function isReminderEnabled(): boolean {
   if (typeof window === "undefined") return false;
-  return localStorage.getItem(REMINDER_ENABLED_KEY) === "true";
+  try {
+    return localStorage.getItem(REMINDER_ENABLED_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+function rememberReminder(enabled: boolean): void {
+  try {
+    localStorage.setItem(REMINDER_ENABLED_KEY, String(enabled));
+  } catch {
+    // Storage is only a preference; the notification API determines success.
+  }
 }
 
 // Toggle the daily reminder, reporting what actually happened.
@@ -25,8 +37,8 @@ export async function setReminderEnabled(
     if (!enabled) {
       await LocalNotifications.cancel({
         notifications: [{ id: REMINDER_ID }],
-      }).catch(() => {});
-      localStorage.setItem(REMINDER_ENABLED_KEY, "false");
+      });
+      rememberReminder(false);
       return "off";
     }
 
@@ -34,7 +46,7 @@ export async function setReminderEnabled(
     // resolves with the standing answer if already decided.
     const permission = await LocalNotifications.requestPermissions();
     if (permission.display !== "granted") {
-      localStorage.setItem(REMINDER_ENABLED_KEY, "false");
+      rememberReminder(false);
       return "denied";
     }
 
@@ -52,11 +64,10 @@ export async function setReminderEnabled(
         },
       ],
     });
-    localStorage.setItem(REMINDER_ENABLED_KEY, "true");
+    rememberReminder(true);
     return "on";
   } catch (err) {
     console.warn("Reminder toggle failed:", err);
-    localStorage.setItem(REMINDER_ENABLED_KEY, "false");
     return "error";
   }
 }

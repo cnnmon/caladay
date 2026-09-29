@@ -208,7 +208,7 @@ function LeaderboardContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f2ede7] px-6 py-4">
+    <div className="scroll-page bg-[#f2ede7] px-6 py-4">
       {/* Full-width header */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
@@ -418,7 +418,7 @@ export default function LeaderboardPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#f2ede7] px-6 py-4">
+        <div className="scroll-page bg-[#f2ede7] px-6 py-4">
           <div className="text-center text-stone-400 py-8">Loading...</div>
         </div>
       }

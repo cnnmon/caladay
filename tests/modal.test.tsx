@@ -4,6 +4,34 @@ import Modal from "../components/Modal";
 
 afterEach(() => jest.restoreAllMocks());
 
+it("moves keyboard focus into Help, traps Tab, and restores focus when dismissed", () => {
+  const opener = document.createElement("button");
+  document.body.append(opener);
+  opener.focus();
+  const onClose = jest.fn();
+  const { rerender } = render(
+    <Modal isOpen onClose={onClose} labelledBy="help-title">
+      <h2 id="help-title">Help</h2>
+      <a href="https://example.com">App</a>
+      <button>Done</button>
+    </Modal>,
+  );
+  const dialog = screen.getByRole("dialog");
+  expect(dialog.contains(document.activeElement)).toBe(true);
+  const first = screen.getByRole("link");
+  const last = screen.getByRole("button", { name: "Done" });
+  last.focus();
+  fireEvent.keyDown(last, { key: "Tab" });
+  expect(first).toHaveFocus();
+  fireEvent.keyDown(first, { key: "Tab", shiftKey: true });
+  expect(last).toHaveFocus();
+  fireEvent.keyDown(last, { key: "Escape" });
+  expect(onClose).toHaveBeenCalledTimes(1);
+  rerender(<Modal isOpen={false} onClose={onClose} labelledBy="help-title">Help</Modal>);
+  expect(opener).toHaveFocus();
+  opener.remove();
+});
+
 it("lets inputs receive pointer and keyboard events without triggering the puzzle underneath", () => {
   const onClose = jest.fn();
   const gamePointer = jest.fn();

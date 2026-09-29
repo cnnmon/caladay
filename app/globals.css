@@ -83,7 +83,8 @@ button {
 
 /* The body already reserves the safe areas. Use the visible viewport here
    so Safari's expanding address bar doesn't push the game below the screen. */
-.puzzle-page {
+.puzzle-page,
+.scroll-page {
   height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
 }
 
@@ -165,4 +166,9 @@ button {
     gap: 8px;
     padding-block: 4px;
   }
+}
+
+/* The game locks body scrolling; longer pages need their own scroll area. */
+.scroll-page {
+  overflow-y: auto;
 }

@@ -153,12 +153,7 @@ export async function shareSolve(
     return "copied";
   } catch (err) {
     // User cancelling the share sheet is not a failure
-    if (err instanceof Error && err.name === "AbortError") return "shared";
-    try {
-      await navigator.clipboard.writeText(text);
-      return "copied";
-    } catch {
-      return "failed";
-    }
+    if (err instanceof Error && (err.name === "AbortError" || (isNative() && err.message === "Share canceled"))) return "shared";
+    return copySolve(day, timeElapsed);
   }
 }

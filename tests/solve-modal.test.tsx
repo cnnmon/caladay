@@ -58,3 +58,23 @@ it("still permits retrying a server failure", async () => {
   expect(onClose).toHaveBeenCalledTimes(1);
   expect(onSubmit).toHaveBeenCalledTimes(2);
 });
+
+it.each(["success", "failure"])("ignores a delayed submission %s after closing and reopening to edit a name", async (result) => {
+  let finish!: () => void;
+  const onSubmit = jest.fn(() => new Promise<void>((resolve, reject) => {
+    finish = result === "success" ? resolve : () => reject(new Error("Offline"));
+  }));
+  const onClose = jest.fn();
+  const { rerender } = render(<SolveModal isOpen mode="submit" onClose={onClose} onSubmit={onSubmit} />);
+  fireEvent.click(screen.getByRole("button", { name: "Submit" }));
+  rerender(<SolveModal isOpen={false} mode="submit" onClose={onClose} onSubmit={onSubmit} />);
+  rerender(<SolveModal isOpen mode="edit" onClose={onClose} />);
+  fireEvent.change(screen.getByRole("textbox"), { target: { value: "BOB" } });
+  expect(screen.getByRole("button", { name: "Save" })).toBeEnabled();
+  fireEvent.click(screen.getByRole("button", { name: "Save" }));
+  expect(getSavedUsername()).toBe("BOB");
+  await act(async () => { finish(); });
+  expect(getSavedUsername()).toBe("BOB");
+  expect(onClose).toHaveBeenCalledTimes(1);
+  expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+});

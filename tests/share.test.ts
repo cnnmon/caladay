@@ -57,3 +57,19 @@ it.each([false, true])("reports clipboard failure without opening Share (native:
   expect(mockBrowserShare).not.toHaveBeenCalled();
   expect(mockNativeShare).not.toHaveBeenCalled();
 });
+
+it("does not overwrite the clipboard when the native share sheet is cancelled", async () => {
+  mockNative = true;
+  mockNativeShare.mockRejectedValueOnce(new Error("Share canceled"));
+  expect(await shareSolve("2026-09-29", 39000)).toBe("shared");
+  expect(mockNativeWrite).not.toHaveBeenCalled();
+  expect(mockBrowserWrite).not.toHaveBeenCalled();
+});
+
+it("uses the native clipboard if the native share sheet fails", async () => {
+  mockNative = true;
+  mockNativeShare.mockRejectedValueOnce(new Error("Error sharing item"));
+  expect(await shareSolve("2026-09-29", 39000)).toBe("copied");
+  expect(mockNativeWrite).toHaveBeenCalledTimes(1);
+  expect(mockBrowserWrite).not.toHaveBeenCalled();
+});
