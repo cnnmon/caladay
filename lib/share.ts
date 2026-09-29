@@ -1,4 +1,4 @@
-// Share a solved puzzle as a Wordle-style emoji mosaic.
+// Share or copy the solve time and game link.
 // Uses the native share sheet on iOS, navigator.share on capable web
 // browsers, and clipboard copy as the final fallback.
 import { Share } from "@capacitor/share";
@@ -105,6 +105,26 @@ function formatShareTime(timeElapsed?: number): string {
 const APP_STORE_URL = "https://apps.apple.com/app/id6798105948";
 const WEB_URL = "https://caladay.vercel.app";
 
+function solveShareText(day: string, timeElapsed?: number): string {
+  return [
+    `caladay ${day} — solved${formatShareTime(timeElapsed)}`,
+    "",
+    `Can you beat it? ${isNative() ? APP_STORE_URL : WEB_URL}`,
+  ].join("\n");
+}
+
+export async function copySolve(
+  day: string,
+  timeElapsed?: number
+): Promise<"copied" | "failed"> {
+  try {
+    await navigator.clipboard.writeText(solveShareText(day, timeElapsed));
+    return "copied";
+  } catch {
+    return "failed";
+  }
+}
+
 // Returns "shared" | "copied" | "failed" so the caller can show feedback.
 // Shares only the solve time — never the board, so solutions stay secret
 // until the next day.
@@ -112,11 +132,7 @@ export async function shareSolve(
   day: string,
   timeElapsed?: number
 ): Promise<"shared" | "copied" | "failed"> {
-  const text = [
-    `caladay ${day} — solved${formatShareTime(timeElapsed)}`,
-    "",
-    `Can you beat it? ${isNative() ? APP_STORE_URL : WEB_URL}`,
-  ].join("\n");
+  const text = solveShareText(day, timeElapsed);
 
   try {
     if (isNative()) {

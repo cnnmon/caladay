@@ -27,7 +27,7 @@ import {
   requestAppReview,
 } from "../../lib/native";
 import { isReminderEnabled, setReminderEnabled } from "../../lib/notifications";
-import { shareSolve } from "../../lib/share";
+import { copySolve, shareSolve } from "../../lib/share";
 import { isGridAlreadySubmitted } from "../../lib/submissions";
 import { loadSolveHistory, saveSolveHistory } from "../../lib/puzzle-history";
 import DifficultyBar from "../DifficultyBar";
@@ -416,6 +416,7 @@ export default function Puzzle() {
   const [reminderOn, setReminderOn] = useState(false);
   const [reminderHint, setReminderHint] = useState<string | null>(null);
   const [shareStatus, setShareStatus] = useState<string | null>(null);
+  const [copyStatus, setCopyStatus] = useState<string | null>(null);
 
   // Native-only UI (reminder bell) is decided after mount to avoid
   // hydration mismatches with the prerendered HTML.
@@ -1622,22 +1623,38 @@ export default function Puzzle() {
                   const dayKey = viewingDate ?? getDateKey(currentDate);
                   const state = history[dayKey];
                   return state ? (
-                    <button
-                      onClick={async () => {
-                        const result = await shareSolve(
-                          state.day,
-                          state.timeElapsed
-                        );
-                        if (result === "copied") {
-                          setShareStatus("copied!");
-                          setTimeout(() => setShareStatus(null), 2000);
-                        }
-                      }}
-                      className="px-2 py-0.5 text-sm whitespace-nowrap rounded-full bg-stone-300 hover:bg-stone-400 text-stone-600 transition-colors"
-                      title="Share your solve"
-                    >
-                      {shareStatus ?? "Share"}
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={async () => {
+                          const result = await shareSolve(
+                            state.day,
+                            state.timeElapsed
+                          );
+                          if (result === "copied") {
+                            setShareStatus("copied!");
+                            setTimeout(() => setShareStatus(null), 2000);
+                          }
+                        }}
+                        className="px-2 py-0.5 text-sm whitespace-nowrap rounded-full bg-stone-300 hover:bg-stone-400 text-stone-600 transition-colors"
+                        title="Share your solve"
+                      >
+                        {shareStatus ?? "Share"}
+                      </button>
+                      {!nativeUI && (
+                        <button
+                          onClick={async () => {
+                            const result = await copySolve(state.day, state.timeElapsed);
+                            setCopyStatus(result === "copied" ? "copied!" : "Copy failed");
+                            setTimeout(() => setCopyStatus(null), 2000);
+                          }}
+                          className="px-2 py-0.5 text-sm whitespace-nowrap rounded-full bg-stone-300 hover:bg-stone-400 text-stone-600 transition-colors"
+                          title="Copy your solve"
+                          aria-live="polite"
+                        >
+                          {copyStatus ?? "Copy"}
+                        </button>
+                      )}
+                    </div>
                   ) : null;
                 })()}
               </motion.div>
