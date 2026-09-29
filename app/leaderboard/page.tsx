@@ -351,16 +351,16 @@ function LeaderboardContent() {
                                 (you)
                               </span>
                             )}
-                            {solution.platform && (
+                            {(solution.platform === "ios" || solution.platform === "web") && (
                               <span
-                                className="ml-2 text-xs text-stone-400 font-sans"
+                                className="ml-2 text-xs text-stone-400 font-sans font-normal tracking-normal"
                                 title={
                                   solution.platform === "ios"
-                                    ? "Solved in the app"
-                                    : "Solved on the web (keyboard shortcuts available)"
+                                    ? "Solved in the iOS app"
+                                    : "Solved in a web browser"
                                 }
                               >
-                                {solution.platform === "ios" ? "📱" : "⌨️"}
+                                {solution.platform === "ios" ? "app" : "web"}
                               </span>
                             )}
                           </span>
