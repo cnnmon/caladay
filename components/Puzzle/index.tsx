@@ -28,19 +28,17 @@ import {
 } from "../../lib/native";
 import { isReminderEnabled, setReminderEnabled } from "../../lib/notifications";
 import { shareSolve } from "../../lib/share";
+import { isGridAlreadySubmitted } from "../../lib/submissions";
+import { loadSolveHistory, saveSolveHistory } from "../../lib/puzzle-history";
 import DifficultyBar from "../DifficultyBar";
 import SolveModal, {
-  addSubmission,
   getSavedUsername,
-  isGridAlreadySubmitted,
   ModalMode,
 } from "../SolveModal";
 
 const PROGRESS_KEY = "caesar-progress-v2";
 const SEEN_HELP_KEY = "CALADAY_SEEN_HELP";
 const REVIEW_PROMPTED_KEY = "CALADAY_REVIEW_PROMPTED";
-const OLD_STORAGE_KEY = "caesar-puzzle-history";
-const OLD_PROGRESS_KEY = "caesar-puzzle-progress";
 const SHAPES_VERSION = "v2"; // Increment when shapes change to clear cached rotations
 
 function getDateKey(date: Date = new Date()): string {
@@ -325,7 +323,7 @@ function markTargets(
 }
 
 const MAX_CELL_SIZE = 48;
-const MOBILE_CELL_SIZE = 38;
+const MOBILE_CELL_SIZE = 40;
 const PALETTE_CELL_SIZE = 15;
 const MOBILE_PALETTE_CELL_SIZE = 12;
 
@@ -349,6 +347,15 @@ export default function Puzzle() {
   const router = useRouter();
 
   const [currentDate, setCurrentDate] = useState(() => new Date());
+  const [grid, setGrid] = useState(() => markTargets(buildGrid(), currentDate));
+  const [placedShapes, setPlacedShapes] = useState<PlacedShape[]>([]);
+  const [shapeRotations, setShapeRotations] = useState<
+    Record<string, ShapeMatrix>
+  >(() => Object.fromEntries(SHAPES.map((s) => [s.id, s.cells])));
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const [finalTime, setFinalTime] = useState<number | null>(null);
+  const [startedAt, setStartedAt] = useState<string | null>(null);
   const [viewingDate, setViewingDate] = useState<string | null>(null); // null = playing today
   const [viewingImported, setViewingImported] = useState(false); // true = previewing imported solution
   const [importedShapes, setImportedShapes] = useState<PlacedShape[]>([]);
@@ -481,11 +488,6 @@ export default function Puzzle() {
     }
   }, [previewSolution]);
 
-  const [grid, setGrid] = useState(() => markTargets(buildGrid(), currentDate));
-  const [placedShapes, setPlacedShapes] = useState<PlacedShape[]>([]);
-  const [shapeRotations, setShapeRotations] = useState<
-    Record<string, ShapeMatrix>
-  >(() => Object.fromEntries(SHAPES.map((s) => [s.id, s.cells])));
   const [dragState, setDragState] = useState<{
     shapeId: string;
     offsetX: number;
@@ -518,23 +520,68 @@ export default function Puzzle() {
   const LONG_PRESS_MS = 450;
   const gridRef = useRef<HTMLDivElement>(null);
   const shapeRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const [isMobile, setIsMobile] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const footerRef = useRef<HTMLDivElement>(null);
+  const [{ cellSize, paletteCellSize }, setLayoutSizes] = useState({
+    cellSize: MOBILE_CELL_SIZE,
+    paletteCellSize: MOBILE_PALETTE_CELL_SIZE,
+  });
 
-  // Detect mobile screen size
+  // Measure the space below the toolbar, including dynamic browser chrome
+  // and safe areas. Keep the drag coordinates and rendered cell size in sync.
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 640);
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
+    const content = contentRef.current;
+    const header = headerRef.current;
+    const footer = footerRef.current;
+    if (!content || !header || !footer) return;
 
-  const cellSize = isMobile ? MOBILE_CELL_SIZE : MAX_CELL_SIZE;
-  const paletteCellSize = isMobile ? MOBILE_PALETTE_CELL_SIZE : PALETTE_CELL_SIZE;
+    const resize = () => {
+      const width = content.clientWidth;
+      const height = content.clientHeight;
+      if (!width || !height) return;
+      const mobile = window.innerWidth < 640;
+      const trayGap = mobile ? 4 : 8;
+      const palette = Math.max(8, Math.min(
+        mobile ? (height < 580 ? 10 : MOBILE_PALETTE_CELL_SIZE) : PALETTE_CELL_SIZE,
+        Math.floor(((width - 4 * trayGap) / 5 - 8) / 4),
+      ));
+      const hasTray = !isSolved && !viewingDate && !viewingImported;
+      const trayHeight = hasTray ? 2 * (4 * palette + 8) + trayGap : 0;
+      const styles = getComputedStyle(content);
+      const gap = parseFloat(styles.rowGap) || 12;
+      const padding = (parseFloat(styles.paddingTop) || 0) + (parseFloat(styles.paddingBottom) || 0);
+      const boardHeight = height - header.offsetHeight - footer.offsetHeight
+        - trayHeight - gap * (hasTray ? 3 : 2) - padding;
+      const cell = Math.max(24, Math.min(
+        mobile ? MOBILE_CELL_SIZE : MAX_CELL_SIZE,
+        Math.floor((width - 8) / 7),
+        Math.floor((boardHeight - 8) / 8),
+      ));
+      setLayoutSizes((previous) =>
+        previous.cellSize === cell && previous.paletteCellSize === palette
+          ? previous : { cellSize: cell, paletteCellSize: palette },
+      );
+    };
+
+    resize();
+    const observer = typeof ResizeObserver !== "undefined" ? new ResizeObserver(resize) : null;
+    observer?.observe(content);
+    observer?.observe(header);
+    observer?.observe(footer);
+    window.addEventListener("resize", resize);
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener("resize", resize);
+    };
+  }, [isSolved, viewingDate, viewingImported]);
 
   // Load history after mount to avoid hydration mismatch
   useEffect(() => {
+    const savedHistory = loadSolveHistory();
+    setHistory(savedHistory);
     const todayKey = getDateKey(currentDate);
-    const todayState = history[todayKey];
+    const todayState = savedHistory[todayKey];
 
     // Check if there's in-progress state - takes priority over solved
     const progress = loadProgress();
@@ -552,17 +599,13 @@ export default function Puzzle() {
         setShapeRotations(parsed.rotations);
         setIsSolved(true);
         setFinalTime(getSolveTime(todayState));
+        setElapsedTime(getSolveTime(todayState));
+        setStartedAt(todayState.startedAt ?? null);
       }
     }
 
     setHasMounted(true);
   }, [currentDate]);
-
-  // Timer state
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [elapsedTime, setElapsedTime] = useState(0);
-  const [finalTime, setFinalTime] = useState<number | null>(null);
-  const [startedAt, setStartedAt] = useState<string | null>(null);
 
   // Track when timer starts
   useEffect(() => {
@@ -696,6 +739,18 @@ export default function Puzzle() {
         );
         setIsSolved(false);
         setViewingDate(null);
+        setViewingImported(false);
+        setImportedShapes([]);
+        setImportedRotations({});
+        setPreviewSolutionId(null);
+        setPreviewSolution(null);
+        setSelectedShapeId(null);
+        setDragState(null);
+        setDragCell(null);
+        if (longPressTimer.current) {
+          clearTimeout(longPressTimer.current);
+          longPressTimer.current = null;
+        }
         setElapsedTime(0);
         setFinalTime(null);
         setStartedAt(null);
@@ -712,7 +767,7 @@ export default function Puzzle() {
 
   // Check for win after each move
   useEffect(() => {
-    if (viewingDate) return; // Don't check when viewing history
+    if (!hasLoadedProgress || viewingDate || viewingImported) return;
 
     const solved = checkSolved();
     if (solved && !isSolved) {
@@ -727,9 +782,9 @@ export default function Puzzle() {
         startedAt: startedAt ?? new Date().toISOString(),
         timeElapsed: elapsedTime * 1000, // Convert seconds to ms
       };
-      const newHistory = { ...history, [dayKey]: state };
+      const newHistory = { ...history, ...loadSolveHistory(), [dayKey]: state };
       setHistory(newHistory);
-      clearProgress();
+      if (saveSolveHistory(newHistory)) clearProgress();
 
       // Invested player (3rd distinct day solved): ask iOS for the rating
       // prompt once, shortly after the win moment. No-op on web.
@@ -759,9 +814,6 @@ export default function Puzzle() {
           timeElapsed: state.timeElapsed,
           platform: isNative() ? "ios" : "web",
         })
-          .then((solutionId) => {
-            addSubmission(solutionId, state.grid);
-          })
           .catch((err) => {
             // Offline or rejected by server-side validation; the solve is
             // still saved locally, just not on the leaderboard.
@@ -782,6 +834,8 @@ export default function Puzzle() {
     currentDate,
     history,
     viewingDate,
+    viewingImported,
+    hasLoadedProgress,
     elapsedTime,
     startedAt,
     grid,
@@ -837,6 +891,7 @@ export default function Puzzle() {
 
   // Reset today's puzzle (resets timer too)
   const resetToday = () => {
+    if (viewingDate || viewingImported) return;
     // If already solved, then reset elapsed time
     if (isSolved) {
       setElapsedTime(0);
@@ -1407,12 +1462,7 @@ export default function Puzzle() {
 
   return (
     <motion.div
-      // relative + w-full: the toolbar below is absolute w-full, and without
-      // an explicit positioned full-width ancestor its containing block
-      // FLIPS between the viewport and this container while framer-motion
-      // animates (transient will-change/transform) — visibly snapping the
-      // toolbar pills outward at every fade's end.
-      className="relative w-full flex flex-col items-center gap-4 p-4 h-full select-none max-h-dvh overflow-hidden"
+      className="relative flex h-full min-h-0 w-full flex-col items-center gap-1 px-3 py-2 select-none overflow-hidden sm:px-4"
       initial={{ opacity: 0 }}
       // Stay invisible until mount effects settle (mobile sizing, saved
       // username, restored progress) AND fonts are loaded, so the reveal
@@ -1422,7 +1472,7 @@ export default function Puzzle() {
       style={{
         WebkitTouchCallout: "none",
         WebkitUserSelect: "none",
-        touchAction: "none",
+        touchAction: "pan-y",
       }}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
@@ -1442,8 +1492,8 @@ export default function Puzzle() {
           container's single fade covers this element. */}
       {/* No safe-area padding here: the container already sits inside the
           body's safe-area padding, so it would double-apply. */}
-      <div className="absolute top-0 left-0 p-2 flex gap-2 items-start w-full justify-between">
-        <div className="flex gap-2 px-2 p-1">
+      <div className="puzzle-toolbar flex w-full shrink-0 items-center justify-between gap-2">
+        <div className="flex items-center gap-1.5">
           <button
             onClick={() => {
               const url = viewingDate
@@ -1463,11 +1513,11 @@ export default function Puzzle() {
             Help
           </button>
         </div>
-        <div className="flex items-start gap-2">
+        <div className="flex items-center gap-1.5">
           {/* Settings */}
           <button
             onClick={() => setShowSettingsModal(true)}
-            className="icon-button h-8"
+            className="icon-button settings-button"
             title="Settings"
           >
             {/* Flat 6-tooth gear: ring + 6 teeth rotated 60° apart */}
@@ -1506,7 +1556,7 @@ export default function Puzzle() {
                 setModalMode("edit");
                 setShowSolveModal(true);
               }}
-              className="px-2 py-1 rounded-md bg-stone-800 text-white hover:bg-stone-700 font-mono tracking-wider"
+              className="username-button px-2 py-1 rounded-full bg-stone-800 text-white hover:bg-stone-700 font-mono tracking-wider"
               title="Click to change name"
             >
               {currentUsername}
@@ -1515,15 +1565,16 @@ export default function Puzzle() {
         </div>
       </div>
 
-      <div className={`flex flex-col gap-4 items-center justify-center h-full`}>
+      <div ref={contentRef} className="puzzle-content">
         {/* Header */}
         <motion.div
-          className="flex flex-col items-center gap-2"
+          ref={headerRef}
+          className="puzzle-header flex flex-col items-center gap-1.5 text-center"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.1 }}
         >
-          <h1 className="text-xl font-light tracking-wide text-stone-700">
+          <h1 className="text-xl font-light tracking-wide text-stone-700 tabular-nums">
             {month} {dayNum}, {dayWord}
             {!viewingImported ? (
               <>
@@ -1597,7 +1648,7 @@ export default function Puzzle() {
 
         {/* Grid */}
         <motion.div
-          className="border-4 border-[#2B2B23] bg-[#2B2B23] rounded-lg"
+          className="puzzle-board border-4 border-[#2B2B23] bg-[#2B2B23] rounded-lg"
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4, delay: 0.2 }}
@@ -1608,6 +1659,7 @@ export default function Puzzle() {
             style={{
               width: 7 * cellSize,
               height: 8 * cellSize,
+              fontSize: Math.min(18, cellSize * 0.43),
               touchAction: "none",
             }}
           >
@@ -1752,94 +1804,65 @@ export default function Puzzle() {
           </div>
         </motion.div>
 
-        {/* Shape palette - always visible */}
-        {!isViewingHistory && isPlaying && !isSolved && (
+        {/* Keep the tray's space when paused so Start/Resume doesn't move the board. */}
+        {!isViewingHistory && !isSolved && (
           <motion.div
-            className="flex w-full items-center gap-2"
+            className="puzzle-tray"
+            style={{ visibility: isPlaying ? "visible" : "hidden" }}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
             transition={{ duration: 0.4, delay: 0.3 }}
           >
-            <div className="flex gap-2 sm:gap-3 px-2 flex-wrap justify-center">
-              {SHAPES.map((shape) => {
-                const cells = shapeRotations[shape.id];
-                // Only dim once a real drag is underway; a plain tap also
-                // creates dragState and would otherwise blink the tile
-                const isDraggingThis =
-                  dragState?.shapeId === shape.id && dragState.hasMoved;
-                const isSelected = selectedShapeId === shape.id;
-                const isPlaced = isShapePlaced(shape.id);
-                // Fixed square slot: every shape fits in 4x4 palette cells in
-                // any orientation, so rotate/flip never reflows the palette
-                const slotSize = 4 * paletteCellSize + 8;
+            {SHAPES.map((shape) => {
+              const cells = shapeRotations[shape.id];
+              // Only dim once a real drag is underway; a plain tap also
+              // creates dragState and would otherwise blink the tile
+              const isDraggingThis =
+                dragState?.shapeId === shape.id && dragState.hasMoved;
+              const isSelected = selectedShapeId === shape.id;
+              const isPlaced = isShapePlaced(shape.id);
+              // Fixed square slot: every shape fits in 4x4 palette cells in
+              // any orientation, so rotate/flip never reflows the palette
+              const slotSize = 4 * paletteCellSize + 8;
 
-                return (
-                  <motion.div
-                    key={shape.id}
-                    ref={(el) => {
-                      shapeRefs.current[shape.id] = el;
-                    }}
-                    className={`flex items-center justify-center rounded-md cursor-pointer transition-all ${
-                      isSelected ? "bg-stone-300/60" : "hover:bg-stone-300/40"
-                    }`}
-                    style={{ width: slotSize, height: slotSize }}
-                    animate={{
-                      opacity: isDraggingThis ? 0.3 : 1,
-                    }}
-                    transition={{ duration: 0.15 }}
-                    onClick={() => setSelectedShapeId(shape.id)}
-                    onPointerDown={(e) => {
-                      setSelectedShapeId(shape.id);
-                      // Only start drag if not already placed
-                      if (!isPlaced) {
-                        handlePointerDown(shape.id, e, false);
-                      }
-                    }}
-                  >
-                    {renderShape(
-                      shape.id,
-                      cells,
-                      shape.color,
-                      () => {}, // Handler is on parent
-                      {
-                        opacity: isPlaced && !isSelected ? 0.35 : 1,
-                        filter: isPlaced ? "grayscale(1)" : "none",
-                      },
-                      paletteCellSize
-                    )}
-                  </motion.div>
-                );
-              })}
-            </div>
-
-            {/* Rotate/Flip controls */}
-            <div className="flex flex-col gap-1 shrink-0 pr-2">
-              <button
-                onClick={() =>
-                  selectedShapeId &&
-                  canRotateSelected &&
-                  handleRotate(selectedShapeId)
-                }
-                disabled={!canRotateSelected}
-                className={`w-7 h-7 sm:w-8 sm:h-8 text-lg sm:text-xl flex items-center justify-center rounded text-sm transition-colors bg-stone-300 hover:bg-stone-400 active:bg-stone-400 text-stone-700 disabled:opacity-30 disabled:cursor-not-allowed`}
-                title="Rotate selected shape (R)"
-              >
-                ↻
-              </button>
-              <button
-                onClick={() =>
-                  selectedShapeId &&
-                  canFlipSelected &&
-                  handleFlip(selectedShapeId)
-                }
-                disabled={!canFlipSelected}
-                className={`w-7 h-7 sm:w-8 sm:h-8 text-lg sm:text-xl flex items-center justify-center rounded text-sm transition-colors bg-stone-300 hover:bg-stone-400 active:bg-stone-400 text-stone-700 disabled:opacity-30 disabled:cursor-not-allowed`}
-                title="Flip selected shape (F)"
-              >
-                ⇆
-              </button>
-            </div>
+              return (
+                <motion.div
+                  key={shape.id}
+                  ref={(el) => {
+                    shapeRefs.current[shape.id] = el;
+                  }}
+                  className={`flex items-center justify-center rounded-md cursor-pointer transition-all ${
+                    isSelected ? "bg-stone-300/60" : "hover:bg-stone-300/40"
+                  }`}
+                  style={{ width: slotSize, height: slotSize }}
+                  animate={{
+                    opacity: isDraggingThis ? 0.3 : 1,
+                  }}
+                  transition={{ duration: 0.15 }}
+                  onClick={() => setSelectedShapeId(shape.id)}
+                  onPointerDown={(e) => {
+                    setSelectedShapeId(shape.id);
+                    // Only start drag if not already placed
+                    if (!isPlaced) {
+                      handlePointerDown(shape.id, e, false);
+                    }
+                  }}
+                >
+                  {renderShape(
+                    shape.id,
+                    cells,
+                    shape.color,
+                    () => {}, // Handler is on parent
+                    {
+                      opacity: isPlaced && !isSelected ? 0.35 : 1,
+                      filter: isPlaced ? "grayscale(1)" : "none",
+                    },
+                    paletteCellSize
+                  )}
+                </motion.div>
+              );
+            })}
           </motion.div>
         )}
 
@@ -1889,7 +1912,7 @@ export default function Puzzle() {
             modalMode === "submit"
               ? async (username: string) => {
                   if (!pendingSolution) throw new Error("No pending solution");
-                  const solutionId = await submitSolution({
+                  await submitSolution({
                     username,
                     grid: pendingSolution.grid,
                     day: pendingSolution.day,
@@ -1897,7 +1920,6 @@ export default function Puzzle() {
                     timeElapsed: pendingSolution.timeElapsed,
                     platform: isNative() ? "ios" : "web",
                   });
-                  return { solutionId, grid: pendingSolution.grid };
                 }
               : undefined
           }
@@ -2140,29 +2162,50 @@ export default function Puzzle() {
         </AnimatePresence>
 
         <motion.div
+          ref={footerRef}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="flex flex-col gap-2 items-center"
+          className="puzzle-footer flex flex-col gap-2 items-center"
         >
-          <p className="text-stone-400 text-center">
+          <p className="text-sm text-stone-500 text-center">
             {isViewingHistory
               ? "Viewing previous solve"
               : isSolved
                 ? "Play again tomorrow!"
                 : isPlaying
-                  ? `Use all shapes without touching the current day`
+                  ? "Leave today’s date uncovered"
                   : elapsedTime > 0
                     ? "Press Resume to continue"
                     : "Press Start to begin"}
           </p>
-          <div className="gap-2 items-center flex">
-            {(placedShapes.length > 0 || isSolved) && (
+          <div className="puzzle-actions">
+            {!isViewingHistory && isPlaying && !isSolved && (
+              <>
+                <button
+                  onClick={() => selectedShapeId && handleRotate(selectedShapeId)}
+                  disabled={!canRotateSelected}
+                  className="icon-button disabled:opacity-30 disabled:cursor-not-allowed"
+                  title="Rotate selected shape (R)"
+                >
+                  <span aria-hidden="true">↻</span> Rotate
+                </button>
+                <button
+                  onClick={() => selectedShapeId && handleFlip(selectedShapeId)}
+                  disabled={!canFlipSelected}
+                  className="icon-button disabled:opacity-30 disabled:cursor-not-allowed"
+                  title="Flip selected shape (F)"
+                >
+                  <span aria-hidden="true">⇆</span> Flip
+                </button>
+              </>
+            )}
+            {!isViewingHistory && (placedShapes.length > 0 || isSolved) && (
               <motion.button onClick={resetToday} className="icon-button">
                 Reset
               </motion.button>
             )}
-            {isPlaying && !isSolved && (
+            {!isViewingHistory && isPlaying && !isSolved && (
               <motion.button
                 onClick={() => setIsPlaying(false)}
                 className="icon-button"

@@ -3,10 +3,16 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState, useSyncExternalStore } from "react";
 import { listSolutions, reportSolution, SolutionRow } from "../../lib/db";
+import {
+  acknowledgeSubmissions,
+  getServerSubmissionSnapshot,
+  getSubmissionSnapshot,
+  mergeSubmissions,
+  subscribeSubmissions,
+} from "../../lib/submissions";
 
-const SUBMISSIONS_KEY = "CALADAY_SUBMISSIONS";
 const REPORTED_KEY = "CALADAY_REPORTED";
 
 function getDateKey(date: Date = new Date()): string {
@@ -35,18 +41,6 @@ function formatDate(day: string): string {
   });
 }
 
-function getMySolutionIds(): Set<string> {
-  if (typeof window === "undefined") return new Set();
-  try {
-    const data = localStorage.getItem(SUBMISSIONS_KEY);
-    if (!data) return new Set();
-    const submissions = JSON.parse(data) as { id: string; grid: string }[];
-    return new Set(submissions.map((s) => s.id));
-  } catch {
-    return new Set();
-  }
-}
-
 function getReportedIds(): Set<string> {
   if (typeof window === "undefined") return new Set();
   try {
@@ -60,11 +54,17 @@ function getReportedIds(): Set<string> {
 function LeaderboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [solutions, setSolutions] = useState<SolutionRow[] | undefined>(
+  const [remoteSolutions, setRemoteSolutions] = useState<SolutionRow[] | undefined>(
     undefined
   );
+  const submissions = useSyncExternalStore(
+    subscribeSubmissions,
+    getSubmissionSnapshot,
+    getServerSubmissionSnapshot,
+  );
+  const solutions = mergeSubmissions(remoteSolutions, submissions.solutions);
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
-  const [mySolutionIds] = useState<Set<string>>(() => getMySolutionIds());
+  const mySolutionIds = new Set(submissions.solutionIds);
   const [urlDayParam, setUrlDayParam] = useState<string | null>(null);
   const [urlParamChecked, setUrlParamChecked] = useState(false);
   const [reportedIds, setReportedIds] = useState<Set<string>>(() =>
@@ -73,6 +73,8 @@ function LeaderboardContent() {
   const [confirmingReportId, setConfirmingReportId] = useState<string | null>(
     null
   );
+  const [reportingId, setReportingId] = useState<string | null>(null);
+  const [reportError, setReportError] = useState<string | null>(null);
   const [loadTimedOut, setLoadTimedOut] = useState(false);
 
   // Fetch the leaderboard on mount; flag failure so we don't spin forever.
@@ -80,20 +82,29 @@ function LeaderboardContent() {
   // requests after a short timeout.
   useEffect(() => {
     let cancelled = false;
+    const confirmedIds = getSubmissionSnapshot().solutions
+      .filter((row) => !row.pending)
+      .map((row) => row._id);
     const offlineCheck = setTimeout(() => {
       if (!cancelled && !navigator.onLine) setLoadTimedOut(true);
     }, 0);
+    const timer = setTimeout(() => setLoadTimedOut(true), 4000);
     listSolutions()
       .then((rows) => {
         if (!cancelled) {
-          setSolutions(rows);
+          clearTimeout(timer);
+          clearTimeout(offlineCheck);
+          setRemoteSolutions(rows);
+          acknowledgeSubmissions(confirmedIds);
           setLoadTimedOut(false);
         }
       })
       .catch(() => {
-        if (!cancelled) setLoadTimedOut(true);
+        if (!cancelled) {
+          clearTimeout(timer);
+          setLoadTimedOut(true);
+        }
       });
-    const timer = setTimeout(() => setLoadTimedOut(true), 4000);
     return () => {
       cancelled = true;
       clearTimeout(offlineCheck);
@@ -101,25 +112,30 @@ function LeaderboardContent() {
     };
   }, []);
 
-  const handleReport = (solutionId: string) => {
-    if (reportedIds.has(solutionId)) return;
+  const handleReport = async (solutionId: string) => {
+    if (reportedIds.has(solutionId) || reportingId !== null) return;
     if (confirmingReportId !== solutionId) {
       // First tap: ask for confirmation
       setConfirmingReportId(solutionId);
       return;
     }
-    reportSolution(solutionId).catch(() => {
-      // Ignore network failures; the local "reported" state still applies
-    });
-    const next = new Set(reportedIds);
-    next.add(solutionId);
-    setReportedIds(next);
+    setReportingId(solutionId);
+    setReportError(null);
     try {
-      localStorage.setItem(REPORTED_KEY, JSON.stringify([...next]));
+      await reportSolution(solutionId);
+      const next = new Set([...getReportedIds(), ...reportedIds, solutionId]);
+      setReportedIds(next);
+      try {
+        localStorage.setItem(REPORTED_KEY, JSON.stringify([...next]));
+      } catch {
+        // The report succeeded even if its local marker cannot be saved.
+      }
     } catch {
-      // localStorage unavailable; non-fatal
+      setReportError("Couldn't send your report. Please try again.");
+    } finally {
+      setReportingId(null);
+      setConfirmingReportId(null);
     }
-    setConfirmingReportId(null);
   };
 
   // Group solutions by day
@@ -210,6 +226,23 @@ function LeaderboardContent() {
 
       {/* Narrower content */}
       <div className="max-w-2xl mx-auto">
+        {reportError && (
+          <p role="alert" className="text-center text-red-600 text-sm mb-4">
+            {reportError}
+          </p>
+        )}
+        {submissions.error && (
+          <p role="alert" className="text-center text-red-600 text-sm mb-4">
+            Your solution wasn&apos;t saved to the leaderboard. {submissions.error}
+          </p>
+        )}
+        {!remoteSolutions && solutions && (
+          <p role="status" className="text-center text-stone-400 text-sm mb-4">
+            {loadTimedOut
+              ? "Can't load other scores. Please check your internet connection."
+              : "Loading other scores…"}
+          </p>
+        )}
         {!solutions ? (
           loadTimedOut ? (
             <div className="text-center text-stone-400 py-8">
@@ -260,10 +293,12 @@ function LeaderboardContent() {
               ) : (
                 <div className="divide-y divide-stone-100">
                   {sortedSolutions.map((solution, index) => {
-                    const isMine = mySolutionIds.has(solution._id);
+                    const isMine =
+                      !!solution.pending || mySolutionIds.has(solution._id);
                     // Can click past day solutions, or your own solutions today
                     const isClickable =
-                      isViewingPastDay || (isViewingToday && isMine);
+                      !solution.pending &&
+                      (isViewingPastDay || (isViewingToday && isMine));
 
                     return (
                       <motion.div
@@ -282,9 +317,11 @@ function LeaderboardContent() {
                             : "cursor-default"
                         }`}
                         title={
-                          isClickable
-                            ? "Click to preview solution"
-                            : "Other players' solutions can be viewed tomorrow"
+                          solution.pending
+                            ? "Saving your solution"
+                            : isClickable
+                              ? "Click to preview solution"
+                              : "Other players' solutions can be viewed tomorrow"
                         }
                       >
                         <div className="flex items-center gap-3">
@@ -329,6 +366,11 @@ function LeaderboardContent() {
                           </span>
                         </div>
                         <div className="flex items-center gap-2">
+                          {solution.pending && (
+                            <span role="status" className="text-stone-400 text-xs">
+                              Saving…
+                            </span>
+                          )}
                           <span className="text-stone-500 font-mono">
                             {formatTime(solution.timeElapsed)}
                           </span>
@@ -345,6 +387,7 @@ function LeaderboardContent() {
                               </span>
                             ) : (
                               <button
+                                disabled={reportingId !== null}
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleReport(solution._id);
@@ -356,9 +399,11 @@ function LeaderboardContent() {
                                 }`}
                                 title="Report inappropriate name"
                               >
-                                {confirmingReportId === solution._id
-                                  ? "report?"
-                                  : "⚑"}
+                                {reportingId === solution._id
+                                  ? "Sending…"
+                                  : confirmingReportId === solution._id
+                                    ? "report?"
+                                    : "⚑"}
                               </button>
                             ))}
                         </div>

@@ -1,6 +1,11 @@
 // Supabase data layer. Row shapes mirror the old Convex documents
 // (_id, timeElapsed, startedAt) so components need minimal changes.
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import {
+  beginSubmission,
+  completeSubmission,
+  failSubmission,
+} from "./submissions";
 
 export interface SolutionRow {
   _id: string;
@@ -53,20 +58,8 @@ function toSolution(row: DbRow): SolutionRow {
 
 const COLUMNS = "id, username, grid, day, started_at, time_elapsed, platform";
 
-// A submission currently in flight (see submitSolution). The leaderboard
-// waits for it so a solve that just happened is present in the fetch —
-// otherwise "solve → tap Leaderboard" races the insert and omits the row.
-let pendingSubmission: Promise<void> | null = null;
-
 // All non-hidden solutions, newest first (hidden filtered by RLS).
 export async function listSolutions(): Promise<SolutionRow[]> {
-  if (pendingSubmission) {
-    // Capped: a hung submission shouldn't block the leaderboard
-    await Promise.race([
-      pendingSubmission,
-      new Promise((resolve) => setTimeout(resolve, 3000)),
-    ]);
-  }
   const { data, error } = await getClient()
     .from("solutions")
     .select(COLUMNS)
@@ -97,7 +90,13 @@ export async function submitSolution(args: {
   timeElapsed?: number;
   platform?: string;
 }): Promise<string> {
-  const run = async (): Promise<string> => {
+  const submission = {
+    ...args,
+    username: args.username.toUpperCase().slice(0, 3),
+    platform: args.platform === "ios" ? "ios" : "web",
+  };
+  const pendingId = beginSubmission(submission);
+  try {
     const { data, error } = await getClient().functions.invoke(
       "submit-solution",
       { body: args }
@@ -116,21 +115,16 @@ export async function submitSolution(args: {
       }
       throw new Error(message);
     }
-    return (data as { id: string }).id;
-  };
-
-  const promise = run();
-  // Track for listSolutions (outcome irrelevant there; errors surface to
-  // the actual caller below)
-  const tracker = promise.then(
-    () => undefined,
-    () => undefined
-  );
-  pendingSubmission = tracker;
-  tracker.then(() => {
-    if (pendingSubmission === tracker) pendingSubmission = null;
-  });
-  return promise;
+    const id = (data as { id: string }).id;
+    completeSubmission(pendingId, id);
+    return id;
+  } catch (error) {
+    failSubmission(
+      pendingId,
+      error instanceof Error ? error.message : "Failed to submit. Please try again.",
+    );
+    throw error;
+  }
 }
 
 export async function reportSolution(solutionId: string): Promise<void> {

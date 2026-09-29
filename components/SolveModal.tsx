@@ -2,66 +2,39 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { isUsernameBanned } from "../supabase/functions/_shared/puzzle";
+import { isUsernameBanned, validateUsername } from "../supabase/functions/_shared/puzzle";
 
 const USERNAME_KEY = "CALADAY_USERNAME";
-const SUBMISSIONS_KEY = "CALADAY_SUBMISSIONS"; // { id: string, grid: string }[]
 
 export type ModalMode = "submit" | "edit";
 
 interface LeaderboardModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit?: (
-    username: string
-  ) => Promise<{ solutionId: string; grid: string }>;
+  onSubmit?: (username: string) => Promise<void>;
   mode: ModalMode;
-}
-
-interface Submission {
-  id: string;
-  grid: string;
-}
-
-function getSubmissions(): Submission[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const data = localStorage.getItem(SUBMISSIONS_KEY);
-    return data ? JSON.parse(data) : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveSubmissions(submissions: Submission[]): void {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(SUBMISSIONS_KEY, JSON.stringify(submissions));
 }
 
 export function getSavedUsername(): string | null {
   if (typeof window === "undefined") return null;
-  return localStorage.getItem(USERNAME_KEY);
+  try {
+    const username = localStorage.getItem(USERNAME_KEY);
+    // Previously saved invalid names should prompt for a replacement rather
+    // than silently failing every future automatic submission.
+    return username && !validateUsername(username) && !isUsernameBanned(username)
+      ? username : null;
+  } catch {
+    return null;
+  }
 }
 
 export function saveUsername(username: string): void {
   if (typeof window === "undefined") return;
-  localStorage.setItem(USERNAME_KEY, username.toUpperCase());
-}
-
-export function addSubmission(solutionId: string, grid: string): void {
-  const submissions = getSubmissions();
-  if (!submissions.some((s) => s.grid === grid)) {
-    submissions.push({ id: solutionId, grid });
-    saveSubmissions(submissions);
+  try {
+    localStorage.setItem(USERNAME_KEY, username.toUpperCase());
+  } catch {
+    // Remembering the name is optional; the server submission already worked.
   }
-}
-
-export function getSolutionIds(): string[] {
-  return getSubmissions().map((s) => s.id);
-}
-
-export function isGridAlreadySubmitted(grid: string): boolean {
-  return getSubmissions().some((s) => s.grid === grid);
 }
 
 export default function SolveModal({
@@ -77,7 +50,7 @@ export default function SolveModal({
   useEffect(() => {
     if (isOpen) {
       const saved = getSavedUsername();
-      if (saved) setUsername(saved);
+      setUsername(saved ?? "");
       setError("");
     }
   }, [isOpen]);
@@ -88,13 +61,18 @@ export default function SolveModal({
     if (isUsernameBanned(upper)) {
       setError("That name is not allowed");
     } else {
-      setError("");
+      setError(upper ? validateUsername(upper) ?? "" : "");
     }
   };
 
   const handleSubmit = async () => {
     if (!username || username.length === 0) {
       setError("Please enter a name");
+      return;
+    }
+    const validationError = validateUsername(username);
+    if (validationError) {
+      setError(validationError);
       return;
     }
     if (isUsernameBanned(username)) {
@@ -114,10 +92,7 @@ export default function SolveModal({
 
     setIsSubmitting(true);
     try {
-      const { solutionId, grid } = await onSubmit(username);
-      saveUsername(username);
-      addSubmission(solutionId, grid);
-      onClose();
+      await onSubmit(username);
     } catch (err) {
       // submitSolution throws Error with a user-facing message
       setError(
@@ -125,9 +100,13 @@ export default function SolveModal({
           ? err.message
           : "Failed to submit. Please try again."
       );
+      return;
     } finally {
       setIsSubmitting(false);
     }
+    // A local preference failure must never invite a second server insert.
+    saveUsername(username);
+    onClose();
   };
 
   const title =
@@ -180,7 +159,7 @@ export default function SolveModal({
                 autoFocus
               />
               {error && (
-                <p className="text-red-500 text-sm mt-1 text-center">{error}</p>
+                <p role="alert" className="text-red-500 text-sm mt-1 text-center">{error}</p>
               )}
             </div>
 
@@ -194,7 +173,7 @@ export default function SolveModal({
               <button
                 onClick={handleSubmit}
                 disabled={
-                  isSubmitting || !username || isUsernameBanned(username)
+                  isSubmitting || !!validateUsername(username) || isUsernameBanned(username)
                 }
                 className="flex-1 px-4 py-2 rounded-lg bg-stone-800 hover:bg-stone-900 text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >

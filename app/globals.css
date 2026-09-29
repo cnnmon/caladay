@@ -80,3 +80,89 @@ button {
 .icon-button {
   @apply px-3 py-1 flex items-center justify-center rounded-full bg-stone-300 hover:bg-stone-400 text-stone-600 transition-colors;
 }
+
+/* The body already reserves the safe areas. Use the visible viewport here
+   so Safari's expanding address bar doesn't push the game below the screen. */
+.puzzle-page {
+  height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+}
+
+.puzzle-toolbar .icon-button,
+.puzzle-toolbar .username-button {
+  min-height: 40px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.puzzle-toolbar .settings-button {
+  width: 40px;
+  padding: 0;
+}
+
+.puzzle-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-height: 0;
+  gap: 12px;
+  padding-block: 8px;
+  overflow-y: auto;
+}
+
+.puzzle-header,
+.puzzle-board,
+.puzzle-tray,
+.puzzle-footer {
+  flex-shrink: 0;
+}
+
+/* Auto margins center the game when there is spare room, while allowing
+   the entire game to scroll on unusually short or landscape screens. */
+.puzzle-header {
+  margin-top: auto;
+}
+
+.puzzle-footer {
+  margin-bottom: auto;
+}
+
+.puzzle-tray {
+  display: grid;
+  grid-template-columns: repeat(5, auto);
+  gap: 4px;
+  touch-action: none;
+}
+
+.puzzle-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  gap: 6px;
+}
+
+.puzzle-actions .icon-button {
+  min-height: 40px;
+  gap: 4px;
+  padding-inline: 12px;
+  font-size: 14px;
+}
+
+@media (min-width: 640px) {
+  .puzzle-content {
+    gap: 16px;
+  }
+
+  .puzzle-tray {
+    gap: 8px;
+  }
+}
+
+@media (max-width: 639px) and (max-height: 640px) {
+  .puzzle-content {
+    gap: 8px;
+    padding-block: 4px;
+  }
+}
