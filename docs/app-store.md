@@ -27,8 +27,9 @@ into the iOS project; `npm run ios:open` opens Xcode.
 - [ ] **Widget**: follow `ios/App/CaladayWidget/README.md` (one-time GUI step).
 - [ ] **Privacy policy URL**: required in App Store Connect. Needs to cover:
       3-letter usernames + solve times stored in Supabase (leaderboard),
-      no accounts, no tracking in the iOS app (Vercel Analytics is web-only,
-      gated off in `app/AnalyticsGate.tsx`).
+      no accounts, no tracking in the iOS app or on cala.day (Vercel
+      Analytics only runs on the older caladay.vercel.app deployment; see
+      `app/AnalyticsGate.tsx`).
 
 ## App Store Connect — App Privacy answers
 

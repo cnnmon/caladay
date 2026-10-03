@@ -4,12 +4,16 @@ export const metadata = {
   title: "Privacy & Terms — Caladay",
 };
 
+// Must match app/AnalyticsGate.tsx: the cala.day build ships without
+// analytics, the older caladay.vercel.app deployment still has them.
+const analyticsDisabled = process.env.NEXT_PUBLIC_DISABLE_ANALYTICS === "true";
+
 export default function PrivacyPage() {
   return (
     <div className="scroll-page bg-[#f2ede7] px-6 py-8">
       <div className="max-w-2xl mx-auto text-stone-700 select-text">
         <h1 className="text-2xl font-light mb-1">Privacy &amp; Terms</h1>
-        <p className="text-sm text-stone-400 mb-8">Last updated: July 22, 2026</p>
+        <p className="text-sm text-stone-400 mb-8">Last updated: October 3, 2026</p>
 
         <div className="space-y-6 text-sm leading-relaxed">
           <section>
@@ -53,11 +57,19 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="font-medium text-base mb-2">Analytics</h2>
-            <p>
-              The website uses Vercel Analytics, a privacy-friendly, cookie-free
-              analytics service that reports aggregate page views. The iOS app
-              contains <strong>no analytics or tracking of any kind</strong>.
-            </p>
+            {analyticsDisabled ? (
+              <p>
+                Neither this website nor the iOS app contains{" "}
+                <strong>analytics or tracking of any kind</strong>.
+              </p>
+            ) : (
+              <p>
+                This website uses Vercel Analytics, a privacy-friendly,
+                cookie-free analytics service that reports aggregate page
+                views. The iOS app contains{" "}
+                <strong>no analytics or tracking of any kind</strong>.
+              </p>
+            )}
           </section>
 
           <section>
