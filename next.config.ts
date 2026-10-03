@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Static export: one bundle serves both Vercel (web) and Capacitor (iOS).
+  // Static export for cala.day (web) and Capacitor (iOS).
   // All routes are client-rendered; no server features are used.
   output: "export",
   // Emit each route as a folder with index.html so static servers

@@ -6,6 +6,6 @@ import { isNative } from "../lib/native";
 // Vercel Analytics only makes sense (and is only disclosed) on the web;
 // the native app must not phone home to a third-party tracker.
 export function AnalyticsGate() {
-  if (isNative()) return null;
+  if (isNative() || process.env.NEXT_PUBLIC_DISABLE_ANALYTICS === "true") return null;
   return <Analytics />;
 }

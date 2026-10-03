@@ -9,10 +9,16 @@ into the iOS project; `npm run ios:open` opens Xcode.
 1. `npm run ios:sync`
 2. In Xcode: select the `App` scheme → Product → Archive → Distribute.
 
+## App Store Connect URLs
+
+- Marketing URL: https://cala.day
+- Support URL: https://cala.day/support/
+- Privacy Policy URL: https://cala.day/privacy/
+
 ## One-time setup remaining
 
 - [ ] **Supabase backend**: follow `supabase/README.md` (project + schema +
-      seed + edge function + env vars in Vercel and `.env.local`) BEFORE
+      seed + edge function + build-time env vars in `.env.local`) BEFORE
       pushing/shipping — the app has no backend until this is done.
 - [ ] **Signing**: in Xcode → App target → Signing & Capabilities, pick your
       team; bundle ID is `com.caladay.app`.
@@ -76,6 +82,6 @@ names; moderation is server-enforced (see below), with in-app reporting.
 
 ## Moderation review
 
-Reported entries are reviewed at https://caladay.vercel.app/admin
+Reported entries are reviewed at https://cala.day/admin
 (Supabase Auth login, cabbagetree876@gmail.com). Names auto-mask at 10
 reports; the admin page can restore/mask names and hide/unhide entries.

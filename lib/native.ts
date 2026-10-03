@@ -1,5 +1,4 @@
-// Native (Capacitor) integrations. Every function is a no-op on the web
-// so the Vercel deployment behaves exactly as before.
+// Native (Capacitor) integrations. Every function is a no-op on the web.
 import { InAppReview } from "@capacitor-community/in-app-review";
 import { Capacitor } from "@capacitor/core";
 import { Haptics, ImpactStyle, NotificationType } from "@capacitor/haptics";

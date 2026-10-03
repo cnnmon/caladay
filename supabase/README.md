@@ -33,12 +33,12 @@ npx supabase functions deploy submit-solution
 ## 4. Wire up the clients
 
 From dashboard → Settings → API, copy the **Project URL** and **anon public
-key** into:
+key** into `.env.local` as `NEXT_PUBLIC_SUPABASE_URL` and
+`NEXT_PUBLIC_SUPABASE_ANON_KEY` before building. The static export bakes
+these values into the bundle; any automated build environment needs the
+same variables.
 
-- `.env.local` (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`)
-- Vercel → project → Settings → Environment Variables (same two vars) —
-  BEFORE pushing this branch, or the deployed site will build without a
-  backend. The old `NEXT_PUBLIC_CONVEX_URL` var can be deleted.
-
-Then rebuild the iOS bundle (`npm run ios:sync`) — the static export bakes
-these env vars in at build time.
+For https://cala.day, build with
+`NEXT_PUBLIC_DISABLE_ANALYTICS=true npm run build` and publish the export
+through Sites (see the web deployment section in `../README.md`).
+Rebuild the iOS bundle separately with `npm run ios:sync`.

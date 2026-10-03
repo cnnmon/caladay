@@ -30,7 +30,7 @@ beforeEach(() => {
 });
 
 it("copies directly on mobile web even when a share sheet is available", async () => {
-  const text = "caladay 2026-09-29 — solved in 0:39\n\nCan you beat it? https://caladay.vercel.app";
+  const text = "caladay 2026-09-29 — solved in 0:39\n\nCan you beat it? https://cala.day";
   expect(await copySolve("2026-09-29", 39000)).toBe("copied");
   expect(mockBrowserWrite).toHaveBeenCalledWith(text);
   expect(mockBrowserShare).not.toHaveBeenCalled();

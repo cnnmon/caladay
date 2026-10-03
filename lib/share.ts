@@ -104,7 +104,7 @@ function formatShareTime(timeElapsed?: number): string {
 
 // Native shares point to the App Store listing; web shares to the site.
 const APP_STORE_URL = "https://apps.apple.com/app/id6798105948";
-const WEB_URL = "https://caladay.vercel.app";
+const WEB_URL = "https://cala.day";
 
 function solveShareText(day: string, timeElapsed?: number): string {
   return [

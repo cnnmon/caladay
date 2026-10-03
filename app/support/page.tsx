@@ -66,7 +66,7 @@ export default function SupportPage() {
             <p>
               See{" "}
               <Link className="underline" href="/privacy">
-                caladay.vercel.app/privacy
+                cala.day/privacy
               </Link>
               .
             </p>
