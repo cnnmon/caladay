@@ -22,7 +22,7 @@ jest.mock("../lib/db", () => ({
 jest.mock("../lib/native", () => ({
   isNative: () => mockNative,
   hapticSolve: jest.fn(), hapticPlace: jest.fn(), hapticInvalid: jest.fn(),
-  hideSplash: jest.fn(), openAppSettings: jest.fn(),
+  hideSplash: jest.fn(), openAppSettings: jest.fn(), setTextInteraction: jest.fn(),
   requestAppReview: () => mockReview(),
 }));
 jest.mock("../lib/notifications", () => ({

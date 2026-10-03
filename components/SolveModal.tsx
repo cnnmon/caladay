@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import Modal from "./Modal";
+import { setTextInteraction } from "../lib/native";
 import { isUsernameBanned, validateUsername } from "../supabase/functions/_shared/puzzle";
 
 const USERNAME_KEY = "CALADAY_USERNAME";
@@ -48,6 +49,11 @@ function NameDialog({ onClose, onSubmit, mode }: Omit<LeaderboardModalProps, "is
   const activeRequest = useRef<symbol | null>(null);
   const titleId = useId();
   useEffect(() => () => { activeRequest.current = null; }, []);
+  // iOS: the name field needs the text interaction the puzzle turns off.
+  useEffect(() => {
+    setTextInteraction(true);
+    return () => setTextInteraction(false);
+  }, []);
 
   const handleUsernameChange = (value: string) => {
     const upper = value.toUpperCase().slice(0, 3);

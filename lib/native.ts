@@ -1,6 +1,6 @@
 // Native (Capacitor) integrations. Every function is a no-op on the web.
 import { InAppReview } from "@capacitor-community/in-app-review";
-import { Capacitor } from "@capacitor/core";
+import { Capacitor, registerPlugin } from "@capacitor/core";
 import { Haptics, ImpactStyle, NotificationType } from "@capacitor/haptics";
 import { SplashScreen } from "@capacitor/splash-screen";
 import { NativeSettings, IOSSettings } from "capacitor-native-settings";
@@ -30,6 +30,19 @@ export function openAppSettings(): void {
 export function hideSplash(): void {
   if (!isNative()) return;
   SplashScreen.hide({ fadeOutDuration: 250 }).catch(() => {});
+}
+
+// App-local plugin defined in ios/App/App/GameViewController.swift.
+const TextInteraction = registerPlugin<{
+  setEnabled(options: { enabled: boolean }): Promise<void>;
+}>("TextInteraction");
+
+// The iOS shell keeps WebKit text interaction off so rapid taps on the
+// puzzle can't summon the text-selection loupe. Text fields need it back
+// on (caret, selection) for as long as they are on screen.
+export function setTextInteraction(enabled: boolean): void {
+  if (!isNative()) return;
+  TextInteraction.setEnabled({ enabled }).catch(() => {});
 }
 
 // Light tap when a piece snaps onto the board

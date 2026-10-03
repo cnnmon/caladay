@@ -1,6 +1,9 @@
 import "@testing-library/jest-dom";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import SolveModal, { getSavedUsername, ModalMode } from "../components/SolveModal";
+import { setTextInteraction } from "../lib/native";
+
+jest.mock("../lib/native", () => ({ setTextInteraction: jest.fn() }));
 
 beforeEach(() => {
   localStorage.clear();
@@ -77,4 +80,11 @@ it.each(["success", "failure"])("ignores a delayed submission %s after closing a
   expect(getSavedUsername()).toBe("BOB");
   expect(onClose).toHaveBeenCalledTimes(1);
   expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+});
+
+it("turns iOS text interaction on only while the name dialog is open", () => {
+  const { rerender } = render(<SolveModal isOpen mode="edit" onClose={jest.fn()} />);
+  expect(setTextInteraction).toHaveBeenLastCalledWith(true);
+  rerender(<SolveModal isOpen={false} mode="edit" onClose={jest.fn()} />);
+  expect(setTextInteraction).toHaveBeenLastCalledWith(false);
 });
