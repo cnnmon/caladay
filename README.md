@@ -8,11 +8,13 @@ Play at [cala.day](https://cala.day).
 
 ## Web deployment
 
-The live site is [cala.day](https://cala.day), hosted through Sites using the
-static export in the separate `../caladay-site/` deployment checkout.
-Build with `NEXT_PUBLIC_DISABLE_ANALYTICS=true npm run build`, replace that
-checkout's `out/` with the new export, and publish a new Sites version.
-The Supabase build variables come from `.env.local`; see `supabase/README.md`.
+The live site is [cala.day](https://cala.day): the static export served by
+Cloudflare as a Worker with static assets only (`wrangler.jsonc`), on the
+Cloudflare account that also runs cala.day's DNS. `npm run deploy:web` builds
+it with analytics off and deploys it (run `npx wrangler@4.147.0 login` once
+first). The Supabase build variables come from `.env.local`; see
+`supabase/README.md`. Keep the MX and SPF records in Cloudflare DNS: they are
+Namecheap's email forwarding for @cala.day.
 An iOS release or a deployment to the old Vercel project does not update this site.
 
 ## iOS app
