@@ -38,7 +38,6 @@ key** into `.env.local` as `NEXT_PUBLIC_SUPABASE_URL` and
 these values into the bundle; any automated build environment needs the
 same variables.
 
-For https://cala.day, build with
-`NEXT_PUBLIC_DISABLE_ANALYTICS=true npm run build` and publish the export
-through Sites (see the web deployment section in `../README.md`).
+For https://cala.day, run `npm run deploy:web` (see the web deployment
+section in `../README.md`).
 Rebuild the iOS bundle separately with `npm run ios:sync`.

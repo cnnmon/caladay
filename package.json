@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "jest",
+    "deploy:web": "NEXT_PUBLIC_DISABLE_ANALYTICS=true next build && npx -y wrangler@4.147.0 deploy",
     "ios:sync": "NEXT_PUBLIC_DISABLE_ANALYTICS=true next build && cap sync ios && cp public/solutions-cache.csv ios/App/CaladayWidget/solutions-cache.csv",
     "ios:open": "cap open ios",
     "android:sync": "NEXT_PUBLIC_DISABLE_ANALYTICS=true next build && cap sync android",

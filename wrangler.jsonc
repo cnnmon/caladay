@@ -1,0 +1,17 @@
+// cala.day: the static export in out/, served by Cloudflare as a Worker
+// with static assets only (no script), so every request is a free asset
+// request. Deploy with `npm run deploy:web`.
+{
+  "name": "caladay",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./out",
+    // next.config.ts emits each route as a folder (trailingSlash: true)
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  },
+  "routes": [
+    { "pattern": "cala.day", "custom_domain": true },
+    { "pattern": "www.cala.day", "custom_domain": true }
+  ]
+}
