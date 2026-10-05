@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Modal from "../Modal";
 import { getSolutionById, submitSolution, SolutionRow } from "../../lib/db";
 import {
@@ -29,6 +29,7 @@ import {
   requestAppReview,
 } from "../../lib/native";
 import { isReminderEnabled, setReminderEnabled } from "../../lib/notifications";
+import { StoreLink, storeLinksFor } from "../../lib/stores";
 import { copySolve, shareSolve } from "../../lib/share";
 import { getServerSubmissionSnapshot, getSubmissionSnapshot, isGridAlreadySubmitted, subscribeSubmissions } from "../../lib/submissions";
 import { loadSolveHistory, saveSolveHistory } from "../../lib/puzzle-history";
@@ -424,15 +425,18 @@ export default function Puzzle() {
     useState<SavedPuzzleState | null>(null);
   const [currentUsername, setCurrentUsername] = useState<string | null>(null);
   const [nativeUI, setNativeUI] = useState(false);
+  const [storeLinks, setStoreLinks] = useState<StoreLink[]>([]);
   const [reminderOn, setReminderOn] = useState(false);
   const [reminderHint, setReminderHint] = useState<string | null>(null);
   const [shareStatus, setShareStatus] = useState<string | null>(null);
   const [copyStatus, setCopyStatus] = useState<string | null>(null);
 
-  // Native-only UI (reminder bell) is decided after mount to avoid
-  // hydration mismatches with the prerendered HTML.
+  // Native-only UI (reminder bell) and the website's app-store links are
+  // decided after mount to avoid hydration mismatches with the prerendered
+  // HTML.
   useEffect(() => {
     setNativeUI(isNative());
+    setStoreLinks(isNative() ? [] : storeLinksFor(navigator.userAgent, navigator.maxTouchPoints));
     setReminderOn(isReminderEnabled());
   }, []);
 
@@ -1833,17 +1837,22 @@ export default function Puzzle() {
               Remove
             </p>
           </div>
-          {!nativeUI && (
+          {storeLinks.length > 0 && (
             <p className="text-sm text-stone-600 mb-4">
               We also have a mobile app!{" "}
-              <a
-                href="https://apps.apple.com/app/id6798105948"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline underline-offset-2"
-              >
-                Download
-              </a>
+              {storeLinks.map((link, i) => (
+                <Fragment key={link.href}>
+                  {i > 0 && " · "}
+                  <a
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline underline-offset-2"
+                  >
+                    {storeLinks.length > 1 ? link.device : "Download"}
+                  </a>
+                </Fragment>
+              ))}
             </p>
           )}
           <button
@@ -1917,17 +1926,24 @@ export default function Puzzle() {
                 )}
               </div>
             )}
-            {!nativeUI && (
+            {storeLinks.length > 0 && (
               <div className="flex items-center justify-between">
-                <span className="text-stone-600">On iPhone?</span>
-                <a
-                  href="https://apps.apple.com/app/id6798105948"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-3 py-1 rounded-full bg-stone-800 hover:bg-stone-900 text-white transition-colors"
-                >
-                  Get the app
-                </a>
+                <span className="text-stone-600">
+                  {storeLinks.length > 1 ? "Get the app" : `On ${storeLinks[0].device}?`}
+                </span>
+                <div className="flex gap-2">
+                  {storeLinks.map((link) => (
+                    <a
+                      key={link.href}
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-1 rounded-full bg-stone-800 hover:bg-stone-900 text-white transition-colors"
+                    >
+                      {storeLinks.length > 1 ? link.device : "Get the app"}
+                    </a>
+                  ))}
+                </div>
               </div>
             )}
             <div className="flex items-center justify-between">

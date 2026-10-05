@@ -154,8 +154,13 @@ Outputs: `android/app/build/outputs/apk/debug/app-debug.apk` and
   bars and pad it with `env(safe-area-inset-*)`, as on iOS. That path is
   untested here; ask closed testers to check the top and bottom edges.
 
-- The web app's "Get the app" links point only to the App Store. Add the
-  Play link (`https://play.google.com/store/apps/details?id=com.caladay.app`)
-  once the listing is public.
+- **When the Play listing goes public**, set `PLAY_STORE_LIVE = true` in
+  `lib/stores.ts`. Until then the website's "get the app" links send
+  iPhones to the App Store and show Android visitors nothing, and Android
+  shares link to cala.day. After the flip, Android visitors get Google
+  Play, computers get both stores, and Android shares link to the Play
+  listing. The website change needs a Sites publish; the share link
+  changes with the next Android build (and iOS build, which bundles the
+  same code but is unaffected).
 - No Android home-screen widget (iOS has one).
 - In-app review prompts only appear in builds installed from Play.

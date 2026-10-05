@@ -246,3 +246,12 @@ it.each([false, true])("shows the mobile app link only on web in initial and reo
   expect(screen.queryAllByText(/We also have a mobile app!/)).toHaveLength(native ? 0 : 1);
   expect(screen.queryAllByRole("link", { name: "Download" })).toHaveLength(native ? 0 : 1);
 });
+
+it("offers no app to Android visitors on the website before the Play listing is public", async () => {
+  jest.spyOn(navigator, "userAgent", "get").mockReturnValue("Mozilla/5.0 (Linux; Android 16; Pixel 8) Chrome/141.0.0.0 Mobile");
+  localStorage.removeItem("CALADAY_SEEN_HELP");
+  await act(async () => { render(<Puzzle />); });
+  expect(screen.getByRole("dialog", { name: "How to Play" })).toBeInTheDocument();
+  expect(screen.queryByText(/We also have a mobile app!/)).not.toBeInTheDocument();
+  expect(screen.queryByRole("link", { name: "Download" })).not.toBeInTheDocument();
+});

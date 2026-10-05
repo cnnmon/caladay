@@ -4,6 +4,7 @@
 import { Share } from "@capacitor/share";
 import { Clipboard } from "@capacitor/clipboard";
 import { appPlatform, isNative } from "./native";
+import { APP_STORE_URL, PLAY_STORE_LIVE, PLAY_STORE_URL } from "./stores";
 
 // Only 7 colored-square emoji exist for 10 shapes, so repeats are
 // unavoidable — but we pick colors per solution so that no two TOUCHING
@@ -104,8 +105,8 @@ function formatShareTime(timeElapsed?: number): string {
 
 // Native shares point to the app's store listing; web shares to the site.
 const SHARE_URLS = {
-  ios: "https://apps.apple.com/app/id6798105948",
-  android: "https://play.google.com/store/apps/details?id=com.caladay.app",
+  ios: APP_STORE_URL,
+  android: PLAY_STORE_LIVE ? PLAY_STORE_URL : "https://cala.day",
   web: "https://cala.day",
 };
 

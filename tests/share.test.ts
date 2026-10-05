@@ -53,11 +53,11 @@ it("copies the unchanged native share message without the browser clipboard", as
   expect(mockNativeShare).toHaveBeenCalledWith({ text });
 });
 
-it("points Android shares at the Google Play listing", async () => {
+it("links Android shares to the website until the Play listing is public", async () => {
   mockPlatform = "android";
   await shareSolve("2026-09-29", 39000);
   expect(mockNativeShare).toHaveBeenCalledWith({
-    text: "caladay 2026-09-29 — solved in 0:39\n\nCan you beat it? https://play.google.com/store/apps/details?id=com.caladay.app",
+    text: "caladay 2026-09-29 — solved in 0:39\n\nCan you beat it? https://cala.day",
   });
 });
 
