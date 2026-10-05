@@ -12,13 +12,17 @@ Installed 2026-10-04, no Android Studio needed:
 - JDK 21: `brew install openjdk@21` →
   `/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home`
 - Android SDK: `~/Library/Android/sdk` (platform 36, build-tools 36,
-  emulator, cmdline-tools). `android/local.properties` points Gradle at it.
-- Emulator: AVD `caladay_pixel` (Pixel 8, Android 16, Google Play image).
+  emulator, cmdline-tools).
+- Emulators: AVDs `caladay_pixel` and `caladay_pixel_361` (Pixel 8,
+  Android 16, Google Play images).
 
-Gradle needs `JAVA_HOME` set:
+Gradle needs `JAVA_HOME` and the SDK location (`ANDROID_HOME`, or a
+gitignored `android/local.properties` with `sdk.dir=...`):
 
 ```sh
 export JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home
+export ANDROID_HOME=$HOME/Library/Android/sdk
+npm run android:sync                     # web bundle into android/
 cd android && ./gradlew assembleDebug    # emulator/sideload APK
 cd android && ./gradlew bundleRelease    # Play upload (.aab)
 ```
