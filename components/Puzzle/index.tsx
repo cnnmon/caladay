@@ -19,6 +19,7 @@ import {
   SolveHistory,
 } from "../../lib/types";
 import {
+  appPlatform,
   hapticInvalid,
   hapticPlace,
   hapticSolve,
@@ -823,7 +824,7 @@ export default function Puzzle() {
           day: state.day,
           startedAt: state.startedAt,
           timeElapsed: state.timeElapsed,
-          platform: isNative() ? "ios" : "web",
+          platform: appPlatform(),
         })
           .catch((err) => {
             // Offline or rejected by server-side validation; the solve is
@@ -1773,7 +1774,7 @@ export default function Puzzle() {
                     day: pendingSolution.day,
                     startedAt: pendingSolution.startedAt,
                     timeElapsed: pendingSolution.timeElapsed,
-                    platform: isNative() ? "ios" : "web",
+                    platform: appPlatform(),
                   });
                 }
               : undefined
@@ -1877,7 +1878,7 @@ export default function Puzzle() {
                       if (status !== "error") setReminderOn(status === "on");
                       setReminderHint(
                         status === "denied"
-                          ? "Notifications are turned off for Caladay. Enable them in the iOS Settings app, then try again."
+                          ? `Notifications are turned off for Caladay. Enable them in ${appPlatform() === "android" ? "Android Settings" : "the iOS Settings app"}, then try again.`
                           : status === "error"
                             ? "Couldn't set the reminder. Please try again."
                             : null

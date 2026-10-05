@@ -3,26 +3,35 @@ import { InAppReview } from "@capacitor-community/in-app-review";
 import { Capacitor, registerPlugin } from "@capacitor/core";
 import { Haptics, ImpactStyle, NotificationType } from "@capacitor/haptics";
 import { SplashScreen } from "@capacitor/splash-screen";
-import { NativeSettings, IOSSettings } from "capacitor-native-settings";
+import { NativeSettings, IOSSettings, AndroidSettings } from "capacitor-native-settings";
 
 export function isNative(): boolean {
   return Capacitor.isNativePlatform();
 }
 
-// Ask iOS to show the in-app rating prompt. The OS decides whether it
-// actually appears (capped at ~3 times/year per device) — treat this as
-// a hint, never a guarantee.
+// Which app this is running in; "web" for any browser.
+export function appPlatform(): "ios" | "android" | "web" {
+  const platform = Capacitor.getPlatform();
+  return platform === "ios" || platform === "android" ? platform : "web";
+}
+
+// Ask the OS to show the in-app rating prompt. It decides whether it
+// actually appears (iOS caps it at ~3 times/year per device; Google Play
+// has its own quota) — treat this as a hint, never a guarantee.
 export function requestAppReview(): void {
   if (!isNative()) return;
   InAppReview.requestReview().catch(() => {});
 }
 
-// Open this app's page in the iOS Settings app (for re-enabling a
-// previously denied notification permission — iOS only shows its own
-// permission prompt once per install).
+// Open this app's settings (for re-enabling a previously denied
+// notification permission — the OS stops showing its own prompt once
+// the user has declined).
 export function openAppSettings(): void {
-  if (!isNative()) return;
-  NativeSettings.openIOS({ option: IOSSettings.App }).catch(() => {});
+  if (appPlatform() === "android") {
+    NativeSettings.openAndroid({ option: AndroidSettings.AppNotification }).catch(() => {});
+  } else if (appPlatform() === "ios") {
+    NativeSettings.openIOS({ option: IOSSettings.App }).catch(() => {});
+  }
 }
 
 // Dismiss the launch splash (launchAutoHide is off so the splash covers
@@ -41,7 +50,7 @@ const TextInteraction = registerPlugin<{
 // puzzle can't summon the text-selection loupe. Text fields need it back
 // on (caret, selection) for as long as they are on screen.
 export function setTextInteraction(enabled: boolean): void {
-  if (!isNative()) return;
+  if (appPlatform() !== "ios") return;
   TextInteraction.setEnabled({ enabled }).catch(() => {});
 }
 

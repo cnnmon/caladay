@@ -9,7 +9,15 @@ const config: CapacitorConfig = {
     backgroundColor: "#f2ede7",
     contentInset: "never",
   },
+  android: {
+    backgroundColor: "#f2ede7",
+  },
   plugins: {
+    LocalNotifications: {
+      // Android only: monochrome status bar icon (res/drawable) and its tint
+      smallIcon: "ic_stat_caladay",
+      iconColor: "#da5597",
+    },
     SplashScreen: {
       // Keep the splash up until the web app has painted its settled UI
       // (hideSplash() in lib/native.ts), preventing the raw-WebView flicker

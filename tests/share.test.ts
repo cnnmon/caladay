@@ -1,12 +1,15 @@
 import { copySolve, shareSolve } from "../lib/share";
 
-let mockNative = false;
+let mockPlatform: "ios" | "android" | "web" = "web";
 const mockNativeWrite = jest.fn();
 const mockNativeShare = jest.fn();
 const mockBrowserWrite = jest.fn();
 const mockBrowserShare = jest.fn();
 
-jest.mock("../lib/native", () => ({ isNative: () => mockNative }));
+jest.mock("../lib/native", () => ({
+  isNative: () => mockPlatform !== "web",
+  appPlatform: () => mockPlatform,
+}));
 jest.mock("@capacitor/clipboard", () => ({
   Clipboard: { write: (...args: unknown[]) => mockNativeWrite(...args) },
 }));
@@ -16,7 +19,7 @@ jest.mock("@capacitor/share", () => ({
 
 beforeEach(() => {
   jest.resetAllMocks();
-  mockNative = false;
+  mockPlatform = "web";
   mockNativeWrite.mockResolvedValue(undefined);
   mockNativeShare.mockResolvedValue({});
   mockBrowserWrite.mockResolvedValue(undefined);
@@ -40,7 +43,7 @@ it("copies directly on mobile web even when a share sheet is available", async (
 });
 
 it("copies the unchanged native share message without the browser clipboard", async () => {
-  mockNative = true;
+  mockPlatform = "ios";
   Object.defineProperty(navigator, "clipboard", { configurable: true, value: undefined });
   const text = "caladay 2026-09-29 — solved in 0:39\n\nCan you beat it? https://apps.apple.com/app/id6798105948";
   expect(await copySolve("2026-09-29", 39000)).toBe("copied");
@@ -50,8 +53,16 @@ it("copies the unchanged native share message without the browser clipboard", as
   expect(mockNativeShare).toHaveBeenCalledWith({ text });
 });
 
+it("points Android shares at the Google Play listing", async () => {
+  mockPlatform = "android";
+  await shareSolve("2026-09-29", 39000);
+  expect(mockNativeShare).toHaveBeenCalledWith({
+    text: "caladay 2026-09-29 — solved in 0:39\n\nCan you beat it? https://play.google.com/store/apps/details?id=com.caladay.app",
+  });
+});
+
 it.each([false, true])("reports clipboard failure without opening Share (native: %s)", async (native) => {
-  mockNative = native;
+  mockPlatform = native ? "ios" : "web";
   (native ? mockNativeWrite : mockBrowserWrite).mockRejectedValueOnce(new Error("denied"));
   expect(await copySolve("2026-09-29", 39000)).toBe("failed");
   expect(mockBrowserShare).not.toHaveBeenCalled();
@@ -59,7 +70,7 @@ it.each([false, true])("reports clipboard failure without opening Share (native:
 });
 
 it("does not overwrite the clipboard when the native share sheet is cancelled", async () => {
-  mockNative = true;
+  mockPlatform = "ios";
   mockNativeShare.mockRejectedValueOnce(new Error("Share canceled"));
   expect(await shareSolve("2026-09-29", 39000)).toBe("shared");
   expect(mockNativeWrite).not.toHaveBeenCalled();
@@ -67,7 +78,7 @@ it("does not overwrite the clipboard when the native share sheet is cancelled", 
 });
 
 it("uses the native clipboard if the native share sheet fails", async () => {
-  mockNative = true;
+  mockPlatform = "ios";
   mockNativeShare.mockRejectedValueOnce(new Error("Error sharing item"));
   expect(await shareSolve("2026-09-29", 39000)).toBe("copied");
   expect(mockNativeWrite).toHaveBeenCalledTimes(1);

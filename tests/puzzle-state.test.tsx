@@ -21,6 +21,7 @@ jest.mock("../lib/db", () => ({
 }));
 jest.mock("../lib/native", () => ({
   isNative: () => mockNative,
+  appPlatform: () => (mockNative ? "ios" : "web"),
   hapticSolve: jest.fn(), hapticPlace: jest.fn(), hapticInvalid: jest.fn(),
   hideSplash: jest.fn(), openAppSettings: jest.fn(), setTextInteraction: jest.fn(),
   requestAppReview: () => mockReview(),

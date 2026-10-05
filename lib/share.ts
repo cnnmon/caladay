@@ -1,9 +1,9 @@
 // Share or copy the solve time and game link.
-// Uses the native share sheet on iOS, navigator.share on capable web
+// Uses the native share sheet in the apps, navigator.share on capable web
 // browsers, and clipboard copy as the final fallback.
 import { Share } from "@capacitor/share";
 import { Clipboard } from "@capacitor/clipboard";
-import { isNative } from "./native";
+import { appPlatform, isNative } from "./native";
 
 // Only 7 colored-square emoji exist for 10 shapes, so repeats are
 // unavoidable — but we pick colors per solution so that no two TOUCHING
@@ -102,15 +102,18 @@ function formatShareTime(timeElapsed?: number): string {
   return ` in ${mins}:${secs.toString().padStart(2, "0")}`;
 }
 
-// Native shares point to the App Store listing; web shares to the site.
-const APP_STORE_URL = "https://apps.apple.com/app/id6798105948";
-const WEB_URL = "https://cala.day";
+// Native shares point to the app's store listing; web shares to the site.
+const SHARE_URLS = {
+  ios: "https://apps.apple.com/app/id6798105948",
+  android: "https://play.google.com/store/apps/details?id=com.caladay.app",
+  web: "https://cala.day",
+};
 
 function solveShareText(day: string, timeElapsed?: number): string {
   return [
     `caladay ${day} — solved${formatShareTime(timeElapsed)}`,
     "",
-    `Can you beat it? ${isNative() ? APP_STORE_URL : WEB_URL}`,
+    `Can you beat it? ${SHARE_URLS[appPlatform()]}`,
   ].join("\n");
 }
 

@@ -9,10 +9,13 @@
     "lint": "eslint",
     "test": "jest",
     "ios:sync": "NEXT_PUBLIC_DISABLE_ANALYTICS=true next build && cap sync ios && cp public/solutions-cache.csv ios/App/CaladayWidget/solutions-cache.csv",
-    "ios:open": "cap open ios"
+    "ios:open": "cap open ios",
+    "android:sync": "NEXT_PUBLIC_DISABLE_ANALYTICS=true next build && cap sync android",
+    "android:open": "cap open android"
   },
   "dependencies": {
     "@capacitor-community/in-app-review": "^8.0.0",
+    "@capacitor/android": "^8.4.2",
     "@capacitor/clipboard": "^8.0.1",
     "@capacitor/core": "^8.4.2",
     "@capacitor/haptics": "^8.0.2",

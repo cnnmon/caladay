@@ -13,15 +13,15 @@ export default function PrivacyPage() {
     <div className="scroll-page bg-[#f2ede7] px-6 py-8">
       <div className="max-w-2xl mx-auto text-stone-700 select-text">
         <h1 className="text-2xl font-light mb-1">Privacy &amp; Terms</h1>
-        <p className="text-sm text-stone-400 mb-8">Last updated: October 3, 2026</p>
+        <p className="text-sm text-stone-400 mb-8">Last updated: October 4, 2026</p>
 
         <div className="space-y-6 text-sm leading-relaxed">
           <section>
             <h2 className="font-medium text-base mb-2">What Caladay is</h2>
             <p>
               Caladay is a free daily puzzle game, available on the web and as
-              an iOS app. It does not require an account, and we collect as
-              little data as possible.
+              an iOS and Android app. It does not require an account, and we
+              collect as little data as possible.
             </p>
           </section>
 
@@ -59,14 +59,14 @@ export default function PrivacyPage() {
             <h2 className="font-medium text-base mb-2">Analytics</h2>
             {analyticsDisabled ? (
               <p>
-                Neither this website nor the iOS app contains{" "}
+                Neither this website nor the iOS and Android apps contain{" "}
                 <strong>analytics or tracking of any kind</strong>.
               </p>
             ) : (
               <p>
                 This website uses Vercel Analytics, a privacy-friendly,
                 cookie-free analytics service that reports aggregate page
-                views. The iOS app contains{" "}
+                views. The iOS and Android apps contain{" "}
                 <strong>no analytics or tracking of any kind</strong>.
               </p>
             )}
@@ -87,9 +87,10 @@ export default function PrivacyPage() {
           <section>
             <h2 className="font-medium text-base mb-2">Notifications</h2>
             <p>
-              The iOS app can send an optional daily reminder. This is scheduled
-              entirely on your device and can be turned off at any time via the
-              bell icon or iOS Settings.
+              The iOS and Android apps can send an optional daily reminder. This
+              is scheduled entirely on your device and can be turned off at any
+              time in the app&apos;s Settings (gear icon) or your phone&apos;s
+              Settings.
             </p>
           </section>
 
@@ -124,7 +125,7 @@ export default function PrivacyPage() {
               someone; and accept that we may hide or remove entries at our
               discretion (including automatically after user reports). The
               service is provided as-is, free of charge, with no warranty; we
-              may modify or discontinue it at any time. Use of the app is
+              may modify or discontinue it at any time. Use of the iOS app is
               otherwise governed by Apple&apos;s standard licensed application
               end user license agreement.
             </p>

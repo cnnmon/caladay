@@ -14,7 +14,7 @@ export interface SolutionRow {
   day: string;
   startedAt?: string;
   timeElapsed?: number;
-  platform?: string; // "web" | "ios"; absent on pre-1.0.1 rows
+  platform?: string; // "web" | "ios" | "android"; absent on pre-1.0.1 rows
 }
 
 interface DbRow {
@@ -93,7 +93,7 @@ export async function submitSolution(args: {
   const submission = {
     ...args,
     username: args.username.toUpperCase().slice(0, 3),
-    platform: args.platform === "ios" ? "ios" : "web",
+    platform: args.platform === "ios" || args.platform === "android" ? args.platform : "web",
   };
   const pendingId = beginSubmission(submission);
   try {

@@ -78,8 +78,9 @@ Deno.serve(async (req) => {
   }
   const startedAt = typeof body.startedAt === "string" ? body.startedAt : null;
   // Closed set; anything unexpected records as "web"
+  const requested = (body as { platform?: unknown }).platform;
   const platform =
-    (body as { platform?: unknown }).platform === "ios" ? "ios" : "web";
+    requested === "ios" || requested === "android" ? requested : "web";
 
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,

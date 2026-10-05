@@ -81,6 +81,16 @@ it("publishes immediately and saves ownership before notifying confirmation list
   unsubscribe();
 });
 
+it.each([["ios", "ios"], ["android", "android"], ["tv", "web"]])(
+  "records the %s platform as %s", async (platform, expected) => {
+    mockInvoke.mockResolvedValue({ data: { id: "saved-id" }, error: null });
+    await db.submitSolution({ ...solution, platform });
+    expect(submissions.getSubmissionSnapshot().solutions).toEqual([
+      expect.objectContaining({ platform: expected }),
+    ]);
+  },
+);
+
 it("keeps concurrent submissions independent when one succeeds and one fails", async () => {
   const first = deferred<{ data: { id: string }; error: null }>();
   const second = deferred<{ data: null; error: object }>();

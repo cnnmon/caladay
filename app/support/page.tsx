@@ -52,7 +52,7 @@ export default function SupportPage() {
               <li>
                 <strong>Daily reminder:</strong> toggle it in Settings (gear
                 icon). If it won&apos;t turn on, allow notifications for
-                Caladay in the iOS Settings app.
+                Caladay in your phone&apos;s Settings app.
               </li>
               <li>
                 <strong>Offline:</strong> the puzzle is fully playable without

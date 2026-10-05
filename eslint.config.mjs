@@ -15,6 +15,7 @@ const eslintConfig = defineConfig([
     // Deno edge function entrypoints (Deno globals, npm:/.ts imports)
     "supabase/functions/submit-solution/**",
     "ios/**",
+    "android/**",
   ]),
 ]);
 
