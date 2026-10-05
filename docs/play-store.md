@@ -74,8 +74,9 @@ Outputs: `android/app/build/outputs/apk/debug/app-debug.apk` and
       editor, then `npx supabase functions deploy submit-solution`. Until
       both are done the old function records Android solves as "web", and a
       just-submitted solve can briefly show twice on the leaderboard.
-- [ ] **Privacy policy**: publish cala.day with the Android wording in
-      `app/privacy/page.tsx` (Sites, via Codex) before filling in App content.
+- [ ] **Privacy policy**: once this branch is merged, run
+      `npm run deploy:web` so cala.day/privacy has the Android wording,
+      before filling in App content.
 
 ## Play Console — app setup
 
@@ -163,7 +164,7 @@ Outputs: `android/app/build/outputs/apk/debug/app-debug.apk` and
   iPhones to the App Store and show Android visitors nothing, and Android
   shares link to cala.day. After the flip, Android visitors get Google
   Play, computers get both stores, and Android shares link to the Play
-  listing. The website change needs a Sites publish; the share link
+  listing. The website change needs `npm run deploy:web`; the share link
   changes with the next Android build (and iOS build, which bundles the
   same code but is unaffected).
 - No Android home-screen widget (iOS has one).
